@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Maooer 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.geomin.demo.repository.PatientRepository">
+
+    <resultMap id="VitalsMap" type="com.geomin.demo.domain.VitalsVO">
+        <id property="vitalsId" column="vitals_id" />
+        <result property="height" column="height" />
+        <result property="weight" column="weight" />
+        <result property="systolicBlood" column="systolic_blood" />
+        <result property="diastolicBlood" column="diastolic_blood" />
+        <result property="pulse" column="pulse" />
+        <result property="vitalDate" column="vital_date" />
+        <association property="patientVO" resultMap="patientMap" />
+    </resultMap>
+
+    <resultMap id="patientMap" type="com.geomin.demo.domain.PatientVO">
+        <id property="patientId" column="patient_id" />
+        <result property="patientName" column="patient_name" />
+        <result property="identify" column="identify" />
+        <result property="gender" column="gender" />
+        <result property="phone" column="phone" />
+        <result property="emergencyPhone" column="emergency_phone" />
+        <result property="age" column="age" />
+        <result property="bloodType" column="blood_type" />
+        <result property="address" column="address" />
+        <result property="addressDetail" column="address_detail" />
+        <result property="postCode" column="post_code" />
+    </resultMap>
+
+
+
+    <select id="findByName" resultType="com.geomin.demo.domain.PatientVO" parameterType="String">
+        SELECT
+            *
+        FROM
+            patient
+        WHERE
+            PATIENT_NAME = #{patientName}
+
+    </select>
+
+    <!--특정(이름)환자 검색 목록 가져오기-->
+    <select id="getPatientList" parameterType="com.geomin.demo.dto.RequestList" resultType="com.geomin.demo.domain.PatientVO">
+        SELECT
+            *
+        FROM
+            patient
+        WHERE
+            PATIENT_NAME = #{data.patientName}
+        <if test="pageable.sort != null and !pageable.sort.isEmpty()">
+            ORDER BY
+            <foreach collection="pageable.sort" item="order" separator=",">
+                ${order.property} ${order.direction}
+            </foreach>
+        </if>
+        OFFSET #{pageable.offset} ROWS FETCH NEXT #{pageable.pageSize} ROWS ONLY
+    </select>
+
+    <!--특정(이름)환자 검색 총 결과-->
+    <select id="getTotal" parameterType="com.geomin.demo.dto.PatientDTO" resultType="int">
+        SELECT
+            COUNT(*) tocnt
+        FROM
+            PATIENT
+        WHERE
+            PATIENT_NAME = #{patientName}
+    </select>
+
+    <!--특정환자(id)의 활력징후 검색 목록 가져오기-->
+    <select id="getVitalsList" parameterType="com.geomin.demo.dto.RequestList" resultMap="VitalsMap">
+        SELECT
+            V.* , P.*
+        FROM
+            VITALS V
+        JOIN
+            PATIENT P
+        ON
+            V.PATIENT_ID = P.PATIENT_ID
+        WHERE
+            V.PATIENT_ID = #{data.patientId}
+        <if test="pageable.sort != null and !pageable.sort.isEmpty()">
+            ORDER BY
+            <foreach collection="pageable.sort" item="order" separator=",">
+                ${order.property} ${order.direction}
+            </foreach>
+        </if>
+        OFFSET #{pageable.offset} ROWS FETCH NEXT #{pageable.pageSize} ROWS ONLY
+    </select>
+
+    <select id="getVitalsTotal" parameterType="int" resultType="int">
+        SELECT
+            COUNT(*) tocnt
+        FROM
+            VITALS
+        WHERE
+            PATIENT_ID = #{patientId}
+    </select>
+
+</mapper>

@@ -1,0 +1,524 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard-dynamic-subset.css');
+/* pretendard 폰트 cdn */
+
+/* 기본 설정 */
+html, body {
+    margin: 0; padding: 0;
+    background-color: white;
+    font-family: 'Pretendard' , 'sans-serif';
+    box-sizing: border-box;
+    background-color: black;
+    min-width: 1900px;
+    height: 100vh;
+    /* background-color: black; */
+    /* overflow-x: hidden; */
+    /* overflow-y: hidden; */
+}
+
+/* 버튼 기본양식 */
+.btn {
+    display: block;
+    border-radius: 10px;
+    border: 0;
+    width: 82px; height: 24px;
+    background-color: #444343;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+#wrap {
+    display: flex;
+    min-height: 100%;
+    background-color: #e8edf6;
+}
+
+#header-main-wrap {
+    width: 1650px;
+    min-height: 100%;
+}
+
+aside {
+    /* display: block; */
+    border-right: 1px solid #444343;
+    min-width: 250px;
+    background-color: #5D78D8;
+}
+
+header {
+    min-width: 1650px;
+    height: 50px;
+    background-color: #5B9FFF;
+    border-bottom: 1px solid #444343;
+}
+
+main {
+    /* border: 1px solid black; */
+    min-width: 1650px;
+    height: 100vh;
+
+}
+
+/* aside */
+/* 위치, 담당자 이름 */
+#name-box {
+    text-indent: 10px;
+    color: white;
+    /* border: 1px solid black; */
+}
+
+#name-box > h3 > span {
+    color: black;
+    font-size: 20px;
+}
+
+/* 진료대기, 진료완료 */
+aside > div:nth-child(3) {
+    /* border: 1px solid black; */
+    display: flex;
+    justify-content: space-around;
+    height: 60px;
+}
+
+aside > div:nth-child(3) > div {
+    /* border: 1px solid red; */
+    text-align: center;
+    color: white;
+}
+
+/* aside > div:nth-child(3) > div > button {
+    display: block;
+    border-radius: 10px;
+    border: 0;
+    width: 82px; height: 24px;
+    background-color: #909090;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+} */
+
+aside > div:nth-child(3) > div > span {
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    display: inline-block;
+    margin-top: 10px;
+    /* border: 1px solid black; */
+}
+
+/* 진료대기자 또는 진료완료 인원 목록 */
+#waiting-list {
+    /* border: 1px solid black; */
+}
+
+.name-card {
+    background-color: white;
+    border-radius: 10px;
+    width: 228px;
+    margin-left: 10px;
+    height: 125px;
+    margin-top: 20px;
+}
+/* 이름 , 호출 버튼 */
+.name-card > div:first-child {
+    display: flex;
+    justify-content: space-around;
+    padding-top: 5px;
+}
+
+.name-card > div:first-child > span {
+    display: block;
+    font-size: 18px; font-weight: bold;
+    /* border: 1px solid black; */
+}
+
+.name-card > div:first-child > button {
+    background-color: #569EC7;
+}
+
+/* 인적사항 */
+.name-card > div:nth-child(2) {
+    /* border: 1px solid black; */
+    display: flex;
+    justify-content: space-evenly;
+    margin-top: 8px; 
+}
+
+/* 접수시간 */
+.name-card > div:nth-child(3) {
+    /* border: 1px solid black; */
+    padding-left: 24px; 
+}
+
+.name-card > div:nth-child(2) ,
+.name-card > div:nth-child(3) ,
+.name-card > div:nth-child(4) > input {
+    font-size: 15px; font-weight: bold;
+}
+
+.name-card > div:nth-child(4) {
+    /* border: 1px solid black; */
+    text-align: center;
+    margin-top: 5px;
+}
+.name-card > div:nth-child(4) > input {
+    border: none;
+    border-bottom: 1px solid black; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 14px;
+}
+.name-card > div:nth-child(4) > input:focus {
+    outline: none;
+}
+
+/* header */
+/* 검색창, 검색버튼 */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header > div:first-child {
+    display: flex;
+    justify-content: space-between;
+    /* border: 1px solid red;  */
+    margin-left: 20px;
+    min-width: 450px;
+}
+
+header > div:first-child > div:last-child {
+    /* border: 1px solid black; */
+    display: flex;
+    align-items: center;
+}
+
+header > div:first-child > div:last-child > button {
+    margin-left: 10px; 
+    
+}
+
+#search-box {
+    /* border: 1px solid black; */
+    display: flex;
+}
+
+#search-box > div > input {
+    width: 282px; height: 24px;
+    font-size: 20px;
+}
+
+#search-btn {
+    cursor: pointer;
+}
+
+/* 로그아웃 버튼 */
+header > div:last-child {
+    /* border: 1px solid red; */
+    margin-right: 30px;
+}
+
+/* main */
+/* 레이아웃 정리 */
+main {
+    display: flex;
+}
+
+section {
+    /* border: 1px solid black; */
+    width: 50%;
+}
+
+#left-section > article ,
+#right-section > article {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    margin-left: 31px; margin-top: 20px;
+    width: 761px;
+    background-color: white;
+}
+
+#patient-article {
+    height: 261px;
+}
+
+#diagnosis-article {
+    height: 610px;
+}
+
+/* 환자 정보 */
+#patient-article > form {
+    box-sizing: border-box;
+    /* border: 1px solid black; */
+    margin-top: 15px;
+    padding-left: 20px;
+}
+
+#patient-article > form > div {
+    margin-top: 10px;
+}
+
+#patient-article > form > div > label {
+    font-weight: bold;
+}
+
+#patient-article > form > div > label:not(:first-child) {
+    /* border: 1px solid red; */
+    margin-left: 20px;
+}
+
+#patient-article > form > div > input {
+    text-align: center;
+}
+/* 환자정보 등록, 수정 버튼 */
+#patient-modify-btn, #patient-btn {
+    display: inline-block;
+    margin-left: 150px;
+}
+
+#patient-modify-btn {
+    display: none;
+}
+
+/* 환자 바이탈 정보 테이블 */
+#vital-sign-table {
+    margin-top: 10px;
+    width: 700px;
+    text-align: center;
+    /* border: 1px solid black; */
+    border-collapse: collapse;
+}
+
+#patient-article > form > table > tbody > tr > td {
+    height: 24px;
+}
+
+#patient-article > form > table > tbody > tr > td > input {
+    border: none;
+    text-align: center;
+}
+#patient-article > form > table > tbody > tr > td > input:focus {
+    outline: none;
+    border-bottom: 2px solid blue;
+}
+
+#patient-article > form > hr {
+
+    border: 1px dashed;
+    margin: 0; padding: 0;
+    margin-top: 10px;
+    margin-right: 20px;
+}
+
+th {
+    background-color: #D9D9D9;
+    border-top: 1px dashed black;
+}
+
+th , td {
+    border: 1px solid black;
+}
+
+#patient-article > form > div:last-child {
+    /* border: 1px solid black; */
+    display: flex;
+    justify-content: space-between;
+}
+
+#patient-article > form > div:last-child > button {
+    margin-right: 15px;
+}
+
+/* 환자 바이탈 정보 테이블 페이징 */
+#vital-sign-pageing {
+    margin: 0; padding: 0;
+    list-style: none;
+    display: flex;
+}
+
+#vital-sign-pageing > li {
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+#vital-sign-pageing > li > a {
+    color: black;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+#vital-sign-pageing > li > a:visited {
+    color: black;
+}
+
+.active {
+    color: blue !important;
+    text-decoration: underline !important;
+}
+
+/* 진료기록 박스 레이아웃 설정*/
+#diagnosis-article {
+    display: flex;
+}
+
+#diagnosis-article > nav {
+    /* border: 1px solid black; */
+    width: 149px;
+    height: inherit;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    background-color: #D9D9D9;
+}
+
+#diagnosis-record-list {
+    padding: 0; margin: 0;
+    text-align: center;
+    margin-top: 20px;
+    list-style-type: none;
+}
+
+/* 진료기록 박스 네비(왼쪽바) */
+#diagnosis-record-list > li {
+    display: block;
+    border: 1px solid black;
+    width: 108px;
+    margin-left: 20px;
+    background-color: white;
+}
+
+#diagnosis-record-list > li > a {
+    color: black;
+    text-decoration: none;
+    display: block;
+    width: 100%;
+    /* border: 1px solid black; */
+}
+
+#diagnosis-record-list > li:first-child > select {
+    border: none;
+    width: 100%;
+}
+
+#diagnosis-record-list > li:first-child > select:focus {
+    outline: none;
+}
+
+#diagnosis-record-list > li > a:visited {
+    color: black;
+}
+
+#diagnosis-record-list > li:not(:first-child) {
+    margin-top: 5px;
+}
+
+/* 진료기록 우측 입력창 */
+#diagnosis-article > div {
+    /* border: 1px solid red; */
+    width: 612px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+#diagnosis-article > div:nth-child(2) > div:first-child {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#diagnosis-article > div:nth-child(2) > div:first-child > h3 {
+    /* border: 1px solid black; */
+    text-indent: 10px;
+}
+
+#diagnosis-article > div:nth-child(2) > div:first-child > h3 > span ,
+#right-section > article > div:first-child > h3 > span {
+    color: #5B9FFF;
+}
+
+#diagnosis-article > div:nth-child(2) > div:first-child > button {
+    margin-right: 20px;
+}
+
+.textarea-box > h4 {
+    text-indent: 15px;
+}
+
+.textarea-box > textarea {
+    width: 572px; height: 90px;
+    margin-left: 15px;
+    resize: none;
+    text-align: start;
+}
+
+/* 우측 진료기록 작성칸 */
+#right-section > article {
+    height: 891px;
+}
+/* 진료기록 작성칸 상단 회색바 */
+#right-section > article > div:first-child {
+    /* border: 1px solid black; */
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    background-color: #D9D9D9;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    text-indent: 20px;
+}
+
+#right-section > article > div {
+    /* border: 1px solid black; */
+}
+
+#right-section > article > div:nth-child(3) {
+    margin-top: 20px;
+}
+
+#right-section > article > div:nth-child(3) > div  {
+    border-top: 1px dashed black;
+}
+
+.big > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.big > div > h4 {
+    margin-left: 40px;
+}
+
+.big > div > button {
+    margin-right: 30px;
+}
+
+.big > textarea {
+    width: 675px; height: 180px;
+    margin-left: 43px;
+}
+
+#right-section > article > div:last-child {
+    display: flex;
+    justify-content: end;
+    /* border: 1px solid red; */
+    margin-top: 10px;
+}
+
+#right-section > article > div:last-child > button {
+    margin-right: 30px;
+    background-color: #9B2727;
+}
+
+
+
+
+
+
+
+
+
+
+

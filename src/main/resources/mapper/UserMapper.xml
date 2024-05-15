@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Maooer 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.geomin.demo.repository.UserRepository">
+
+    <select id="findById" resultType="com.geomin.demo.domain.UserVO" parameterType="String">
+        SELECT
+            *
+        FROM
+            user
+        WHERE
+            id = #{id}
+    </select>
+
+    <insert id="save" parameterType="com.geomin.demo.domain.UserVO">
+        INSERT INTO user
+        ( id, password, name, role_set)
+        VALUES
+        (#{id} , #{password}, #{name} , #{roleSet , typeHandler=com.geomin.demo.config.UserRoleTypeHandler})
+    </insert>
+
+
+</mapper>

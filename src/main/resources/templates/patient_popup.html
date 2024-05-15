@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- fontawesome cdn -->
+    <script src="https://kit.fontawesome.com/fa8d81743a.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="/css/patient_popup.css">
+    <title>Geomin-Patient-Search</title>
+</head>
+<body>
+    <section>
+        <div id="search-box">
+            <div>
+                <input type="text" placeholder="환자 검색" id="search-bar" name="patientName">
+            </div>
+            <button type="button" id="search-btn" alt="검색버튼">
+                <i class="fa-solid fa-magnifying-glass" style="color: #000000;"></i>
+            </button>
+        </div>
+
+        <table>
+            <caption><span th:text="${searchValue}">임승범</span> 님의 검색결과 총 <span th:text="${patients.getTotalElements()}">3</span>건</caption>
+            <tbody>
+                <tr>
+                    <th>환자번호</th>
+                    <th>이름</th>
+                    <th>주민등록번호</th>
+                    <th>성별</th>
+                    <th>연락처</th>
+                    <th>비상연락처</th>
+                    <th>나이</th>
+                    <th></th>
+                </tr>
+                <th:block th:each="patient : ${patients.content}">
+                    <tr>
+                       <td th:text="${patient.getPatientId()}">1</td>
+                       <td th:text="${patient.getPatientName()}">임승범</td>
+                       <td th:text="${patient.getIdentify()}">970422-1234567</td>
+                       <td th:if="${patient.isGender()}">남</td>
+                       <td th:if="${!patient.isGender()}">여</td>
+                       <td th:text="${patient.getPhone()}">010-5039-0123</td>
+                       <td th:text="${patient.getEmergencyPhone()}">010-8773-6789</td>
+                       <td th:text="${patient.getAge()}">28</td>
+                       <td><button type="button" class="btn" onclick="passValue(this)">선택</button></td>
+                    </tr>
+                </th:block>
+            </tbody>
+        </table>
+
+
+        <div>
+            <h3 th:if="${patients.getTotalElements() == 0}">검색결과가 없습니다.</h3>
+            <ul id="vital-sign-pageing">
+                <!--/*이전 버튼*/-->
+                <li th:if="${patients.getNumber() > 0}">
+                    <a th:href="@{'/patient-search/' + ${searchValue} + '?page=' + ${patients.getNumber() - 1}}">
+                        <i class="fa-solid fa-angle-left" style="color: #000000;"></i>
+                    </a>
+                </li>
+
+                <!--/*페이지 번호들*/-->
+
+                <th:block th:if="${patients.getTotalPages() > 0}"
+                          th:each="page : ${#numbers.sequence(0 , patients.totalPages - 1)}">
+                    <li th:classappend="${page == patients.getNumber() ? 'active' : ''}">
+                        <a th:href="@{'/patient-search/' + ${searchValue} + '?page=' + ${page}}" th:text="${page + 1}"></a>
+                    </li>
+                </th:block>
+
+                <!--/*다음 버튼*/-->
+                <li th:if="${patients.getNumber() < patients.getTotalPages() - 1}">
+                    <a th:href="@{'/patient-search/' + ${searchValue} + '?page=' + ${patients.getNumber() + 1}}">
+                        <i class="fa-solid fa-angle-right" style="color: #000000;"></i>
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
+    </section>
+    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="/js/patient_popup.js"></script>
+    <script th:inline="javascript">
+
+        function passValue(button) {
+
+            var row = button.closest('tr');                                     // button으로부터 가장 인접한 tr태그 가져온다.
+            var patientId = row.querySelector('td:nth-child(1)').innerText;     // 해당 tr, 즉 row의 첫번째 td의 값(patientId)을 가져온다.
+
+            console.log("버튼 누른 키값" + patientId);
+
+            var patientList = [[${patients.getContent()}]]                      // 타임리프로 서버에서 보냈던 List<patientDTO> 가져오기
+
+            console.log(patientList);
+
+            var patientObj = patientList.find(function (patient){               // obj 배열에서 find를 통해 patientId가 일치하는 obj 찾기
+               return patient.patientId == patientId;                           // === 면 타입까지 일치해야해서 값만 같으면 가져오도록 == 이걸로 찾기
+            });
+
+            console.log(patientObj);
+
+            var patient = JSON.stringify(patientObj);   // 부모창으로 보낼때 String이어야 함으로 json으로 만들어서 보내기
+
+            opener.parent.receivePatientInfo(patient);  // opener.parent로 부모창 부르고 부모창의 함수 사용
+            window.self.close();                        // 팝업창(자식) 닫기
+        }
+
+    </script>
+</body>
+</html>

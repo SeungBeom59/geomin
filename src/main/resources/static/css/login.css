@@ -1,0 +1,110 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard-dynamic-subset.css');
+/* pretendard 폰트 cdn */
+
+/* 기본 설정 */
+html, body {
+    margin: 0; padding: 0;
+    background-color: white;
+    height: 100%;
+    font-family: 'Pretendard' , 'sans-serif';
+    box-sizing: border-box;
+    background-color: #e8edf6;
+}
+
+#login-form {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    border: 2px solid #747474;
+    border-radius: 10px;
+    width: 500px; height: 600px;
+    text-align: center;
+    background-color: white;
+}
+
+#login-form > div:first-child {
+    /* border: 1px solid black; */
+    text-align: center;
+    margin-top: 50px;
+    height: 150px;
+    /* text-indent: 25px; */
+}
+
+#login-form > div:first-child > h1 {
+    /* border: 1px solid black; */
+    display: block; margin: 0;
+}
+
+#login-form > div:nth-child(2) ,
+#login-form > div:nth-child(3) ,
+#login-form > div:nth-child(4) {
+    /* border: 1px solid black; */
+    margin-top: 15px;
+    padding-left: 50px;
+    text-align: left;
+}
+
+#login-form > div:nth-child(2) {
+    margin-top: 0;
+}
+
+.input-box input {
+    display: block;
+    width: 400px; height: 30px;
+    border: 1px solid #747474;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 18px;
+}
+
+.input-box > label {
+    font-weight: bold;
+}
+
+#login-form input:focus {
+    outline: none;
+}
+
+#login-form > div:nth-child(4) {
+    /* border: 1px solid black; */
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    padding-right: 50px;
+}
+
+#login-form > div:nth-child(4) > a{
+    color: black;
+    text-decoration: none;
+
+}
+
+#login-form > div:nth-child(4) > a:visited {
+    color: black;
+}
+
+#login-form > div:last-child {
+    /* border: 1px solid red; */
+    margin-top: 50px;
+}
+
+#login-form > div:last-child > button {
+    display: block;
+    width: 400px; height: 30px;
+    border-radius: 5px;
+    font-size: 18px;
+    font-weight: bold;
+    margin-left: 50px;
+    cursor: pointer;
+    background-color: #5b9fff;
+    color: white;
+    border: none;
+}
+
+#login-form > div:last-child > button:last-child {
+    margin-top: 15px;
+    background-color: #444343;
+}
+
+
+
