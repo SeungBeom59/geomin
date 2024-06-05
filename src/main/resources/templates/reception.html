@@ -20,6 +20,7 @@
             <div id="name-box">
                 <h1>진료실2 - <span>내과</span></h1>
                 <h3>담당자 : <span th:text="${user.getName()}">최은석</span></h3>
+                <input type="hidden" id="userId" th:value="${user.getId()}">
             </div>
 
             <hr>
@@ -98,7 +99,7 @@
                 </div>
 
                 <div>
-                    <button type="button" class="btn" id="logout-btn">로그아웃</button>
+                    <button type="button" class="btn" id="logout-btn" onclick="logout()">로그아웃</button>
                 </div>
 
             </header>
@@ -111,6 +112,9 @@
                         <form method="post" id="patient-record">
                             
                             <div>
+                                <input type="hidden" id="patientId">
+                                <input type="hidden" id="vitalId">
+
                                 <label for="patient_name">성함 : </label>
                                 <input type="text" id="patient_name" name="patientName" value="" size="10">
     
@@ -181,22 +185,24 @@
                             </table>
                             
                             <div>
+                                <div id="vital-sign-btn-box">
+                                    <button type="button" class="btn" onclick="clearVitals()" id="vital-sign-add-btn">+</button>
+                                    <button type="button" class="btn" onclick="updateVital()" id="vital-sign-update-btn">등록</button>
+                                    <button type="button" class="btn" onclick="modifyVital()" id="vital-sign-modify-btn">수정</button>
+                                    <button type="button" class="btn" onclick="addVital()" id="vital-sign-btn">등록</button>
+                                    <button type="button" class="btn" onclick="searchVitals()" id="vital-sign-cancel-btn">취소</button>
+                                </div>
+
                                 <ul id="vital-sign-pageing">
-                                    <li>
+                                    <li id="prev-page">
                                         <i class="fa-solid fa-angle-left" style="color: #000000;"></i>
                                     </li>
-                                    
-                                    <li><a href="" class="active">1</a></li>
-                                    <li><a href="">2</a></li>
-                                    <li><a href="">3</a></li>
 
-                                    <li>
+
+                                    <li id="next-page">
                                         <i class="fa-solid fa-angle-right" style="color: #000000;"></i>
                                     </li>
                                 </ul>
-
-                                <!-- <button type="button" class="btn" id="vital-sign-modify-btn">수정</button> -->
-                                <button type="button" class="btn" id="vital-sign-btn">등록</button>
                             </div>
 
                         </form>

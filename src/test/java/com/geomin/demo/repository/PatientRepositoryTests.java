@@ -32,12 +32,9 @@ public class PatientRepositoryTests {
 
         String patientName = "임승범";
 
-        List<PatientDTO> patients = patientRepository.findByName(patientName)
-                .stream()
-                .map(PatientDTO::new)
-                .toList();
+        List<PatientVO> patients = patientRepository.findByName(patientName);
 
-        for(PatientDTO patient : patients){
+        for(PatientVO patient : patients){
             System.out.println(patient.toString());
         }
     }

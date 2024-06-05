@@ -267,7 +267,7 @@ section {
 
 #patient-article > form > div > label:not(:first-child) {
     /* border: 1px solid red; */
-    margin-left: 20px;
+    /*margin-left: 20px;*/
 }
 
 #patient-article > form > div > input {
@@ -276,7 +276,7 @@ section {
 /* 환자정보 등록, 수정 버튼 */
 #patient-modify-btn, #patient-btn {
     display: inline-block;
-    margin-left: 150px;
+    margin-left: 190px;
 }
 
 #patient-modify-btn {
@@ -284,6 +284,34 @@ section {
 }
 
 /* 환자 바이탈 정보 테이블 */
+#vital-sign-btn-box {
+    display: flex;
+    margin-right: 10px;
+}
+
+#vital-sign-add-btn {
+    margin-right: 10px;
+    display: none;
+}
+
+#vital-sign-modify-btn {
+    display: none;
+    background-color: #569EC7;
+    color: white;
+}
+
+#vital-sign-update-btn {
+    display: none;
+    margin-right: 10px;
+}
+
+#vital-sign-cancel-btn {
+    display: none;
+    background: #9B2727;
+    color: white;
+    margin-left: 10px;
+}
+
 #vital-sign-table {
     margin-top: 10px;
     width: 700px;
@@ -336,13 +364,14 @@ th , td {
 #vital-sign-pageing {
     margin: 0; padding: 0;
     list-style: none;
-    display: flex;
+    display: none;
 }
 
 #vital-sign-pageing > li {
-    margin-left: 10px;
+    margin-right: 15px;
     cursor: pointer;
 }
+
 
 #vital-sign-pageing > li > a {
     color: black;

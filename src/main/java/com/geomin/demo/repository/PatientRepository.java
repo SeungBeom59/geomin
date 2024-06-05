@@ -4,6 +4,7 @@ import com.geomin.demo.domain.PatientVO;
 import com.geomin.demo.domain.VitalsVO;
 import com.geomin.demo.dto.PatientDTO;
 import com.geomin.demo.dto.RequestList;
+import com.geomin.demo.dto.VitalsDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -21,4 +22,13 @@ public interface PatientRepository {
     List<VitalsVO> getVitalsList(RequestList<?> requestList);
     // 환자 활력징후 검색 총 튜플 갯수 반환
     int getVitalsTotal(int patientId);
+
+    // 환자의 활력징후 정보 추가
+    int addVitals(VitalsDTO vitalsDTO);
+
+    // 환자 활력징후 마지막 pk 번호 알아오기
+    int geLastVitalId();
+
+    // 특정 활력징후 vital_id로 정보 변경하기
+    int updateVitals(VitalsDTO vitalsDTO);
 }

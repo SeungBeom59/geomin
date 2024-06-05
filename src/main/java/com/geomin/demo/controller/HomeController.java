@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -102,8 +103,9 @@ public class HomeController {
 
     // 활력징후 가져오기
     @PostMapping("/vitals-search")
-    public ResponseEntity<Page<VitalsDTO>> getVitalsList(@PageableDefault(size = 1) Pageable pageable ,
-                              @RequestBody VitalsDTO vitalsDTO){
+    public ResponseEntity<Page<VitalsDTO>> getVitalsList(
+            @PageableDefault(size = 1 , sort = "vital_date" , direction = Sort.Direction.DESC) Pageable pageable ,
+            @RequestBody VitalsDTO vitalsDTO){
 
         log.info("post >> /vitals-search... getVitalsList() 실행됨.");
 
@@ -111,9 +113,51 @@ public class HomeController {
 
         Page<VitalsDTO> vitals = patientService.getVitalsList(vitalsDTO , pageable);
 
-
-
         return ResponseEntity.status(HttpStatus.OK).body(vitals);
+    }
+
+    // 활력징후 등록
+    @PostMapping("/vitals-add")
+    public ResponseEntity<?> addVitals(
+        @PageableDefault(size = 1 , sort = "vital_date" , direction = Sort.Direction.DESC) Pageable pageable,
+        @RequestBody VitalsDTO vitalsDTO ){
+
+        log.info("post >> /vitals-add... addVitals() 실행됨.");
+        log.info("vitalsDTO::{}",vitalsDTO);
+
+        int result = patientService.addVitals(vitalsDTO);
+
+        if(result == 0){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 또는 사용자 에러");
+        }
+        else {
+            Page<VitalsDTO> vitals = patientService.getVitalsList(vitalsDTO , pageable);
+
+            return ResponseEntity.status(HttpStatus.OK).body(vitals);
+        }
+
+    }
+
+    // 활력징후 업데이트
+    @PostMapping("/vitals-update")
+    public ResponseEntity<?> updateVitals(
+            @PageableDefault(size = 1 , sort = "vital_date" , direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestBody VitalsDTO vitalsDTO){
+
+        log.info("post >> /vitals-update... updatevitals() 실행됨.");
+        log.info("vitalsDTO::{}",vitalsDTO);
+
+        int result = patientService.updateVitals(vitalsDTO);
+
+        if(result == 0){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 또는 사용자 에러");
+        }
+        else {
+            Page<VitalsDTO> vitals = patientService.getVitalsList(vitalsDTO , pageable);
+
+            return ResponseEntity.status(HttpStatus.OK).body(vitals);
+        }
+
     }
 
 

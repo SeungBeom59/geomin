@@ -13,4 +13,7 @@ public interface PatientService {
 
     Page<VitalsDTO> getVitalsList(VitalsDTO vitalsDTO , Pageable pageable);
 
+    int addVitals(VitalsDTO vitalsDTO);
+
+    int updateVitals(VitalsDTO vitalsDTO);
 }

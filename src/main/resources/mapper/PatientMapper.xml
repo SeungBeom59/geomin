@@ -6,13 +6,16 @@
 <mapper namespace="com.geomin.demo.repository.PatientRepository">
 
     <resultMap id="VitalsMap" type="com.geomin.demo.domain.VitalsVO">
-        <id property="vitalsId" column="vitals_id" />
+        <id property="vitalId" column="vital_id" />
         <result property="height" column="height" />
         <result property="weight" column="weight" />
         <result property="systolicBlood" column="systolic_blood" />
         <result property="diastolicBlood" column="diastolic_blood" />
         <result property="pulse" column="pulse" />
         <result property="vitalDate" column="vital_date" />
+        <result property="temperature" column="temperature" />
+        <result property="modifyDate" column="modify_date" />
+        <result property="vitalModifier" column="vital_modifier" />
         <association property="patientVO" resultMap="patientMap" />
     </resultMap>
 
@@ -59,7 +62,7 @@
         OFFSET #{pageable.offset} ROWS FETCH NEXT #{pageable.pageSize} ROWS ONLY
     </select>
 
-    <!--특정(이름)환자 검색 총 결과-->
+    <!--특정(이름)환자 검색 목록 총 갯수-->
     <select id="getTotal" parameterType="com.geomin.demo.dto.PatientDTO" resultType="int">
         SELECT
             COUNT(*) tocnt
@@ -90,6 +93,7 @@
         OFFSET #{pageable.offset} ROWS FETCH NEXT #{pageable.pageSize} ROWS ONLY
     </select>
 
+    <!--특정환자(id)의 활력징후 검색 목록 총 갯수-->
     <select id="getVitalsTotal" parameterType="int" resultType="int">
         SELECT
             COUNT(*) tocnt
@@ -98,5 +102,42 @@
         WHERE
             PATIENT_ID = #{patientId}
     </select>
+
+    <!--활력징후 마지막 pk 번호 가져오기-->
+    <select id="geLastVitalId" resultType="int">
+        SELECT
+            MAX(VITAL_ID)
+        FROM
+            VITALS
+    </select>
+
+    <!--특정환자(id)의 활력징후 추가-->
+    <insert id="addVitals" parameterType="com.geomin.demo.dto.VitalsDTO" >
+        INSERT INTO
+            VITALS
+            (VITAL_ID, PATIENT_ID , HEIGHT, WEIGHT,
+            SYSTOLIC_BLOOD, DIASTOLIC_BLOOD, PULSE,
+            VITAL_DATE, TEMPERATURE)
+        VALUES
+            (#{lastVitalId} +1 , #{patientId} , #{height} , #{weight} ,
+            #{systolicBlood} , #{diastolicBlood} , #{pulse}, #{vitalDate} , #{temperature})
+    </insert>
+
+    <!--특정 활력징후(vital_id)의 활력징후 추가-->
+    <update id="updateVitals" parameterType="com.geomin.demo.dto.VitalsDTO">
+        UPDATE
+            VITALS
+        SET
+            HEIGHT = #{height} ,
+            WEIGHT = #{weight} ,
+            SYSTOLIC_BLOOD = #{systolicBlood} ,
+            DIASTOLIC_BLOOD = #{diastolicBlood} ,
+            PULSE = #{pulse} ,
+            TEMPERATURE = #{temperature} ,
+            MODIFY_DATE = #{modifyDate} ,
+            VITAL_MODIFIER = #{vitalModifier}
+        WHERE
+            vital_id = #{vitalId}
+    </update>
 
 </mapper>

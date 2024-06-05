@@ -1,6 +1,7 @@
 package com.geomin.demo.domain;
 
 import lombok.*;
+import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
 
@@ -19,6 +20,9 @@ public class VitalsVO {
     private int systolicBlood;          // 혈압수축 수치
     private int diastolicBlood;         // 혈압이완 수치
     private int pulse;                  // 맥박
-    private LocalDateTime vitalDate ;       // 측정날짜
+    private double temperature;            // 체온
+    private LocalDateTime vitalDate;       // 측정날짜
+    private LocalDateTime modifyDate;       // 수정날짜
+    private String vitalModifier;           // 수정자
 
 }
