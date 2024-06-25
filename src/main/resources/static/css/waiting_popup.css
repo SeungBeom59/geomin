@@ -1,0 +1,115 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard-dynamic-subset.css');
+/* pretendard 폰트 cdn */
+
+/* 기본 설정 */
+html, body {
+    margin: 0; padding: 0;
+    background-color: #e8edf6;
+    font-family: 'Pretendard' , 'sans-serif';
+    box-sizing: border-box;
+    width: 450px;
+    height: 430px;
+    /*border: 1px solid black;*/
+}
+
+section {
+    background-color: white;
+    /* border: 1px solid red; */
+    height: 460px;
+    width: 410px;
+    margin-top: 35px;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+div {
+    /* border: 1px solid blue; */
+}
+
+textarea {
+    width: 380px; height: 200px;
+    resize: none;
+    text-align: start;
+    margin-inline:15px;
+}
+
+section > div:first-child {
+    display: flex;
+    justify-content: space-around;
+    padding-top: 10px;
+    border-bottom: 2px solid #ccc;
+}
+
+section > div:first-child > span {
+    font-size: 20px;
+    /* border: 1px solid red; */
+}
+section > div:first-child > span:first-child {
+    color:  #5B9FFF;
+    font-weight: bold;
+}
+
+#waiting-info {
+    /* border: 1px solid red; */
+    margin-block: 20px;
+    height: 70px;
+    border-bottom: 1px solid #ccc;
+}
+
+#waiting-info > span:first-child,
+#waiting-symptoms-box > div:first-child > span {
+    /* border: 1px solid red; */
+    margin-left: 20px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+#waiting-info > div:nth-child(2) {
+    margin-top: 10px;
+    padding-left: 20px;
+}
+
+#waiting-info > div:nth-child(2) > label {
+    color: #272727;
+}
+
+#waiting-info > div:nth-child(2) > label:nth-child(3) {
+    margin-left: 10px;
+}
+
+section > div:last-child {
+    display: flex;
+    justify-content: end;
+}
+
+#waiting-symptoms-box > div:first-child > span:nth-child(2) {
+    margin-right: 10px;
+    font-size: 18px;
+}
+
+#waiting-symptoms-box > div:first-child {
+    display: flex;
+    justify-content: space-between;
+}
+
+section > div:last-child > button {
+    margin-right: 10px;
+    margin-top: 10px;
+}
+
+
+/* 버튼 기본양식 */
+.btn {
+    display: block;
+    border-radius: 10px;
+    border: 0;
+    width: 82px; height: 24px;
+    background-color: #444343;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+
+

@@ -42,7 +42,6 @@
             patient
         WHERE
             PATIENT_NAME = #{patientName}
-
     </select>
 
     <!--특정(이름)환자 검색 목록 가져오기-->
@@ -70,6 +69,60 @@
             PATIENT
         WHERE
             PATIENT_NAME = #{patientName}
+    </select>
+
+    <!--환자의 마지막 pk 번호 가져오기-->
+    <select id="getLastPatientId" resultType="int" >
+        SELECT
+            MAX(PATIENT_ID)
+        FROM
+            PATIENT
+    </select>
+
+    <!--새로운 환자 등록-->
+    <insert id="addPatient" parameterType="com.geomin.demo.domain.PatientVO">
+        INSERT INTO
+            PATIENT
+            (PATIENT_ID , PATIENT_NAME , IDENTIFY, GENDER, PHONE, EMERGENCY_PHONE,
+             AGE, BLOOD_TYPE, ADDRESS, ADDRESS_DETAIL, POST_CODE)
+        VALUES
+            (#{patientId} + 1 , #{patientName}, #{identify}, #{gender}, #{phone}, #{emergencyPhone},
+             #{age}, #{bloodType}, #{address}, #{addressDetail}, #{postCode})
+    </insert>
+
+    <!--특정조건(이름, 주민등록번호)으로 환자 정보 가져오기-->
+    <select id="getPatient" parameterType="com.geomin.demo.domain.PatientVO" resultType="com.geomin.demo.domain.PatientVO">
+        SELECT
+            *
+        FROM
+            PATIENT
+        WHERE
+            PATIENT_NAME = #{patientName}
+            AND
+            IDENTIFY = #{identify}
+    </select>
+
+    <!--특정조건(patientId:pk)으로 환자 정보 수정하기-->
+    <update id="updatePatient" parameterType="com.geomin.demo.domain.PatientVO">
+        UPDATE
+            PATIENT
+        SET
+            PATIENT_NAME = #{patientName} , IDENTIFY = #{identify} , GENDER = #{gender} ,
+            PHONE = #{phone} , EMERGENCY_PHONE = #{emergencyPhone} ,
+            AGE = #{age} , BLOOD_TYPE = #{bloodType} ,
+            ADDRESS = #{address} , ADDRESS_DETAIL = #{addressDetail} , POST_CODE = #{postCode}
+        WHERE
+            PATIENT_ID = #{patientId}
+    </update>
+
+    <!--특정 조건(patientId:pk)으로 환자 정보 가져오기-->
+    <select id="getPatientById" parameterType="int" resultType="com.geomin.demo.domain.PatientVO">
+        SELECT
+            *
+        FROM
+            PATIENT
+        WHERE
+            PATIENT_ID = #{patientId}
     </select>
 
     <!--특정환자(id)의 활력징후 검색 목록 가져오기-->
@@ -106,7 +159,7 @@
     <!--활력징후 마지막 pk 번호 가져오기-->
     <select id="geLastVitalId" resultType="int">
         SELECT
-            MAX(VITAL_ID)
+            IFNULL(MAX(VITAL_ID) , 0)
         FROM
             VITALS
     </select>

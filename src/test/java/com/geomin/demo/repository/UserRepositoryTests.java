@@ -20,12 +20,13 @@ public class UserRepositoryTests {
     public void insertUser(){
 
         UserVO user = UserVO.builder()
-                .id("tkdldjsltms1")
+                .id("user1")
                 .password(passwordEncoder.encode("1234"))
-                .name("임승범")
+                .name("이현승")
+                .referenceId(2)
                 .build();
 
-        user.addRole(UserRole.ROLE_USER);
+        user.addRole(UserRole.ROLE_ADMIN);
 
         System.out.println("*******************************");
 

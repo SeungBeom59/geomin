@@ -23,20 +23,5 @@ public class PatientDTO {
     private String addressDetail;   // 상세주소
     private String postCode;        // 우편번호
 
-//    public PatientDTO(PatientVO patientVO) {
-//
-//        this.patientId = patientVO.getPatientId();
-//        this.patientName = patientVO.getPatientName();
-//        this.identify = patientVO.getIdentify();
-//        this.gender = patientVO.isGender();
-//        this.phone = patientVO.getPhone();
-//        this.emergencyPhone = patientVO.getEmergencyPhone();
-//        this.age = patientVO.getAge();
-//        this.bloodType = patientVO.getBloodType();
-//        this.address = patientVO.getAddress();
-//        this.addressDetail = patientVO.getAddressDetail();
-//        this.postCode = patientVO.getPostCode();
-//    }
-
 
 }

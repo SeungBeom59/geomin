@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- fontawesome cdn -->
+    <script src="https://kit.fontawesome.com/fa8d81743a.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="/css/waiting_popup.css">
+    <title>Geomin-Waiting</title>
+</head>
+<body>
+
+    <section>
+        <div>
+            <input type="hidden" th:value="${patient.getPatientId()}" id="patientId">
+            <span th:text="${patient.getPatientName()}">이현승</span>
+            <span th:text="${patient.getIdentify()}">1997-03-21</span>
+            <span th:text="${patient.getAge()}">28세</span>
+            <span th:if="${patient.isGender() == true}">남</span>
+            <span th:if="${patient.isGender() == false}">여</span>
+        </div>
+
+        <div id="waiting-info">
+            <span>접수 정보</span>
+            <div>
+                <label for="waiting-type">접수목적 :</label>
+                <!--<input type="text" id="gender" name="gender" value="" size="2">-->
+                <select name="waitingType" id="waiting-type">
+                    <option value="0">일반진료</option>
+                    <option value="1">전문진료</option>
+                    <option value="2">입원진료</option>
+                    <option value="3">응급진료</option>
+                    <option value="4">외래진료</option>
+                    <option value="5">재활진료</option>
+                </select>
+
+                <label for="department-id">진료과 :</label>
+                <select name="departmentId" id="department-id">
+                    <option value="1">내과</option>
+                    <option value="2">정신과</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="waiting-symptoms-box">
+            <div>
+                <span>증상</span><span>2024/05/11</span>
+            </div>
+
+            <div>
+                <textarea name="symptoms" id="waiting-symptoms" ></textarea>
+            </div>
+        </div>
+
+        <div>
+            <button class="btn" id="waiting-add-btn" onclick="addWaiting()">등록</button>
+        </div>
+    </section>
+    
+<script src="https://code.jquery.com/jquery-latest.min.js"></script>
+<script src="/js/waiting_popup.js"></script>
+<script>
+
+    function addWaiting(){
+
+        var data = {
+            patientId : $('#patientId').val(),
+            waitingType : $('#waiting-type').val(),
+            departmentId : $('#department-id').val(),
+            symptoms : $('#waiting-symptoms').val()
+        }
+
+        if(data.symptoms === "" || data.symptoms === null){
+            data.symptoms = "의사와 상담시에 증상을 설명하고자 함.";
+        }
+
+        console.log("data = " + data.patientId + data.symptoms , data.waitingType, data.departmentId);
+
+        $.ajax({
+            url: '/waiting/post',
+            type: 'POST',
+            data: JSON.stringify(data),
+            contentType: 'application/json; charset=utf-8',
+            success: function (response){
+                alert("진료 접수 성공");
+                // 부모의 수신용 함수로 응답 송신하도록...
+                console.log(response);
+
+                var waitingList = JSON.stringify(response);
+                opener.parent.receiveWaitingInfo(waitingList);
+
+                /**********************************************************/
+                // '이 페이지를 나가시겠습니까?' 라는 onbeforeunload 이벤트 없애고
+                // 나갈 수 있도록 처리해야함.
+                /**********************************************************/
+                // window.removeEventListener('beforeunload' , );
+
+                window.self.close();
+            },
+            error: function (xhr, status, error){
+                alert('진료 접수 실패');
+                console.log('ajax 요청 실패 : ' , status, error);
+                window.self.close();
+            }
+        });
+
+    }
+
+
+</script>
+</body>
+</html>

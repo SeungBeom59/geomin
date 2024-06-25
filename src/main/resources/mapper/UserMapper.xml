@@ -17,9 +17,13 @@
 
     <insert id="save" parameterType="com.geomin.demo.domain.UserVO">
         INSERT INTO user
-        ( id, password, name, role_set)
+        ( id, password, name, reference_id, role_set)
         VALUES
-        (#{id} , #{password}, #{name} , #{roleSet , typeHandler=com.geomin.demo.config.UserRoleTypeHandler})
+        (#{id} ,
+        #{password},
+        #{name} ,
+        #{referenceId} ,
+        #{roleSet , typeHandler=com.geomin.demo.config.UserRoleTypeHandler})
     </insert>
 
 

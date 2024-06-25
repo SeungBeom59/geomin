@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Maooer 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.geomin.demo.repository.DoctorRepository">
+
+    <resultMap id="DoctorMap" type="com.geomin.demo.domain.DoctorVO">
+        <id property="doctorId" column="doctor_id" />
+        <result property="doctorName" column="doctor_name" />
+        <result property="doctorPhone" column="doctor_phone" />
+        <association property="department" resultMap="departmentMap" />
+    </resultMap>
+
+    <resultMap id="departmentMap" type="com.geomin.demo.domain.DepartmentVO">
+        <id property="departmentId" column="department_id" />
+        <result property="departmentName" column="department_name" />
+        <result property="departmentPhone" column="department_phone" />
+    </resultMap>
+
+
+
+    <select id="findById" parameterType="int" resultMap="DoctorMap">
+        SELECT
+            D.DOCTOR_ID , D.DOCTOR_NAME , D.DOCTOR_PHONE , D.DEPARTMENT_ID,
+            D2.DEPARTMENT_ID, D2.DEPARTMENT_NAME,  D2.DEPARTMENT_PHONE
+        FROM
+            DOCTOR D
+        INNER JOIN
+            DEPARTMENT D2
+        ON
+            D.DEPARTMENT_ID = D2.DEPARTMENT_ID
+        WHERE
+            D.DOCTOR_ID = #{referenceId};
+    </select>
+
+</mapper>

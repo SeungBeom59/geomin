@@ -9,7 +9,7 @@ html, body {
     box-sizing: border-box;
     background-color: black;
     min-width: 1900px;
-    height: 100vh;
+    height: 1000px;
     /* background-color: black; */
     /* overflow-x: hidden; */
     /* overflow-y: hidden; */
@@ -111,6 +111,7 @@ aside > div:nth-child(3) > div > span {
 /* 진료대기자 또는 진료완료 인원 목록 */
 #waiting-list {
     /* border: 1px solid black; */
+    /*min-height: 560px;*/
 }
 
 .name-card {
@@ -118,7 +119,8 @@ aside > div:nth-child(3) > div > span {
     border-radius: 10px;
     width: 228px;
     margin-left: 10px;
-    height: 125px;
+    /*height: 125px;*/
+    height: 100px;
     margin-top: 20px;
 }
 /* 이름 , 호출 버튼 */
@@ -149,12 +151,21 @@ aside > div:nth-child(3) > div > span {
 /* 접수시간 */
 .name-card > div:nth-child(3) {
     /* border: 1px solid black; */
-    padding-left: 24px; 
+    /*padding-left: 24px;*/
+    display: flex;
+    justify-content: space-around;
 }
+
+.name-card > div:nth-child(3) > span:last-child ,
+.name-card > div:nth-child(4) > span {
+    color: #0a58ca;
+}
+
+
 
 .name-card > div:nth-child(2) ,
 .name-card > div:nth-child(3) ,
-.name-card > div:nth-child(4) > input {
+.name-card > div:nth-child(4)  {
     font-size: 15px; font-weight: bold;
 }
 
@@ -276,11 +287,28 @@ section {
 /* 환자정보 등록, 수정 버튼 */
 #patient-modify-btn, #patient-btn {
     display: inline-block;
-    margin-left: 190px;
+    margin-left: 200px;
+}
+
+#patient-update-btn {
+    margin-left: 100px;
+    display: none;
+}
+
+#patient-cancel-btn {
+    margin-left: 15px;
+    display: none;
+    background: #9B2727;
+    color: white;
 }
 
 #patient-modify-btn {
     display: none;
+}
+
+#post-search-btn {
+    display: inline-block;
+    margin-left: 30px;
 }
 
 /* 환자 바이탈 정보 테이블 */
@@ -360,26 +388,35 @@ th , td {
     margin-right: 15px;
 }
 
-/* 환자 바이탈 정보 테이블 페이징 */
-#vital-sign-pageing {
+
+
+/* 환자 바이탈 정보 테이블 페이징 , 접수대기 페이징 */
+#vital-sign-pageing , #waiting-pageing {
     margin: 0; padding: 0;
     list-style: none;
     display: none;
 }
 
-#vital-sign-pageing > li {
+#waiting-pageing {
+    display: flex;
+    font-weight: bold;
+    margin-top: 20px;
+    justify-content: center;
+}
+
+#vital-sign-pageing > li , #waiting-pageing > li {
     margin-right: 15px;
     cursor: pointer;
 }
 
 
-#vital-sign-pageing > li > a {
+#vital-sign-pageing > li > a  , #waiting-pageing > li > a{
     color: black;
     font-weight: bold;
     text-decoration: none;
 }
 
-#vital-sign-pageing > li > a:visited {
+#vital-sign-pageing > li > a:visited , #waiting-pageing > li > a:visited {
     color: black;
 }
 

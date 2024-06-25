@@ -1,20 +1,18 @@
 package com.geomin.demo.security;
 
+import com.geomin.demo.domain.DoctorVO;
+import com.geomin.demo.domain.UserRole;
 import com.geomin.demo.domain.UserVO;
 import com.geomin.demo.dto.UserSecurityDTO;
+import com.geomin.demo.repository.DoctorRepository;
 import com.geomin.demo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -29,6 +27,8 @@ public class CustomUserDetailsService implements UserDetailsService {
 //    }
 
     private final UserRepository userRepository;
+    private final DoctorRepository doctorRepository;
+
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -44,6 +44,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         UserVO userVO = result.get();
 
         UserSecurityDTO userSecurityDTO = new UserSecurityDTO(userVO);
+
 
         log.info("***************************************************************************************");
         log.info("UserSecurityDTO::{}",userSecurityDTO);

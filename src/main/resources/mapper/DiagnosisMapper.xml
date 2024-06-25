@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Maooer 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.geomin.demo.repository.DiagnosisRepository">
+    
+    <resultMap id="DiagnosisMap" type="com.geomin.demo.domain.DiagnosisVO">
+        <id property="diagnosisId" column="diagnosis_id" />
+        <result property="symptoms" column="symptoms" />
+        <result property="diagnosisDate" column="diagnosis_date" />
+        <result property="diagnosis" column="diagnosis" />
+        <result property="prescription" column="prescription" />
+        <result property="diagnosisYn" column="diagnosis_yn" />
+        <result property="modifyDate" column="modify_date" />
+        <result property="diagnosisModifier" column="diagnosis_modifier" />
+        <association property="patient" resultMap="patientMap" />
+        <association property="doctor" resultMap="DoctorMap" />
+        <association property="department" resultMap="departmentMap" />
+    </resultMap>
+
+    <resultMap id="patientMap" type="com.geomin.demo.domain.PatientVO">
+        <id property="patientId" column="patient_id" />
+        <result property="patientName" column="patient_name" />
+        <result property="identify" column="identify" />
+        <result property="gender" column="gender" />
+        <result property="phone" column="phone" />
+        <result property="emergencyPhone" column="emergency_phone" />
+        <result property="age" column="age" />
+        <result property="bloodType" column="blood_type" />
+        <result property="address" column="address" />
+        <result property="addressDetail" column="address_detail" />
+        <result property="postCode" column="post_code" />
+    </resultMap>
+
+    <resultMap id="doctorMap" type="com.geomin.demo.domain.DoctorVO">
+        <id property="doctorId" column="doctor_id" />
+        <result property="doctorName" column="doctor_name" />
+        <result property="doctorPhone" column="doctor_phone" />
+        <association property="department" resultMap="departmentMap" />
+    </resultMap>
+
+    <resultMap id="departmentMap" type="com.geomin.demo.domain.DepartmentVO">
+        <id property="departmentId" column="department_id" />
+        <result property="departmentName" column="department_name" />
+        <result property="departmentPhone" column="department_phone" />
+    </resultMap>
+
+    <insert id="addOnlySymptoms">
+        INSERT INTO DIAGNOSIS
+            (DIAGNOSIS_ID , PATIENT_ID , DEPARTMENT_ID,
+             SYMPTOMS , DIAGNOSIS_DATE)
+        VALUES
+            (#{lastDiagnosisId} + 1 , #{patientId}, #{departmentId},
+             #{symptoms} , now() )
+    </insert>
+
+
+    <select id="getLastDiagnosisId">
+        SELECT
+            IFNULL(MAX(DIAGNOSIS_ID) , 0)
+        FROM
+            DIAGNOSIS
+    </select>
+
+
+    
+</mapper>

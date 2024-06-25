@@ -18,6 +18,7 @@ public class UserVO {
     private String password;    // 비밀번호
     private String name;        // 이름
     private UserRole roleSet;   // 권한
+    private int referenceId;    // 개인정보 참조키
 
 
     public void addRole(UserRole userRole){

@@ -3,8 +3,11 @@ package com.geomin.demo.controller;
 import com.geomin.demo.dto.PatientDTO;
 import com.geomin.demo.dto.UserSecurityDTO;
 import com.geomin.demo.dto.VitalsDTO;
+import com.geomin.demo.dto.WaitingDTO;
 import com.geomin.demo.service.PatientService;
 import com.geomin.demo.service.UserService;
+import com.geomin.demo.service.WaitingService;
+import com.geomin.demo.service.WaitingUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -15,12 +18,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.Map;
 
 @Slf4j
 @Controller
@@ -29,6 +30,7 @@ public class HomeController {
 
     private final UserService userService;
     private final PatientService patientService;
+    private final WaitingService waitingService;
 
     // 로그인
     @GetMapping("/login")
@@ -44,43 +46,36 @@ public class HomeController {
         return "login";
     }
 
-//    @PostMapping("/login")
-//    public ResponseEntity<?> login(@RequestBody UserDTO userDTO){
-//
-//        log.info("post >> /login... login() 실행됨.");
-//        log.info("userDTO::{}",userDTO);
-//
-//        UserVO userVO = userService.login(userDTO);
-//
-//        if(userVO == null){
-//            log.info("실패");
-//            log.info("userVO::{}" , userVO);
-//
-//            String error = "로그인에 실패하였습니다.";
-//
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-//        }
-//
-//        return ResponseEntity.status(HttpStatus.OK).body(userVO);
-//    }
-
     // 접수 페이지
 //    @PreAuthorize("hasAnyRole('USER')")
-    @GetMapping("/reception")
-    public String getHome(Principal principal , Model model){
-
+    @GetMapping(value = {"/reception" , "/" , ""})
+    public String getHome(
+            Principal principal , Model model,
+            @PageableDefault(size = 4) Pageable pageable
+    ){
         log.info("get >> /reception... getHome() 실행됨.");
-
-        log.info(principal.getName());
+//        log.info("principal::{}",principal);
+//        log.info(principal.getName());
         UserSecurityDTO user = userService.getUser(principal.getName());
+//        log.info("user::{}" , user);
+
+        Page<WaitingDTO> waitingList = waitingService.getWaitingList(pageable , user.getDepartmentId());
+        log.info("page" + waitingList.getPageable());
+        log.info("totalPage " + waitingList.getTotalPages());
+        log.info("totalElements " + waitingList.getTotalElements());
+        log.info("waitingList::{}" , waitingList.stream().toList());
+
+        int waitingEnd = waitingService.getEndCount(user.getDepartmentId());
 
         model.addAttribute("user" , user);
+        model.addAttribute("waitingList" , waitingList);
+        model.addAttribute("waitingEnd" , waitingEnd);
 
 
         return "reception";
     }
 
-    // 환자 검색
+    // 환자 검색 팝업창
     @GetMapping("/patient-search/{name}")
     public String getPatientList( @PathVariable(name = "name") String patientName ,
                                   @PageableDefault(size = 5) Pageable pageable ,
@@ -100,6 +95,130 @@ public class HomeController {
 
         return "patient_popup";
     }
+
+    // 진료 접수 팝업창
+    @GetMapping("/waiting/{patientId}")
+    public String getWaiting(@PathVariable("patientId") String patientId , Model model){
+
+        PatientDTO patientDTO = new PatientDTO();
+        patientDTO.setPatientId(Integer.parseInt(patientId));
+
+        log.info("get >> /waiting/" + patientDTO.getPatientId() + "... getWaiting()실행됨");
+
+        PatientDTO dto = patientService.getPatientById(patientDTO);
+        dto.setIdentify(WaitingUtil.getIdentify(dto.getIdentify()));
+        log.info("dto::{}",dto);
+
+        model.addAttribute("patient" , dto);
+
+        return "/waiting_popup";
+    }
+
+    // 진료 접수 추가
+    @PostMapping("/waiting/post")
+    public ResponseEntity<?> addWaiting(
+            @RequestBody WaitingDTO waitingDTO,
+            Principal principal ,
+            @PageableDefault(size = 4) Pageable pageable){
+
+        log.info("post >> /waiting/post... addWaiting() 실행됨.");
+
+        log.info("waitingDTO::{}",waitingDTO);
+
+        int result = waitingService.addWaiting(waitingDTO);
+
+        if(result == 2){
+            UserSecurityDTO user = userService.getUser(principal.getName());
+            Page<WaitingDTO> waitingList = waitingService.getWaitingList(pageable , user.getDepartmentId());
+
+            return ResponseEntity.status(HttpStatus.OK).body(waitingList);
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("실패");
+        }
+    }
+
+
+    // 진료 접수 리스트 가져오기
+    @PostMapping("/waiting")
+    public ResponseEntity<?> searchWaiting(
+            @RequestBody Map<String, Integer> requestBody,
+            @PageableDefault(size = 4) Pageable pageable,
+            Principal principal){
+
+        int page = requestBody.get("page");
+        log.info("post >> /waiting... searchWaiting() 실행됨");
+        log.info("page = " + page);
+
+        UserSecurityDTO user = userService.getUser(principal.getName());
+
+        Page<WaitingDTO> waitingList = waitingService.getWaitingList(pageable.withPage(page) , user.getDepartmentId());
+        log.info("waitingList::{}" , waitingList.stream().toList());
+
+        return ResponseEntity.status(HttpStatus.OK).body(waitingList);
+    }
+
+    // 환자 등록
+    @PostMapping("/patient-add")
+    public ResponseEntity<?> addPatient(@RequestBody PatientDTO patientDTO){
+
+
+        log.info("Post >> /patient-add... addPatient() 실행됨");
+        log.info("patientDTO::{}",patientDTO);
+
+         int result = patientService.addPatient(patientDTO);
+
+         if(result == 0){
+             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("서버 또는 사용자 에러");
+         }
+         else {
+             PatientDTO dto = patientService.getPatient(patientDTO);
+
+             return ResponseEntity.status(HttpStatus.OK).body(dto);
+         }
+
+    }
+
+    // 환자 정보 업데이트
+    @PostMapping("/patient-update")
+    public ResponseEntity<?> updatePatient(@RequestBody PatientDTO patientDTO){
+
+        log.info("Post >> /patient-update... updatePatient() 실행됨");
+        log.info("patientDTO::{}" , patientDTO);
+
+        int result = patientService.updatePatient(patientDTO);
+
+        if(result == 0){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("서버 또는 사용자 에러");
+        }
+        else{
+            PatientDTO dto = patientService.getPatientById(patientDTO);
+
+            if(patientDTO.getPatientId() == 0){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("서버 또는 사용자 에러");
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(dto);
+        }
+    }
+
+    // 환자 정보 가져오기
+    @PostMapping("/patient-get")
+    public ResponseEntity<?> getPatient(@RequestBody PatientDTO patientDTO){
+
+        log.info("Post >> /patient-get... getPatient() 실행됨");
+        log.info("patientDTO::{}" , patientDTO);
+
+        PatientDTO dto = patientService.getPatientById(patientDTO);
+
+        if(dto.getPatientId() == 0){
+            log.info("여기서 걸림");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("서버 또는 사용자 에러");
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.OK).body(dto);
+        }
+    }
+
 
     // 활력징후 가져오기
     @PostMapping("/vitals-search")

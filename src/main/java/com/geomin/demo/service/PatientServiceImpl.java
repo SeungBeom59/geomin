@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -122,5 +123,110 @@ public class PatientServiceImpl implements PatientService{
 
         return result;
     }
+
+    @Override
+    public int addPatient(PatientDTO patientDTO) {
+
+        // 마지막 번호 가져오기
+        int lastPatientId = patientRepository.getLastPatientId();
+        // 성별, 나이 계산
+        patientDTO = PatientUtil.getAgeAndGender(patientDTO);
+
+        PatientVO vo = PatientVO.builder()
+                .patientId(lastPatientId)
+                .patientName(patientDTO.getPatientName())
+                .identify(patientDTO.getIdentify())
+                .gender(patientDTO.isGender())
+                .phone(patientDTO.getPhone())
+                .emergencyPhone(patientDTO.getEmergencyPhone())
+                .age(patientDTO.getAge())
+                .bloodType(patientDTO.getBloodType())
+                .address(patientDTO.getAddress())
+                .addressDetail(patientDTO.getAddressDetail())
+                .postCode(patientDTO.getPostCode())
+                .build();
+
+        int result = patientRepository.addPatient(vo);
+
+        return result;
+    }
+
+    @Override
+    public PatientDTO getPatient(PatientDTO patientDTO) {
+
+        PatientVO vo = PatientVO.builder()
+                .patientName(patientDTO.getPatientName())
+                .identify(patientDTO.getIdentify())
+                .build();
+
+        PatientVO result = patientRepository.getPatient(vo);
+
+        PatientDTO dto = new PatientDTO();
+
+        dto.setPatientId(result.getPatientId());
+        dto.setPatientName(result.getPatientName());
+        dto.setIdentify(result.getIdentify());
+        dto.setGender(result.isGender());
+        dto.setPhone(result.getPhone());
+        dto.setEmergencyPhone(result.getEmergencyPhone());
+        dto.setAge(result.getAge());
+        dto.setBloodType(result.getBloodType());
+        dto.setAddress(result.getAddress());
+        dto.setAddressDetail(result.getAddressDetail());
+        dto.setPostCode(result.getPostCode());
+
+        return dto;
+    }
+
+    @Override
+    public int updatePatient(PatientDTO patientDTO) {
+
+        PatientVO vo = PatientVO.builder()
+                .patientId(patientDTO.getPatientId())
+                .patientName(patientDTO.getPatientName())
+                .identify(patientDTO.getIdentify())
+                .gender(patientDTO.isGender())
+                .phone(patientDTO.getPhone())
+                .emergencyPhone(patientDTO.getEmergencyPhone())
+                .age(patientDTO.getAge())
+                .bloodType(patientDTO.getBloodType())
+                .address(patientDTO.getAddress())
+                .addressDetail(patientDTO.getAddressDetail())
+                .postCode(patientDTO.getPostCode())
+                .build();
+
+        int result = patientRepository.updatePatient(vo);
+
+        return result;
+    }
+
+    @Override
+    public PatientDTO getPatientById(PatientDTO patientDTO) {
+
+        int patientId = patientDTO.getPatientId();
+
+        PatientVO result = patientRepository.getPatientById(patientId);
+
+        if(result == null){
+            return new PatientDTO();
+        }
+
+        PatientDTO dto = new PatientDTO();
+
+        dto.setPatientId(result.getPatientId());
+        dto.setPatientName(result.getPatientName());
+        dto.setIdentify(result.getIdentify());
+        dto.setGender(result.isGender());
+        dto.setPhone(result.getPhone());
+        dto.setEmergencyPhone(result.getEmergencyPhone());
+        dto.setAge(result.getAge());
+        dto.setBloodType(result.getBloodType());
+        dto.setAddress(result.getAddress());
+        dto.setAddressDetail(result.getAddressDetail());
+        dto.setPostCode(result.getPostCode());
+
+        return dto;
+    }
+
 
 }

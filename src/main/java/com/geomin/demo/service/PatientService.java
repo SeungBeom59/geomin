@@ -16,4 +16,12 @@ public interface PatientService {
     int addVitals(VitalsDTO vitalsDTO);
 
     int updateVitals(VitalsDTO vitalsDTO);
+
+    int addPatient(PatientDTO patientDTO);
+
+    PatientDTO getPatient(PatientDTO patientDTO);
+
+    int updatePatient(PatientDTO patientDTO);
+
+    PatientDTO getPatientById(PatientDTO patientDTO);
 }
