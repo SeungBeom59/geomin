@@ -146,7 +146,7 @@ public class HomeController {
             @PageableDefault(size = 4) Pageable pageable,
             Principal principal){
 
-        int page = requestBody.get("page");
+        int page = requestBody.get("page") != null? requestBody.get("page") : 0;
         log.info("post >> /waiting... searchWaiting() 실행됨");
         log.info("page = " + page);
 
@@ -156,6 +156,23 @@ public class HomeController {
         log.info("waitingList::{}" , waitingList.stream().toList());
 
         return ResponseEntity.status(HttpStatus.OK).body(waitingList);
+    }
+
+    // 진료접수 상태||종류 변경
+    @PostMapping("/waiting-modify")
+    public ResponseEntity<?> modifyWaitingStatus(@RequestBody WaitingDTO waitingDTO){
+
+        log.info("post >> /waiting-modify... modifyWaitingStatus() 실행됨");
+        log.info("waitingDTO::{}" , waitingDTO);
+
+        int result = waitingService.modifyWaitingStatus(waitingDTO);
+
+        if(result == 1){
+            return ResponseEntity.status(HttpStatus.OK).body("성공");
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("실패");
+        }
     }
 
     // 환자 등록

@@ -578,6 +578,48 @@ th , td {
     background-color: #9B2727;
 }
 
+/*우클릭 메뉴 css 설정*/
+#custom-context-menu {
+    display: none;
+    position: absolute;
+    z-index: 1000;
+    background:  white;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+#custom-context-menu > ul {
+    text-align: center;
+    list-style: none;
+    position: relative;
+    width: 120px;
+    margin: 0; padding: 0;
+    padding-block: 5px;
+    cursor: pointer;
+}
+
+#custom-context-menu > ul > li:hover , .submenu > li:hover {
+    background-color: #5B9FFF;
+    color: white;
+    font-weight: bold;
+}
+
+.submenu {
+    display: none;
+    margin: 0; padding: 0;
+    list-style: none;
+    text-align: center;
+    /*border: 1px solid black;*/
+    position: absolute;
+    width: 100px;
+    left: 120px;
+    top: -1px;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    border: 1px solid #ccc;
+    background: white;
+    color: black;
+}
 
 
 

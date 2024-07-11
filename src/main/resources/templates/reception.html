@@ -52,7 +52,7 @@
                         </div>
 
                         <div>
-                            <input type="hidden" th:value="${waitingUser.getWaitingId()}">
+                            <input type="hidden" th:value="${waitingUser.getWaitingId()}" class="waitingId">
                             <span th:text="${waitingUser.getIdentify()}">생년월일</span>
                             <sapn th:if="${waitingUser.getAge() != null && waitingUser.getAge() != 0}" th:text="${waitingUser.getAge()+'세'}">나이</sapn>
                             <span th:if="${waitingUser.isGender() == true}">남</span>
@@ -72,6 +72,9 @@
 
 
             </div>
+
+
+            <input type="hidden" value="0" id="waiting-current-page">
 
             <ul id="waiting-pageing">
                 <!--<li id="waiting-prev-page">
@@ -326,6 +329,34 @@
 
 
             </main>
+        </div>
+
+        <div id="custom-context-menu">
+            <ul>
+                <li class="waiting-type-menu">
+                    접수상태변경
+                    <ul class="submenu">
+                        <li>대기중</li>
+                        <li>진료중</li>
+                        <li>진료완료</li>
+                        <li>검사대기</li>
+                        <li>검사중</li>
+<!--                        <li>접수취소</li>-->
+                    </ul>
+                </li>
+
+                <li class="waiting-type-menu">
+                    접수종류변경
+                    <ul class="submenu">
+                        <li>일반진료</li>
+                        <li>전문진료</li>
+                        <li>입원진료</li>
+                        <li>응급진료</li>
+                        <li>외래진료</li>
+                        <li>재활진료</li>
+                    </ul>
+                </li>
+            </ul>
         </div>
     
 

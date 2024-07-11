@@ -1,5 +1,7 @@
 package com.geomin.demo.service;
 
+import com.geomin.demo.domain.WaitingVO;
+import com.geomin.demo.dto.WaitingDTO;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
@@ -64,7 +66,63 @@ public class WaitingUtil {
 
     }
 
+    public static WaitingVO modifyWaitingStatusOrType(WaitingDTO waitingDTO){
 
+        String value = waitingDTO.getAction();
+
+        int waitingValue = -1;
+        boolean statusOrType = false;
+
+        String[] actionList = {"대기중" , "진료중" , "진료완료" , "검사중" , "검사대기"};
+
+        for (String s : actionList) {
+            if(waitingDTO.getAction().equals(s)){
+                statusOrType = true;
+                break;
+            }
+        }
+
+        if(value.equals("대기중") || value.equals("일반진료")){
+            waitingValue = 0;
+        }
+        else if(value.equals("진료중") || value.equals("전문진료")){
+            waitingValue = 1;
+        }
+        else if(value.equals("진료완료") || value.equals("입원진료")){
+            waitingValue = 2;
+        }
+        else if(value.equals("검사중") || value.equals("응급진료")){
+            waitingValue = 3;
+        }
+        else if(value.equals("검사대기") || value.equals("외래진료")){
+            waitingValue = 4;
+        }
+        else if(value.equals("재활진료")){
+            waitingValue = 5;
+        }
+
+
+        // true 라면 Status 이고 false 라면 type 에 대한 설정.
+        if(statusOrType){
+            WaitingVO vo =  WaitingVO.builder()
+                    .waitingId(waitingDTO.getWaitingId())
+                    .waitingStatus(waitingValue)
+                    .waitingType(-1)
+                    .build();
+
+            return vo;
+        }
+        else {
+            WaitingVO vo =  WaitingVO.builder()
+                    .waitingId(waitingDTO.getWaitingId())
+                    .waitingType(waitingValue)
+                    .waitingStatus(-1)
+                    .build();
+
+            return vo;
+        }
+
+    }
 
     public static String getIdentify(String identify){
 

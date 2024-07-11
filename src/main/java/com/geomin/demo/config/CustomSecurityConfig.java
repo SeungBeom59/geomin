@@ -11,6 +11,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -59,7 +61,14 @@ public class CustomSecurityConfig {
                         .tokenRepository(persistentTokenRepository())
                         .userDetailsService(userDetailsService)
                         .tokenValiditySeconds(60*60*24*30)
-                );
+                )
+                // 세션 설정
+                .sessionManagement(SessionManagement -> SessionManagement
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)   // 시큐리티가 필요로 할때만 세션 생성
+                        .sessionFixation(SessionManagementConfigurer.SessionFixationConfigurer::newSession) // 세션 고정 보호: 전략은 새로운 세션 생성
+                        .maximumSessions(1)                                         // 사용자의 세션 최대 수 1로 고정(세션 하이 재킹 , 아이디 동시 접속 불가)
+                        .maxSessionsPreventsLogin(false)                             // false(기본) 기존 사용자 세션 만료 | true 새로운 사용자 인증예외 발생
+                        .expiredUrl("/login?expired=ture")); // 세션 만료시 login으로 이동, expired=true를 줘서 세션만료임을 메시지로 나타내기 가능.
 
         return http.build();
     }

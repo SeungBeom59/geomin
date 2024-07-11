@@ -12,4 +12,7 @@ public interface WaitingService {
     int getEndCount(int departmentId);
 
     int addWaiting(WaitingDTO waitingDTO);
+
+    //
+    int modifyWaitingStatus(WaitingDTO waitingDTO);
 }

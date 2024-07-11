@@ -112,4 +112,23 @@ public class WaitingServiceImpl implements WaitingService {
         return diagnosisResult + waitingResult;
 
     }
+
+    @Override
+    public int modifyWaitingStatus(WaitingDTO waitingDTO) {
+
+        WaitingVO vo = WaitingUtil.modifyWaitingStatusOrType(waitingDTO);
+
+        int result = 0;
+
+        if(vo.getWaitingStatus() == -1){
+            result = waitingRepository.updateWaitingType(vo);
+        }
+        else if(vo.getWaitingType() == -1){
+            result = waitingRepository.updateWaitingStatus(vo);
+        }
+
+        return result;
+    }
+
+
 }

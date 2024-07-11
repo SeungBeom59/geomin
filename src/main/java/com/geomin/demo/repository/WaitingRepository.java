@@ -26,4 +26,11 @@ public interface WaitingRepository {
 
     // 가장 마지막 waitingKey 가져오기
     String getLastWaitingKey();
+
+    // waitingStatus 변경
+    int updateWaitingStatus(WaitingVO vo);
+
+    // waitingType 변경
+    int updateWaitingType(WaitingVO vo);
+
 }

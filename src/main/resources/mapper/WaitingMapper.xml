@@ -111,4 +111,22 @@
              now(), #{waitingType} , #{departmentId})
     </insert>
 
+    <update id="updateWaitingStatus" parameterType="com.geomin.demo.domain.WaitingVO">
+        UPDATE
+            WAITING
+        SET
+            WAITING_STATUS = #{waitingStatus}
+        WHERE
+            WAITING_ID = #{waitingId}
+    </update>
+
+    <update id="updateWaitingType" parameterType="com.geomin.demo.domain.WaitingVO">
+        UPDATE
+            WAITING
+        SET
+            WAITING_TYPE = #{waitingType}
+        WHERE
+            WAITING_ID = #{waitingId}
+    </update>
+
 </mapper>

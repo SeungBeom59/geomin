@@ -686,11 +686,13 @@ function insertWaiting(content){
 
     $('#waiting-list').empty(); // 하위 html 모두 삭제
 
+    console.log('content : ' , content);
+
     content.forEach(function (waitingUser){
 
         var html = '<div class="name-card">';
 
-        html += '<div><input type="hidden" value=' + waitingUser.patientId + '">';
+        html += '<div><input type="hidden" value="' + waitingUser.waitingId + '" class="waitingId">';
         html += '<span>' + waitingUser.patientName + '</span><button class="btn" onclick="callPatient(this)">호출</button></div>';
         html += '<div><span>' + waitingUser.identify + '</span>';
 
@@ -723,6 +725,8 @@ function waitingPageing(waitingList){
 
     console.log('totalElements = ' , totalPages , ' totalPages = ' ,
         totalPages, ' size = ' , size , ' currentPage = ' , currentPage);
+
+    $('#waiting-current-page').val(currentPage); // 현재페이지 hidden으로 숨겨놓기
 
     $('#waiting-user-count').text(totalElements);   // 진료 대기 환자수 변경
     // 진료 완료 환자수 변경 필요
@@ -839,3 +843,65 @@ function checkPatient(){
     return flag;
 }
 
+// 서브메뉴 contextmenu 이벤트 설정
+$(".waiting-type-menu").mouseover(function(){
+    $(this).children(".submenu").show();
+});
+$(".waiting-type-menu").mouseleave(function(){
+    $(this).children(".submenu").hide();
+});
+
+$(document).on('contextmenu', '.name-card', function(event) {
+    event.preventDefault();
+
+    var waitingId = $(this).find('.waitingId').val();
+
+    console.log('waitingId : ' , waitingId);
+
+    $('#custom-context-menu')
+        .data(
+            'waiting-id' , waitingId
+        )
+        .css({
+        top: event.pageY + 'px',
+        left: event.pageX + 'px'
+    }).show();
+});
+
+$(document).on('click' , function(event){
+    if(!$(event.target).closest('#custom-context-menu').length){
+        $('#custom-context-menu').hide();
+    }
+});
+
+$('#custom-context-menu .submenu li').on('click' , function (){
+
+    var waitingId = $('#custom-context-menu').data('waiting-id');
+    var action = $(this).text();
+
+    console.log('--------------------------클릭이벤트------------');
+    console.log('waitingId = ' , waitingId);
+    console.log('action = ' , action);
+
+    var data = {
+        waitingId : waitingId,
+        action : action
+    };
+
+    $.ajax({
+        url: "/waiting-modify",
+        type: 'post',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(data),
+        success: function (response){
+            alert('성공' + $('#waiting-current-page').val());
+
+            searchWaiting($('#waiting-current-page').val());
+        } ,
+        error : function (xhr, status, error){
+            console.error('AJAX 요청 실패: ', status, error);
+        }
+    });
+
+
+});

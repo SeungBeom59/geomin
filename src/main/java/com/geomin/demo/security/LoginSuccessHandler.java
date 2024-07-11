@@ -24,6 +24,8 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
             HttpServletResponse response,
             Authentication auth) throws IOException, ServletException {
 
+
+
         // 기본 uri
         String uri = "/reception";
 

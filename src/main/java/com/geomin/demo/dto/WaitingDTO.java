@@ -33,4 +33,6 @@ public class WaitingDTO {
 
     private String symptoms;                // 증상
 
+    private String action;                  // 수정할 접수값
+
 }
