@@ -16,7 +16,7 @@ html, body {
 }
 
 /* 버튼 기본양식 */
-.btn {
+.btn , .btn2 {
     display: block;
     border-radius: 10px;
     border: 0;
@@ -26,6 +26,7 @@ html, body {
     font-weight: bold;
     cursor: pointer;
     font-size: 16px;
+    text-align: center;
 }
 
 #wrap {
@@ -393,6 +394,7 @@ th , td {
 /* 환자 바이탈 정보 테이블 페이징 , 접수대기 페이징 */
 #vital-sign-pageing , #waiting-pageing {
     margin: 0; padding: 0;
+    padding-right: 10px;
     list-style: none;
     display: none;
 }
@@ -508,6 +510,15 @@ th , td {
     margin-right: 20px;
 }
 
+.pre-diagnosis-box {
+    display: none;
+}
+
+#diagnosis-title span {
+    display: none;
+}
+
+
 .textarea-box > h4 {
     text-indent: 15px;
 }
@@ -535,16 +546,16 @@ th , td {
     text-indent: 20px;
 }
 
-#right-section > article > div {
-    /* border: 1px solid black; */
-}
+/*#right-section > article > div {*/
+/*     border: 1px solid black; */
+/*}*/
 
-#right-section > article > div:nth-child(3) {
-    margin-top: 20px;
-}
+/*#right-section > article > div:nth-child(3) {*/
+/*    margin-top: 20px;*/
+/*}*/
 
 #right-section > article > div:nth-child(3) > div  {
-    border-top: 1px dashed black;
+    /*border-top: 1px dashed black;*/
 }
 
 .big > div {
@@ -562,21 +573,21 @@ th , td {
 }
 
 .big > textarea {
-    width: 675px; height: 180px;
+    width: 675px; height: 135px;
     margin-left: 43px;
 }
 
-#right-section > article > div:last-child {
-    display: flex;
-    justify-content: end;
-    /* border: 1px solid red; */
-    margin-top: 10px;
-}
+/*#right-section > article > div:last-child {*/
+/*    display: flex;*/
+/*    justify-content: end;*/
+/*    !* border: 1px solid red; *!*/
+/*    margin-top: 10px;*/
+/*}*/
 
-#right-section > article > div:last-child > button {
-    margin-right: 30px;
-    background-color: #9B2727;
-}
+/*#right-section > article > div:last-child > button {*/
+/*    margin-right: 30px;*/
+/*    background-color: #9B2727;*/
+/*}*/
 
 /*우클릭 메뉴 css 설정*/
 #custom-context-menu {
@@ -621,12 +632,130 @@ th , td {
     color: black;
 }
 
+/**호출 버튼 클릭시, 진료중 버튼 설정**/
+.btn2 {
+    background-color: #3eb97b !important
+}
 
+/**진료기록 없음 설정**/
+#no-record-diagnosis {
+    display: flex;
+    justify-content: center;
+    height: 500px;
+    text-align: center;
+    align-items: center;
+    font-size: x-large;
+}
 
+/*담당의*/
+#attending-doctor-box {
+    display: none;
+    justify-content: right;
+    padding-inline: 20px;
+    padding-block: 5px;
+    color: black;
+    font-size: large;
+    font-weight: bold;
+}
 
+.diagnosis-modify-btn {
+    display: none;
+}
 
+#diagnosis-detail-box {
+    display: none;
+    justify-content: space-between;
+}
 
+#diagnosis-photo-box {
+    display: flex;
+    justify-content: space-around;
+    padding-left: 15px;
+}
 
+#diagnosis-photo-box > div {
+    width: 50px; height: 50px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+}
 
+/*우측 진료기록 작성의 증상 옆 버튼 박스*/
+#diagnosis-btn-box {
+    display: flex;
+    margin-right: 38px;
+}
+
+/*우측 진료기록 작성의 증상 옆 버튼 설정 */
+#diagnosis-delete-btn,
+#diagnosis-modify-btn, #diagnosis-cancel-btn{
+    display: none;
+}
+
+#diagnosis-modify-btn {
+    margin-right: 10px;
+}
+#diagnosis-delete-btn{
+    background-color: #9B2727;
+}
+
+/*진료기록 작성 옆 구분자, 성명 설정*/
+#diagnosis-write-title > span:nth-child(2) ,
+#diagnosis-write-title > span:nth-child(3) {
+    display: none;
+}
+
+#file-box {
+    /*border: 1px solid black;*/
+}
+
+/*진료기록 파일등록창*/
+#file-box > div:first-child {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-inline: 38px;
+    margin-top: 15px;
+}
+
+.file-label {
+    font-weight: normal;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#file-drag-box {
+    margin-left: 48px;
+    width: 681px;
+    height: 130px;
+    max-height: 130px;
+    border: 2px dashed black;
+    text-align: center;
+}
+
+.highlight {
+    border: 2px dashed #0a58ca !important;
+}
+
+#file-drag-box > i {
+    padding-top: 50px;
+}
+#file-drag-box > p , #file-drag-box > i {
+    display: none;
+}
+
+#file-box ul {
+    list-style: none;
+    margin: 0;
+}
+
+.file {
+    display: none;
+}
+
+#files {
+    border: 1px solid red;
+    height: 130px;
+}
 
 

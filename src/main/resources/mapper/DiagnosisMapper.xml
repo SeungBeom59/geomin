@@ -14,8 +14,22 @@
         <result property="diagnosisYn" column="diagnosis_yn" />
         <result property="modifyDate" column="modify_date" />
         <result property="diagnosisModifier" column="diagnosis_modifier" />
+        <result property="fileId" column="file_id" />
+        <result property="diagnosisDelYn" column="diagnosis_del_yn" />
         <association property="patient" resultMap="patientMap" />
-        <association property="doctor" resultMap="DoctorMap" />
+        <association property="doctor" resultMap="doctorMap" />
+        <association property="department" resultMap="departmentMap" />
+        <association property="waiting" resultMap="waitingMap" />
+    </resultMap>
+
+    <resultMap id="waitingMap" type="com.geomin.demo.domain.WaitingVO">
+        <id property="waitingId" column="waiting_id" />
+        <result property="waitingKey" column="waiting_key" />
+        <result property="waitingDate" column="waiting_date" />
+        <result property="waitingStatus" column="waiting_status" />
+        <result property="waitingType" column="waiting_type" />
+        <result property="receptionist" column="receptionist" />
+        <association property="patient" resultMap="patientMap" />
         <association property="department" resultMap="departmentMap" />
     </resultMap>
 
@@ -46,13 +60,15 @@
         <result property="departmentPhone" column="department_phone" />
     </resultMap>
 
+
+
     <insert id="addOnlySymptoms">
         INSERT INTO DIAGNOSIS
-            (DIAGNOSIS_ID , PATIENT_ID , DEPARTMENT_ID,
+            (DIAGNOSIS_ID , PATIENT_ID , DEPARTMENT_ID, WAITING_ID ,
              SYMPTOMS , DIAGNOSIS_DATE)
         VALUES
-            (#{lastDiagnosisId} + 1 , #{patientId}, #{departmentId},
-             #{symptoms} , now() )
+            (#{lastDiagnosisId} + 1 , #{diagnosisDTO.patientId}, #{diagnosisDTO.departmentId},
+            #{diagnosisDTO.waitingId} , #{diagnosisDTO.symptoms} , now() )
     </insert>
 
 
@@ -61,6 +77,69 @@
             IFNULL(MAX(DIAGNOSIS_ID) , 0)
         FROM
             DIAGNOSIS
+    </select>
+
+    <select id="getDiagnosisList" resultMap="DiagnosisMap">
+        SELECT
+            *
+        FROM
+            diagnosis d
+            LEFT OUTER JOIN DOCTOR d2 ON d2.DOCTOR_ID = d.DOCTOR_ID
+            LEFT OUTER JOIN DEPARTMENT d3 ON d3.DEPARTMENT_ID = d.DEPARTMENT_ID
+        WHERE
+            d.DEPARTMENT_ID = #{diagnosisDTO.departmentId}
+        AND
+            d.PATIENT_ID = #{diagnosisDTO.patientId}
+        AND
+            d.DIAGNOSIS_YN = 1
+        AND
+            d.DIAGNOSIS_DEL_YN = 0
+        <if test="pageable.sort != null and !pageable.sort.isEmpty()">
+            ORDER BY
+            <foreach item="order" index="index" collection="pageable.sort.orders" separator=",">
+                ${order.property} ${order.direction}
+            </foreach>
+        </if>
+        OFFSET
+            #{pageable.offset} ROWS
+        FETCH NEXT
+            #{pageable.pageSize} ROWS ONLY
+    </select>
+
+    <select id="getTotalDiagnosis" parameterType="com.geomin.demo.dto.DiagnosisDTO">
+        SELECT
+            COUNT(*) total
+        FROM
+            diagnosis
+        WHERE
+            DEPARTMENT_ID = #{departmentId}
+        AND
+            PATIENT_ID = #{patientId}
+        AND
+            DIAGNOSIS_YN = 1
+        AND
+            DIAGNOSIS_DEL_YN != 1
+    </select>
+
+    <update id="deleteDiagnosisByWaitingId">
+        UPDATE
+            DIAGNOSIS
+        SET
+            DIAGNOSIS_DEL_YN = 1
+        WHERE
+            WAITING_ID = #{waitingId}
+    </update>
+
+    <select id="getDiagnosisByWaitingId" resultMap="DiagnosisMap">
+        SELECT
+            *
+        FROM
+            DIAGNOSIS d
+            LEFT OUTER JOIN DEPARTMENT d2 ON d2.DEPARTMENT_ID = d.DEPARTMENT_ID
+            LEFT OUTER JOIN WAITING w ON w.WAITING_ID = d.WAITING_ID
+            LEFT OUTER JOIN PATIENT p ON p.PATIENT_ID = d.PATIENT_ID
+        WHERE
+            d.WAITING_ID = #{waitingId}
     </select>
 
 

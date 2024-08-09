@@ -1,13 +1,10 @@
 package com.geomin.demo.controller;
 
-import com.geomin.demo.dto.PatientDTO;
-import com.geomin.demo.dto.UserSecurityDTO;
-import com.geomin.demo.dto.VitalsDTO;
-import com.geomin.demo.dto.WaitingDTO;
-import com.geomin.demo.service.PatientService;
-import com.geomin.demo.service.UserService;
-import com.geomin.demo.service.WaitingService;
-import com.geomin.demo.service.WaitingUtil;
+import com.geomin.demo.domain.DiagnosisVO;
+import com.geomin.demo.domain.WaitingVO;
+import com.geomin.demo.dto.*;
+import com.geomin.demo.repository.DiagnosisRepository;
+import com.geomin.demo.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -17,6 +14,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,6 +29,7 @@ public class HomeController {
     private final UserService userService;
     private final PatientService patientService;
     private final WaitingService waitingService;
+    private final DiagnosisService diagnosisService;
 
     // 로그인
     @GetMapping("/login")
@@ -96,6 +95,21 @@ public class HomeController {
         return "patient_popup";
     }
 
+    // 진료기록 가져오기
+    @PostMapping("/diagnosis")
+    public ResponseEntity<?> getDiagnosisList(@PageableDefault(size = 10) Pageable pageable ,
+                                              @RequestBody DiagnosisDTO diagnosisDTO ){
+
+        log.info("post >> /diagnosis... getDiagnosisList() 실행됨.");
+        log.info("diagnosisDTO::{}" , diagnosisDTO);
+
+        Page<DiagnosisDTO> diagnosisList = diagnosisService.getDiagnosisList(pageable, diagnosisDTO);
+
+        return ResponseEntity.status(HttpStatus.OK).body(diagnosisList);
+
+    }
+
+
     // 진료 접수 팝업창
     @GetMapping("/waiting/{patientId}")
     public String getWaiting(@PathVariable("patientId") String patientId , Model model){
@@ -125,7 +139,7 @@ public class HomeController {
 
         log.info("waitingDTO::{}",waitingDTO);
 
-        int result = waitingService.addWaiting(waitingDTO);
+        int result = waitingService.addWaiting(waitingDTO , principal);
 
         if(result == 2){
             UserSecurityDTO user = userService.getUser(principal.getName());
@@ -173,6 +187,21 @@ public class HomeController {
         else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("실패");
         }
+    }
+
+    // 진료완료 수 가져오기
+    @PostMapping("/waiting-end-cnt")
+    public ResponseEntity<?> getWaitingEndCnt(@RequestBody WaitingDTO waitingDTO){
+
+        log.info("post >> /waiting-end-cnt... getWaitingEndCnt() 실행.");
+
+        log.info("waitingDTO::{}", waitingDTO);
+        int waitingEndCnt = waitingService.getEndCount(waitingDTO.getDepartmentId());
+
+        waitingDTO.setWaitingEndCnt(waitingEndCnt);
+        log.info("waitingDTO::{}" , waitingDTO);
+
+        return ResponseEntity.status(HttpStatus.OK).body(waitingDTO);
     }
 
     // 환자 등록
@@ -228,12 +257,42 @@ public class HomeController {
         PatientDTO dto = patientService.getPatientById(patientDTO);
 
         if(dto.getPatientId() == 0){
-            log.info("여기서 걸림");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("서버 또는 사용자 에러");
         }
         else {
             return ResponseEntity.status(HttpStatus.OK).body(dto);
         }
+    }
+
+    // 진료대기환자 호출
+    @Transactional
+    @PostMapping("/patient-call")
+    public ResponseEntity<?> callPatient(@RequestBody WaitingDTO waitingDTO){
+
+        log.info("post >> /patient-call... callPatient() 실행.");
+        log.info("waitingDTO::{}" , waitingDTO);
+
+        // action 없이 waiting-modify에 waitingId만 요청 받을 경우, 호출 버튼을 누른 것이므로
+        // action을 "진료중"으로 바꾸어준다.
+        if(waitingDTO.getAction() == null){
+            waitingDTO.setAction("진료중");
+        }
+
+        int result = waitingService.modifyWaitingStatus(waitingDTO);    // waiting status 변경(진료중)
+
+        DiagnosisDTO todayDiagnosisDTO = diagnosisService.getTodayDiagnosis(waitingDTO.getWaitingId());
+
+        PatientDTO patient = new PatientDTO();
+        patient.setPatientId(todayDiagnosisDTO.getPatientId());
+        PatientDTO patientDTO = patientService.getPatientById(patient);
+
+        CallPatientDTO callResponse = new CallPatientDTO(patientDTO , todayDiagnosisDTO);
+
+        if(result != 1 || callResponse.getPatient() == null || callResponse.getTodayDiagnosis() == null){
+            return ResponseEntity.internalServerError().body("서버 요청 처리 실패");
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(callResponse);
     }
 
 

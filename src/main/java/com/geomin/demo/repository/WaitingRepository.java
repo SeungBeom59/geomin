@@ -33,4 +33,6 @@ public interface WaitingRepository {
     // waitingType 변경
     int updateWaitingType(WaitingVO vo);
 
+    // 방금 생성된 유니크 키로 집어넣었던 waiting 가져오기
+    WaitingVO getWaitingByKey(String newWaitingKey);
 }

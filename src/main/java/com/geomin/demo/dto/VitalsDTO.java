@@ -30,7 +30,7 @@ public class VitalsDTO {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime modifyDate;   // 수정날짜
 
-    private String vitalModifier;       // 수정자 id
+    private String vitalModifier;       // 수정자(security name) id
 
 
 

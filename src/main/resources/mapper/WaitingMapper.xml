@@ -11,6 +11,7 @@
         <result property="waitingDate" column="waiting_date" />
         <result property="waitingStatus" column="waiting_status" />
         <result property="waitingType" column="waiting_type" />
+        <result property="receptionist" column="receptionist" />
         <association property="patient" resultMap="patientMap" />
         <association property="department" resultMap="departmentMap" />
     </resultMap>
@@ -47,6 +48,8 @@
         AND
         WAITING_STATUS != 2
         AND
+        WAITING_STATUS != 5
+        AND
         w.DEPARTMENT_ID = #{departmentId}
     ORDER BY
         WAITING_KEY ASC
@@ -68,6 +71,8 @@
             DATE(waiting_date) = CURDATE()
         AND
             WAITING_STATUS != 2
+        AND
+            WAITING_STATUS != 5
         AND
             w.DEPARTMENT_ID = #{departmentId}
     </select>
@@ -95,20 +100,20 @@
     <select id="getLastWaitingKey" resultType="String">
         SELECT COALESCE(
             (SELECT waiting_key
-             FROM waiting
-             WHERE DATE(waiting_date) = CURDATE()
-             ORDER BY waiting_key DESC
-             LIMIT 1) , '0'
+            FROM waiting
+            WHERE DATE(waiting_date) = CURDATE()
+            ORDER BY CAST(SUBSTRING_INDEX(waiting_key, 'T', -1) AS UNSIGNED) DESC
+            LIMIT 1), '0'
         ) AS last_waiting_key;
     </select>
 
     <insert id="addWaiting" parameterType="com.geomin.demo.dto.WaitingDTO">
         INSERT INTO WAITING
             (WAITING_ID , PATIENT_ID, WAITING_KEY,
-             WAITING_DATE , WAITING_TYPE, DEPARTMENT_ID)
+             WAITING_DATE , WAITING_TYPE, DEPARTMENT_ID , RECEPTIONIST)
         VALUES
             (#{lastWaitingId} + 1 , #{patientId} , #{waitingKey},
-             now(), #{waitingType} , #{departmentId})
+             now(), #{waitingType} , #{departmentId} , #{receptionist})
     </insert>
 
     <update id="updateWaitingStatus" parameterType="com.geomin.demo.domain.WaitingVO">
@@ -128,5 +133,14 @@
         WHERE
             WAITING_ID = #{waitingId}
     </update>
+
+    <select id="getWaitingByKey" resultType="com.geomin.demo.domain.WaitingVO">
+        SELECT
+            *
+        FROM
+            WAITING
+        WHERE
+            WAITING_KEY = #{newWaitingKey}
+    </select>
 
 </mapper>

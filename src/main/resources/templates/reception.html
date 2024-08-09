@@ -24,6 +24,7 @@
                 </h1>
                 <h3>담당자 : <span th:text="${user.getName()}">최은석</span></h3>
                 <input type="hidden" id="userId" th:value="${user.getId()}">
+                <input type="hidden" id="departmentId" th:value="${user.getDepartmentId()}">
             </div>
 
             <hr>
@@ -48,13 +49,14 @@
                     <div class="name-card">
                         <div>
                             <span class="name" th:text="${waitingUser.getPatientName()}">이름</span>
-                            <button class="btn" onclick="callPatient(this)">호출</button>
+                            <input type="hidden" th:value="${waitingUser.getWaitingId()}" class="waitingId">
+                            <button th:if="${waitingUser.getWaitingStatus() == '진료중'}" class="btn2" onclick="endPatient(this)">진료중</button>
+                            <button th:if="${waitingUser.getWaitingStatus() != '진료중'}" class="btn" onclick="callPatient(this)">호출</button>
                         </div>
 
                         <div>
-                            <input type="hidden" th:value="${waitingUser.getWaitingId()}" class="waitingId">
                             <span th:text="${waitingUser.getIdentify()}">생년월일</span>
-                            <sapn th:if="${waitingUser.getAge() != null && waitingUser.getAge() != 0}" th:text="${waitingUser.getAge()+'세'}">나이</sapn>
+                            <span th:if="${waitingUser.getAge() != null && waitingUser.getAge() != 0}" th:text="${waitingUser.getAge()+'세'}">나이</span>
                             <span th:if="${waitingUser.isGender() == true}">남</span>
                             <span th:if="${waitingUser.isGender() == false}">여</span>
                         </div>
@@ -132,7 +134,7 @@
                                 <input type="hidden" value="" id="vitalPage">
 
                                 <label for="patient_name">성함 : </label>
-                                <input type="text" id="patient_name" name="patientName" value="" size="10" autocomplete="off" class="patientValue" placeholder="이름">
+                                <input type="text" id="patient_name" name="patientName" value="" size="10" autocomplete="off" class="patientValue" placeholder="OOO">
     
                                 <label for="identify">주민등록번호 : </label>
                                 <input type="text" id="identify" name="identify" value="" size="10" autocomplete="off" class="patientValue" oninput="checkIdentify(this)" placeholder="000000-0000000">
@@ -200,12 +202,12 @@
     
                                     <tr>
                                         <td><input type="date" value=""></td>
-                                        <td><input type="text" value="" size="2" autocomplete="off" oninput="checkDouble(this)" class="vitalValue"></td>
-                                        <td><input type="text" value="" size="2" autocomplete="off" oninput="checkDouble(this)" class="vitalValue"></td>
-                                        <td><input type="text" value="" size="2" autocomplete="off" oninput="checkInt(this)" class="vitalValue"></td>
-                                        <td><input type="text" value="" size="2" autocomplete="off" oninput="checkInt(this)" class="vitalValue"></td>
-                                        <td><input type="text" value="" size="2" autocomplete="off" oninput="checkDouble(this)" class="vitalValue"></td>
-                                        <td><input type="text" value="" size="2" autocomplete="off" oninput="checkInt(this)" class="vitalValue"></td>
+                                        <td><input type="text" value="" size="2" autocomplete="off" oninput="checkDouble(this)" class="vitalValue" placeholder="00.0"></td>
+                                        <td><input type="text" value="" size="2" autocomplete="off" oninput="checkDouble(this)" class="vitalValue" placeholder="000.0"></td>
+                                        <td><input type="text" value="" size="2" autocomplete="off" oninput="checkInt(this)" class="vitalValue" placeholder="0"></td>
+                                        <td><input type="text" value="" size="2" autocomplete="off" oninput="checkInt(this)" class="vitalValue" placeholder="0"></td>
+                                        <td><input type="text" value="" size="2" autocomplete="off" oninput="checkDouble(this)" class="vitalValue" placeholder="00.0"></td>
+                                        <td><input type="text" value="" size="2" autocomplete="off" oninput="checkInt(this)" class="vitalValue" placeholder="0"></td>
                                     </tr>
 
                                     
@@ -246,40 +248,71 @@
                                 <!-- <li><a href="">최신순</a></li> -->
                                 <li>
                                     <select name="" id="">
-                                        <option value="now">최신순</option>
-                                        <option value="now">오래된순</option>
+                                        <option value="desc">최신순</option>
+                                        <option value="asc">오래된순</option>
                                     </select>
                                 </li>
-                                <li><a href="">2024-05-11</a></li>
-                                <li><a href="">2024-05-04</a></li>
-                                <li><a href="">2024-04-27</a></li>
+
+<!--                                <li><a href="">2024-05-11</a></li>-->
+<!--                                <li><a href="">2024-05-04</a></li>-->
+<!--                                <li><a href="">2024-04-27</a></li>-->
+
                             </ul>
                         </nav>
                         
                         <div>
                             <div>
-                                <h3>진료기록 <span>2024-05-04</span></h3>
-                                <button class="btn">수정</button>
+                                <input type="hidden" id="post-diagnosis-id">
+                                <h3 id="diagnosis-title">진료기록
+                                    <span>2024-05-04</span>
+                                    <span> | </span>
+                                    <span>임승범</span>
+                                </h3>
+                                <button class="btn diagnosis-modify-btn">수정</button>
                             </div>
 
-                            <div class="textarea-box">
+                            <div class="textarea-box pre-diagnosis-box">
                                 <h4>증상</h4>
                                 <textarea name="symptoms" id="symptoms-past-record" readonly placeholder="증상을 입력해주세요.">코 막힘 , 호흡불편 , 코 가려움</textarea>
                             </div>
 
-                            <div class="textarea-box">
+                            <div class="textarea-box pre-diagnosis-box">
                                 <h4>진료</h4>
                                 <textarea name="diagnosis" id="diagnosis-past-record" readonly placeholder="진료 내용을 입력해주세요.">알레르기성 비염, 환경 개선 및 약물요법 병행치료 진행 </textarea>
                             </div>
 
-                            <div class="textarea-box">
+                            <div class="textarea-box pre-diagnosis-box">
                                 <h4>처방</h4>
                                 <textarea name="prescription" id="prescription-past-record" readonly placeholder="처방 내용을 입력해주세요.">항히스타민 성분 약 7일치 처방 바람.</textarea>
                             </div>
 
-                        </div>
-                    </article>
+                            <div id="no-record-diagnosis">
+                                <span>과거 진료 기록이 없습니다.</span>
+                            </div>
 
+                            <div id="diagnosis-detail-box">
+
+                                <div id="diagnosis-photo-box">
+                                    <div>1</div>
+                                    <div>2</div>
+                                    <div>3</div>
+                                    <div>+</div>
+                                </div>
+
+                                <div id="attending-doctor-box">
+                                    <span>담당의 </span>
+                                    <span> : </span>
+                                    <span>임승범</span>
+                                </div>
+
+                            </div>
+
+
+                        </div>
+
+
+
+                    </article>
                 </section>
 
                 <section id="right-section">
@@ -287,26 +320,34 @@
                     <article>
 
                         <div>
-                            <h3>진료기록 작성 <span>2024/05/11 15:13</span></h3>
+                            <input type="hidden" id="new-diagnosisId">
+                            <h3 id="diagnosis-write-title">
+                                진료기록 작성
+                                <span id="todayDiagnosisDate">2024/05/11 15:13</span>
+                                <span> | </span>
+                                <span>임승범</span>
+                            </h3>
                         </div>
 
                         <div class="textarea-box big">
                             <div>
                                 <h4>증상</h4>
-                                <button class="btn">수정</button>
-                                <!-- <button class="btn">등록</button> -->
+                                <div id="diagnosis-btn-box">
+                                    <button class="btn" id="diagnosis-modify-btn">수정</button>
+                                    <button class="btn" id="diagnosis-delete-btn">삭제</button>
+                                    <button class="btn" id="diagnosis-cancel-btn">취소</button>
+                                    <button class="btn" id="diagnosis-create-btn">등록</button>
+                                </div>
                             </div>
-                            <textarea name="symptoms" id="symptoms-record" >마른 기침, 콧물, 가래, 수면무호흡 증상 있음</textarea>
+                            <textarea name="symptoms" id="symptoms-record" readonly ></textarea>
                         </div>
 
                         <div class="textarea-box big">
                             <div>
                                 <h4>진료</h4>
-                                <!-- <button class="btn">수정</button> -->
-                                <button class="btn">등록</button>
                             </div>
                             
-                            <textarea name="diagnosis" id="diagnosis-record" >감기몸살, 비염으로 인한 무호흡</textarea>
+                            <textarea name="diagnosis" id="diagnosis-record" readonly></textarea>
                         </div>
 
                         <div class="textarea-box big">
@@ -314,12 +355,32 @@
                                 <h4>처방</h4>
                             </div>
                             
-                            <textarea name="prescription" id="prescription-record" >아세트아미노펜, 인산 코데인</textarea>
+                            <textarea name="prescription" id="prescription-record" readonly></textarea>
                         </div>
 
-                        <div>
-                            <button class="btn" id="delete-btn">삭제</button>
+                        <div id="file-box">
+                            <div>
+                                <h4>파일등록</h4>
+                                <label for="file-upload" class="btn file-label">내PC</label>
+                            </div>
+
+                            <div>
+                                <div id="file-drag-box" class="">
+                                    <i class="fa-solid fa-file-image fa-2xl" style="color: #74C0FC;"></i>
+                                    <p>File drag and drop</p>
+
+                                    <div id="files" class="files">
+
+                                    </div>
+
+                                </div>
+
+                                <ul>
+                                    <li><input type="file" class="file" id="file-upload" accept="image/*, .pdf" multiple></li>
+                                </ul>
+                            </div>
                         </div>
+
 
                     </article>
 
@@ -341,7 +402,7 @@
                         <li>진료완료</li>
                         <li>검사대기</li>
                         <li>검사중</li>
-<!--                        <li>접수취소</li>-->
+                        <li>접수취소</li>
                     </ul>
                 </li>
 

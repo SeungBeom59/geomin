@@ -1,5 +1,6 @@
-// 시작시 활력징후 입력표 초기화
+// 시작시 활력징후 ,  입력표 초기화
 $(document).ready(function (){
+
     var date = new Date();
     var today =  date.getFullYear() + "-" + ("0"+(date.getMonth()+1)).slice(-2) + "-" + ("0"+date.getDate()).slice(-2);
 
@@ -11,7 +12,47 @@ $(document).ready(function (){
     $tr.find('td').eq(4).find('input').val(0);
     $tr.find('td').eq(5).find('input').val(0);
     $tr.find('td').eq(6).find('input').val(0);
+
+    $('#todayDiagnosisDate').text(today);   // 진료기록 작성창에 오늘 날짜 넣기
+
+    // 첨부파일 박스 html
+    const fileDragBox = $('#file-drag-box');
+
+    // 첨부파일 드래그 이벤트 추가
+    fileDragBox.on('dragenter' , highlight );
+    fileDragBox.on('dragover' , highlight );
+    fileDragBox.on('dragleave' , unhighlight );
+    fileDragBox.on('drop' , handleDrop );
+
+    console.log('document.ready 실행됨.');
+
+    // 첨부파일 드랍박스 하이라이트
+    function highlight(e){
+        console.log('drag enter or over');
+        e.preventDefault();     // 이벤트 방지
+        fileDragBox.addClass("highlight");
+    }
+// 하이라이트 제거
+    function unhighlight(e){
+        console.log('drag leave');
+        e.preventDefault();
+        fileDragBox.removeClass("highlight");
+    }
+
+    function handleDrop(e){
+        console.log('file dropped');
+        unhighlight(e);
+        e.preventDefault();
+
+        var files = e.originalEvent.dataTransfer.files;
+        console.log(files);
+
+    }
+
 });
+
+
+
 
 // 로그아웃
 function logout(){
@@ -122,6 +163,8 @@ function insertPatient(patientObj){
     $('#patient-update-btn').css('display' , 'none');
 
     searchVitals();
+    getDiagnosis();
+    // newDiagnosis();
 
 }
 
@@ -147,6 +190,7 @@ function searchVitals(){
             if(response.content.length === 0){
                 // 활력징후 결과 없을시
                 clearVitals();
+                $('#vital-sign-cancel-btn').css('display', 'none');
                 return;
             }
             insertVitals(response);
@@ -202,7 +246,7 @@ function clearVitals(){
     $('#vital-sign-modify-btn').css('display' , 'none');
     $('#vital-sign-add-btn').css('display' , 'none');
     $('#vital-sign-btn').css('display' , 'inline-block');
-    $('#vital-sign-cancel-btn').css('display', 'none');
+    $('#vital-sign-cancel-btn').css('display', 'inline-block');
     $('#vital-sign-pageing').hide();
 
     // 활력징후 page 번호, 활력징후 id 삭제
@@ -686,15 +730,25 @@ function insertWaiting(content){
 
     $('#waiting-list').empty(); // 하위 html 모두 삭제
 
+    console.log('insertWaiting 실행됨');
     console.log('content : ' , content);
 
     content.forEach(function (waitingUser){
 
         var html = '<div class="name-card">';
 
-        html += '<div><input type="hidden" value="' + waitingUser.waitingId + '" class="waitingId">';
-        html += '<span>' + waitingUser.patientName + '</span><button class="btn" onclick="callPatient(this)">호출</button></div>';
-        html += '<div><span>' + waitingUser.identify + '</span>';
+        html += '<div>' +
+                    '<input type="hidden" value="' + waitingUser.waitingId + '" class="waitingId">';
+
+        if(waitingUser.waitingStatus == '진료중'){
+            html +=     '<span class="name">' + waitingUser.patientName + '</span><button class="btn2" onclick="">진료중</button></div>';
+        }
+        else {
+            html +=     '<span class="name">' + waitingUser.patientName + '</span><button class="btn" onclick="callPatient(this)">호출</button></div>';
+        }
+
+        html += '<div>' +
+                    '<span>' + waitingUser.identify + '</span>';
 
         if(waitingUser.age != null && waitingUser.age >= 0){
             html += '<span>' + waitingUser.age + '세</span>';
@@ -716,12 +770,21 @@ function waitingPageing(waitingList){
 
     $('#waiting-pageing').empty();
 
-    console.log("실행");
+    console.log("waitingPageing 실행됨");
 
     var totalElements = waitingList.totalElements;          // 총 레코드 갯수
     var totalPages = waitingList.totalPages;                // 총 페이지 갯수
     var size = waitingList.size;                            // 보여줄 레코드 수
     var currentPage = waitingList.pageable.pageNumber;      // 현재 페이지
+    var waitingEndCnt = 0;                                  // 진료완료 수
+
+    if(waitingList.content.length !== 0){
+        waitingEndCnt = waitingList.content.at(0).waitingEndCnt;
+        $('#waiting-end-count').text(waitingEndCnt);    // 진료 완료 환자수 변경
+    }
+    else {
+        getWaitingEndCnt();
+    }
 
     console.log('totalElements = ' , totalPages , ' totalPages = ' ,
         totalPages, ' size = ' , size , ' currentPage = ' , currentPage);
@@ -729,6 +792,8 @@ function waitingPageing(waitingList){
     $('#waiting-current-page').val(currentPage); // 현재페이지 hidden으로 숨겨놓기
 
     $('#waiting-user-count').text(totalElements);   // 진료 대기 환자수 변경
+
+
     // 진료 완료 환자수 변경 필요
 
     // var html = '<ul id="waiting-pageing>"';
@@ -762,6 +827,29 @@ function waitingPageing(waitingList){
 
 }
 
+function getWaitingEndCnt(){
+
+    var data = {
+        departmentId: $('#departmentId').val()
+    }
+
+    $.ajax({
+        url: '/waiting-end-cnt',
+        type: 'post',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(data),
+        success: function (response){
+            console.log('따로 ajax 이용, 진료완료 환자 수 가져옴.');
+            var waitingEndCnt = response.waitingEndCnt;
+            $('#waiting-end-count').text(waitingEndCnt);    // 진료 완료 환자수 변경
+        },
+        error: function (xhr, status, error){
+            console.error('AJAX 요청 실패: ', status, error);
+        }
+    })
+
+}
+
 function searchWaiting(page){
 
     console.log(page);
@@ -787,9 +875,13 @@ function searchWaiting(page){
 }
 
 
+// 진료대기 환자 호출 함수 waitingList patient call
 function callPatient(button){
 
     var name = $(button).closest('.name-card').find('.name').text();
+    var id = $(button).closest('.name-card').find('.waitingId').val();
+
+    var departmentId = $('#departmentId').val();
 
     var isCall = confirm(name + '님을 호출 할까요?');
 
@@ -798,9 +890,35 @@ function callPatient(button){
     }
 
     console.log(name + '님을 호출');
+    console.log('id : ' + id);
 
+    var data = {
+        waitingId: id,
+        departmentId: departmentId
+    }
+
+    $.ajax({
+        url:'/patient-call',
+        type: 'post',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(data),
+        success: function (response){
+            alert('성공');
+            console.log(response);
+            var patientObj = response.patient;
+            var todayDiagnosis = response.todayDiagnosis;
+            console.log(patientObj);
+            console.log(todayDiagnosis);
+
+            searchWaiting($('#waiting-current-page').val());    // waitingList 새로고침
+            insertPatient(patientObj);
+            insertDiagnosis(todayDiagnosis);
+        },
+        error: function (xhr, status, error){
+            console.error('AJAX 요청 실패: ' , status, error);
+        }
+    })
 }
-
 
 
 function checkDouble(input){
@@ -894,7 +1012,7 @@ $('#custom-context-menu .submenu li').on('click' , function (){
         contentType: 'application/json; charset=utf-8',
         data: JSON.stringify(data),
         success: function (response){
-            alert('성공' + $('#waiting-current-page').val());
+            alert('성공');
 
             searchWaiting($('#waiting-current-page').val());
         } ,
@@ -905,3 +1023,163 @@ $('#custom-context-menu .submenu li').on('click' , function (){
 
 
 });
+
+// 진료완료 버튼 누를 경우 처리함수
+function endPatient() {
+
+}
+
+// 진료기록 가져오기
+function getDiagnosis(){
+
+    var patientId = $('#patientId').val();
+    var departmentId = $('#departmentId').val();
+
+    var data = {
+        patientId : patientId,
+        departmentId : departmentId
+    }
+
+    $.ajax({
+        url:"diagnosis",
+        type: 'post',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(data),
+        success: function (response){
+            alert('성공');
+            console.log('getDiagnosisList : ' , response );
+            if(response.content.length !== 0){
+                insertPastDiagnosis(response);
+            }
+            else {
+                clearPreDiagnosisList();
+            }
+
+        },
+        error: function (xhr, status, error){
+            console.error('AJAX 요청 처리 실패 : ', status, error);
+        }
+    });
+
+}
+
+// 진료기록 리스트 : 검색결과 있음 (넣어주기)
+function insertPastDiagnosis(response){
+
+    var content = response.content.at(0);
+    var symptoms = content.symptoms;
+    var diagnosis = content.diagnosis;
+    var prescription = content.prescription;
+
+    var attendingDoctor = content.diagnosisModifier !== null?
+        content.diagnosisModifier : content.doctorName;
+
+    var date = content.modifyDate !== null?
+        content.modifyDate : content.diagnosisDate;
+
+    $('#post-diagnosis-id').val(content.diagnosisId);                   // diagnosisId 넣기
+
+    $('.pre-diagnosis-box').show();                                     // 진료기록 박스 활성화
+    $('#no-record-diagnosis').hide();                                   // 진료기록 없다는 메세지 숨김
+    $('#diagnosis-title span').show();                                  // 진료기록 타이틀 옆 날짜 표시
+    $('.diagnosis-modify-btn').show();                                  // 수정버튼 활성화
+    $('#diagnosis-detail-box').css('display' , 'flex');     // 추가 정보 박스 활성화
+    $('#attending-doctor-box').css('display' , 'flex');     // 담당의 박스 활성화
+
+    // if문으로 사진이 있을 경우에만.
+    $('#diagnosis-photo-box').css('display' , 'flex');      // 진료기록 사진 박스 활성화
+
+    var name = $('#patient_name').val();
+    $('#diagnosis-title span:last-child').text(name);       // 진료기록 환자 성명
+    $('#attending-doctor-box span:last-child').text(attendingDoctor);   // 담당의
+    $('#diagnosis-title span:first-child').text(date);      // 진료날짜
+
+    $('#symptoms-past-record').text(symptoms);               // 증상 textarea
+    $('#diagnosis-past-record').text(diagnosis);             // 진료 textarea
+    $('#prescription-past-record').text(prescription);       // 처방 textarea
+}
+
+
+// 진료기록 리스트 : 검색결과 없음 표시
+function clearPreDiagnosisList(){
+
+    $('.pre-diagnosis-box').hide();
+    $('#no-record-diagnosis').css('display' , 'flex');
+    $('#diagnosis-title span').show();
+    $('#diagnosis-title span:not(:last-child)').hide();
+    $('.diagnosis-modify-btn').hide();
+
+    var name = $('#patient_name').val();
+    $('#diagnosis-title span:last-child').text(name);
+
+    $('#post-diagnosis-id').val("");                // 과거진료기록 번호 삭제
+
+    // 페이징도 지워줘야함.
+    $('#diagnosis-record-list > li:not(:first-child)').hide();
+
+    $('#diagnosis-detail-box').hide();
+
+}
+
+// 진료기록 작성칸 활성화 해주기
+function insertDiagnosis(diagnosis){
+
+    if(diagnosis.diagnosis_yn === true){
+        // true 라면 진료했던 기록이므로 버튼 설정 변경
+        $('#diagnosis-modify-btn').show();
+        $('#diagnosis-delete-btn').show();
+        $('#diagnosis-create-btn').hide();
+        $('#diagnosis-record').text(diagnosis.diagnosis);   // 진료 기록 넣기
+        $('#prescription').text(diagnosis.prescription);    // 처방 기록 넣기
+
+        // 모든 textarea 입력창 readonly로 수정 불가로 처리.
+        $('#symptoms-record').attr('readonly' , true);
+        $('#diagnosis-record').attr('readonly' , true);
+        $('#prescription').attr('readonly' , true);
+
+    }
+    else if(diagnosis.diagnosisYn === false || diagnosis.diagnosisYn == null){
+        $('#diagnosis-modify-btn').hide();
+        $('#diagnosis-create-btn').show();
+
+        $('#symptoms-record').attr('readonly' , false);
+        $('#diagnosis-record').attr('readonly' , false);
+        $('#prescription').attr('readonly' , false);
+    }
+
+    $('#todayDiagnosisDate').text(diagnosis.diagnosisDate)  // 시간을 넣어준다.
+    $('#diagnosis-write-title > span').show();              // 모든 span 보여주기(날짜:시간, 환자명)
+    $('#diagnosis-write-title > span:nth-child(3)').text(diagnosis.patientName);   // 환자명 넣기
+
+    $('#new-diagnosisId').val(diagnosis.diagnosisId);   // hidden에 진료 id 넣기
+    $('#symptoms-record').text(diagnosis.symptoms);     // 증상 값 넣기
+
+}
+
+function diagnosisPageing(response){
+
+}
+
+function addDiagnosis(){
+
+
+
+
+}
+
+
+// function newDiagnosis(){
+//
+//
+//     var $diagnosisIdInput = $('#post-diagnosis-id');
+//
+//     var diagnosisId =
+//         $diagnosisIdInput.val() === null || $diagnosisIdInput.val() === ""? null : $diagnosisIdInput.val();
+//
+//     if(diagnosisId === null || diagnosisId === ""){
+//
+//
+//     }
+//
+//
+// }

@@ -73,7 +73,7 @@ public class WaitingUtil {
         int waitingValue = -1;
         boolean statusOrType = false;
 
-        String[] actionList = {"대기중" , "진료중" , "진료완료" , "검사중" , "검사대기"};
+        String[] actionList = {"대기중" , "진료중" , "진료완료" , "검사중" , "검사대기" , "접수취소"};
 
         for (String s : actionList) {
             if(waitingDTO.getAction().equals(s)){
@@ -97,7 +97,7 @@ public class WaitingUtil {
         else if(value.equals("검사대기") || value.equals("외래진료")){
             waitingValue = 4;
         }
-        else if(value.equals("재활진료")){
+        else if(value.equals("접수취소") || value.equals("재활진료")){
             waitingValue = 5;
         }
 
