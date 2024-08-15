@@ -10,4 +10,8 @@ public interface DiagnosisService {
 
 
     DiagnosisDTO getTodayDiagnosis(int waitingId);
+
+    DiagnosisDTO updateDiagnosisById(DiagnosisDTO diagnosisDTO);
+
+    void createDiagnosis();
 }

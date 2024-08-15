@@ -24,6 +24,20 @@ $(document).ready(function (){
     fileDragBox.on('dragleave' , unhighlight );
     fileDragBox.on('drop' , handleDrop );
 
+    // 파일 업로드 input, label 이용시
+    $('#file-upload').on('change', fileSelect);
+
+    function fileSelect(e){
+        $('#file-drag-box > i').hide();
+        $('#file-drag-box > p').hide();
+
+        let files = e.target.files;
+        console.log('선택된 파일' , files);
+
+        processFile(files);
+
+    }
+
     console.log('document.ready 실행됨.');
 
     // 첨부파일 드랍박스 하이라이트
@@ -39,19 +53,169 @@ $(document).ready(function (){
         fileDragBox.removeClass("highlight");
     }
 
+    const fileList = $('#files');   // 파일 담을 div dom
+    let uploadFiles = [];           // 파일 업로드 목록
+
     function handleDrop(e){
+
+        $('#file-drag-box > i ').hide();
+        $('#file-drag-box > p').hide();
+
         console.log('file dropped');
         unhighlight(e);
         e.preventDefault();
 
-        var files = e.originalEvent.dataTransfer.files;
-        console.log(files);
+        var files = e.originalEvent.dataTransfer.files;     // 파일 정보를 담은 유사배열
+
+        processFile(files);
+    }
+
+    function processFile(files){
+
+        console.log('files' , files);
+
+        var fileArray = [...files];     // 위의 유사배열인 files의 내용을 복사하여 진짜 배열로 변경.
+
+        // 파일 업로드 목록 담기 처리 및 파일 목록 출력
+        for(var i=0; i < fileArray.length; i++){
+
+            // 중복파일 무효화 처리
+            // 업로드파일 목록에 있는 파일을 순차로 돌면서 파일이름이 fileArray 이번 회차 파일이름과 같은지 확인.
+            if(uploadFiles.some(f => f.name === fileArray[i].name && f.size === fileArray[i].size)){
+                console.log('중복 파일 제외 : ' , fileArray[i].name);
+                continue;   // 루프 건너뜀.
+            }
+
+            fileList.append(renderFile(fileArray[i]));  // div에 만들어진 파일 html 추가
+            uploadFiles.push(fileArray[i]);             // 업로드할 목록에 담아준다.
+        }
+
+        console.log('uploadFiles[] ' , uploadFiles);
+        // return uploadFiles;
+    }
+
+
+    // 파일 사이즈 출력
+    function formatFileSize(sizeInBytes) {
+        if (sizeInBytes < 1024) {
+            return `${sizeInBytes} B`; // 바이트 단위로 표시
+        } else if (sizeInBytes < (1024*1024)) {
+            return `${(sizeInBytes / 1024).toFixed(1)} kb`; // KB 단위로 표시
+        } else {
+            return `${(sizeInBytes / 1048576).toFixed(1)} mb`; // MB 단위로 표시
+        }
+    }
+
+    // 파일 html 변환
+    function renderFile(file) {
+            var fileHtml = $('<div></div>');
+            fileHtml.addClass('file');
+
+            fileHtml.append(`
+            <div class="thumbnail">
+                
+            </div>
+            
+            <div class="file-info">
+                <span class="name">${file.name}</span>
+                <span class="size">${formatFileSize(file.size)}</span>
+            </div>
+            
+            <div onclick="deleteFile(this)">
+                <span>X</span>
+            </div>
+        `)
+
+        // <img src="" title="${escape(file.name)}">
+        // 파일 미리보기 처리 (이미지 파일만 해당)
+        if (file.type.startsWith('image/')) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                // fileHtml.find('img').attr('src', e.target.result);
+                fileHtml.find('.thumbnail').html(`<img src="${e.target.result}" title="${escape(file.name)}" />`);
+            };
+            reader.readAsDataURL(file);
+        }
+        // image 파일이 아닌 다른 유형일 경우 아래의 아이콘 삽입하도록
+        else {
+
+            var iconType = '';
+
+            if(file.type === 'application/pdf'){
+                iconType = 'fa-file-pdf';
+            }
+            else if(file.type.startsWith('text/')){
+                iconType = 'fa-file-lines';
+            }
+            else if(file.type.startsWith('video/')){
+                iconType = 'fa-file-video';
+            }
+            else if(file.type.startsWith('audio')){
+                iconType = 'fa-file-audio';
+            }
+            else {
+                iconType = 'fa-file';
+            }
+            fileHtml.find('.thumbnail').html(`<i class="fa-regular ${iconType}"></i>`)
+        }
+
+        return fileHtml;
+    }
+
+
+    var btn = $('#diagnosis-create-btn');
+    btn.on('click' , updateDiagnosis);
+
+
+    // 진료기록 작성|수정
+    function updateDiagnosis(){
+
+        console.log('updateDiagnosis' ,  $('#diagnosis-yn').val());
+
+        var $diagnosisId = $('#new-diagnosisId');
+
+        // diagnosisId가 null 또는 "" 이라면 새로작성, 아니라면 수정
+        // 진료접수를 받으면 diagnosisId가 무조건 생기는데 왜 없는 경우를 가정하느냐는
+        // 진료접수 없이 새로운 진료기록을 작성하는 경우를 고려함.
+        var diagnosisId = $diagnosisId.val() === null || $diagnosisId.val() === ""?
+            0 : $diagnosisId.val();
+
+        // ajax 데이터
+        var data = new FormData();
+
+        data.append("diagnosis" , new Blob([JSON.stringify({
+            diagnosisId : diagnosisId,
+            symptoms : $('#symptoms-record').val().replace('\r\n' , '<br\>'),
+            diagnosis : $('#diagnosis-record').val().replace('\r\n' , '<br\>'),
+            prescription : $('#prescription-record').val().replace('\r\n' , '<br\>'),
+            diagnosisYn : $('#diagnosis-yn').val(),
+        })] , { type: "application/json; charset=utf-8"}));
+
+        uploadFiles.forEach(function (file){
+            data.append("uploadFiles" , file);
+        });
+
+        console.log('data : ' , data);
+
+        $.ajax({
+            url: '/diagnosis-update',
+            type: 'post',
+            processData: false,
+            contentType: false,
+            data : data,
+            success: function (response){
+                alert('성공');
+                console.log(response);
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX 요청 실패: ' , status , error);
+            }
+        })
+
 
     }
 
 });
-
-
 
 
 // 로그아웃
@@ -1124,18 +1288,22 @@ function clearPreDiagnosisList(){
 // 진료기록 작성칸 활성화 해주기
 function insertDiagnosis(diagnosis){
 
-    if(diagnosis.diagnosis_yn === true){
+    $('#diagnosis-yn').val(false);
+
+    if(diagnosis.diagnosisYn === true){
         // true 라면 진료했던 기록이므로 버튼 설정 변경
         $('#diagnosis-modify-btn').show();
         $('#diagnosis-delete-btn').show();
         $('#diagnosis-create-btn').hide();
-        $('#diagnosis-record').text(diagnosis.diagnosis);   // 진료 기록 넣기
-        $('#prescription').text(diagnosis.prescription);    // 처방 기록 넣기
+        $('#diagnosis-record').text(diagnosis.diagnosis.replace('\r\n' , '<br\>'));   // 진료 기록 넣기
+        $('#prescription').text(diagnosis.prescription.replace('\r\n' , '<br\>'));    // 처방 기록 넣기
 
         // 모든 textarea 입력창 readonly로 수정 불가로 처리.
         $('#symptoms-record').attr('readonly' , true);
         $('#diagnosis-record').attr('readonly' , true);
         $('#prescription').attr('readonly' , true);
+
+        $('#diagnosis-yn').val(true);
 
     }
     else if(diagnosis.diagnosisYn === false || diagnosis.diagnosisYn == null){
@@ -1144,15 +1312,20 @@ function insertDiagnosis(diagnosis){
 
         $('#symptoms-record').attr('readonly' , false);
         $('#diagnosis-record').attr('readonly' , false);
-        $('#prescription').attr('readonly' , false);
+        $('#prescription-record').attr('readonly' , false);
     }
 
-    $('#todayDiagnosisDate').text(diagnosis.diagnosisDate)  // 시간을 넣어준다.
+    if(diagnosis.modifyDate !== null){
+        $('#todayDiagnosisDate').text(diagnosis.modifyDate);
+    }
+    else {
+        $('#todayDiagnosisDate').text(diagnosis.diagnosisDate)  // 시간을 넣어준다.
+    }
     $('#diagnosis-write-title > span').show();              // 모든 span 보여주기(날짜:시간, 환자명)
     $('#diagnosis-write-title > span:nth-child(3)').text(diagnosis.patientName);   // 환자명 넣기
 
     $('#new-diagnosisId').val(diagnosis.diagnosisId);   // hidden에 진료 id 넣기
-    $('#symptoms-record').text(diagnosis.symptoms);     // 증상 값 넣기
+    $('#symptoms-record').text(diagnosis.symptoms.replace('\r\n' , '<br\>'));     // 증상 값 넣기
 
 }
 
@@ -1160,26 +1333,5 @@ function diagnosisPageing(response){
 
 }
 
-function addDiagnosis(){
 
 
-
-
-}
-
-
-// function newDiagnosis(){
-//
-//
-//     var $diagnosisIdInput = $('#post-diagnosis-id');
-//
-//     var diagnosisId =
-//         $diagnosisIdInput.val() === null || $diagnosisIdInput.val() === ""? null : $diagnosisIdInput.val();
-//
-//     if(diagnosisId === null || diagnosisId === ""){
-//
-//
-//     }
-//
-//
-// }

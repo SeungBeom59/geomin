@@ -22,4 +22,8 @@ public interface DiagnosisRepository {
     void deleteDiagnosisByWaitingId(int waitingId);
 
     DiagnosisVO getDiagnosisByWaitingId(int waitingId);
+
+    int updateDiagnosisById(DiagnosisDTO diagnosisDTO);
+
+    DiagnosisVO getDiagnosisById(int diagnosisId);
 }

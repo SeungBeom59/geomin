@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,6 +81,7 @@ public class DiagnosisServiceImpl implements DiagnosisService{
     }
 
     @Override
+    @Transactional
     public DiagnosisDTO getTodayDiagnosis(int waitingId) {
 
         DiagnosisVO result = diagnosisRepository.getDiagnosisByWaitingId(waitingId);
@@ -110,5 +112,51 @@ public class DiagnosisServiceImpl implements DiagnosisService{
 
         return todayDiagnosis;
     }
+
+    @Override
+    @Transactional
+    public DiagnosisDTO updateDiagnosisById(DiagnosisDTO diagnosisDTO) {
+        log.info("updateDiagnosisById 실행");
+
+        // 진료 했던 기록이냐? 아니냐?
+
+        int updateResult = diagnosisRepository.updateDiagnosisById(diagnosisDTO);
+        DiagnosisVO result = diagnosisRepository.getDiagnosisById(diagnosisDTO.getDiagnosisId());
+
+        PatientVO patient = result.getPatient();
+        DepartmentVO department = result.getDepartment();
+        WaitingVO waiting = result.getWaiting();
+
+
+        log.info("result::{}" , result);
+
+        DiagnosisDTO diagnosis = DiagnosisDTO.builder()
+                .diagnosisId(result.getDiagnosisId())
+                .patientId(patient.getPatientId())
+                .patientName(patient.getPatientName())
+                .departmentId(department.getDepartmentId())
+                .departmentName(department.getDepartmentName())
+                .waitingId(waiting.getWaitingId())
+                .symptoms(result.getSymptoms())
+                .diagnosis(result.getDiagnosis())
+                .prescription(result.getPrescription())
+                .diagnosisYn(result.getDiagnosisYn())
+                .fileId(result.getFileId())
+                .diagnosisModifier(result.getDiagnosisModifier())
+                .build();
+
+        diagnosis = result.getDateAndModifiedMember(result , diagnosis);
+
+        return diagnosis;
+    }
+
+    @Override
+    public void createDiagnosis() {
+
+        //        DiagnosisVO result =  diagnosisRepository.insertDiagnosis(diagnosisDTO);
+        log.info("createDiagnosis 실행");
+
+    }
+
 
 }

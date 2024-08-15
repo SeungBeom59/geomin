@@ -7,19 +7,25 @@ import com.geomin.demo.repository.DiagnosisRepository;
 import com.geomin.demo.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Response;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Map;
+
+import static com.geomin.demo.domain.UserRole.ROLE_ADMIN;
 
 @Slf4j
 @Controller
@@ -30,6 +36,7 @@ public class HomeController {
     private final PatientService patientService;
     private final WaitingService waitingService;
     private final DiagnosisService diagnosisService;
+    private final FileService fileService;
 
     // 로그인
     @GetMapping("/login")
@@ -353,6 +360,55 @@ public class HomeController {
             return ResponseEntity.status(HttpStatus.OK).body(vitals);
         }
 
+    }
+
+    // 진료 기록 작성 | 수정
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PostMapping("/diagnosis-update")
+    @Transactional
+    public ResponseEntity<?> updateDiagnosis(
+            @RequestPart("diagnosis") DiagnosisDTO diagnosisDTO ,
+            @RequestPart("uploadFiles") List<MultipartFile> uploadFiles,
+            Principal principal){
+
+        log.info("post >> /diagnosis-update... updateDiagnosis() 실행.");
+        log.info("diagnosisDTO::{}" , diagnosisDTO);
+        log.info("--------------------------------------------------------------------------");
+        log.info("uploadFiles::{}" , uploadFiles);
+
+        UserSecurityDTO user = userService.getUser(principal.getName());    // 신원확인 정보 가져오기
+
+        // 의사인지 체크
+        if(user.getRoleSet() == ROLE_ADMIN){
+            diagnosisDTO.setDoctorId(user.getReferenceId());    //  의사 id 설정
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한부족으로 인한 진료기록 작성 불가");
+        }
+
+        // 진료했던 진료기록이라면 수정자에 아이디 넣기
+        if(diagnosisDTO.getDiagnosisYn()){
+            diagnosisDTO.setDiagnosisModifier(user.getId());
+        }
+
+        // 파일이 존재 한다면 업로드 진행, 파일 저장 id 대입
+        if( !uploadFiles.isEmpty() ){
+            int fileId = fileService.upload(uploadFiles);
+            diagnosisDTO.setFileId(fileId);
+        }
+
+        // id가 존재(기존 진료기록 또는 진료접수를 통한 진료기록)
+        if(diagnosisDTO.getDiagnosisId() > 0){
+            DiagnosisDTO result =  diagnosisService.updateDiagnosisById(diagnosisDTO);
+            log.info("result::{}", result);
+        }
+        // id가 0 또는 그 이하인 경우, 진료접수 없이 작성한 새로운 진료기록
+        else {
+//            diagnosisDTO.setDiagnosisYn(true);  // 진료완료 처리
+//            diagnosisService.createDiagnosis();
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body("");
     }
 
 

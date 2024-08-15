@@ -16,8 +16,14 @@
         <result property="diagnosisModifier" column="diagnosis_modifier" />
         <result property="fileId" column="file_id" />
         <result property="diagnosisDelYn" column="diagnosis_del_yn" />
-        <association property="patient" resultMap="patientMap" />
+
+        <!--  diagnosis_modifier mapping -->
+<!--        <association property="diagnosisModifier" resultMap="doctorMap" column="diagnosis_modifier"/>-->
+
+<!--         doctor_id maaping -->
         <association property="doctor" resultMap="doctorMap" />
+
+        <association property="patient" resultMap="patientMap" />
         <association property="department" resultMap="departmentMap" />
         <association property="waiting" resultMap="waitingMap" />
     </resultMap>
@@ -53,6 +59,8 @@
         <result property="doctorPhone" column="doctor_phone" />
         <association property="department" resultMap="departmentMap" />
     </resultMap>
+
+
 
     <resultMap id="departmentMap" type="com.geomin.demo.domain.DepartmentVO">
         <id property="departmentId" column="department_id" />
@@ -140,6 +148,47 @@
             LEFT OUTER JOIN PATIENT p ON p.PATIENT_ID = d.PATIENT_ID
         WHERE
             d.WAITING_ID = #{waitingId}
+    </select>
+
+    <update id="updateDiagnosisById">
+        UPDATE
+            DIAGNOSIS
+        <set>
+            SYMPTOMS = #{symptoms},
+            DIAGNOSIS = #{diagnosis},
+            PRESCRIPTION = #{prescription},
+
+            <if test="fileId > 0">
+                FILE_ID = #{fileId},
+            </if>
+
+            <if test="diagnosisYn == true">
+                MODIFY_DATE = now(),
+                DIAGNOSIS_MODIFIER = #{diagnosisModifier},
+            </if>
+
+            <if test="diagnosisYn == false">
+                DIAGNOSIS_DATE = now(),
+                DOCTOR_ID = #{doctorId},
+                DIAGNOSIS_YN = true,
+            </if>
+        </set>
+        WHERE
+            DIAGNOSIS_ID = #{diagnosisId}
+    </update>
+
+
+    <select id="getDiagnosisById" resultMap="DiagnosisMap">
+        SELECT
+            *
+        FROM
+        DIAGNOSIS d
+            LEFT OUTER JOIN DEPARTMENT d2 ON d2.DEPARTMENT_ID = d.DEPARTMENT_ID
+            LEFT OUTER JOIN WAITING w ON w.WAITING_ID = d.WAITING_ID
+            LEFT OUTER JOIN PATIENT p ON p.PATIENT_ID = d.PATIENT_ID
+            LEFT OUTER JOIN DOCTOR d3 ON d3.DOCTOR_ID = d.DOCTOR_ID
+        WHERE
+            d.DIAGNOSIS_ID = #{diagnosisId}
     </select>
 
 

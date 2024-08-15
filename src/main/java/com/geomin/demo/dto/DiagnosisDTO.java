@@ -4,8 +4,10 @@ import com.geomin.demo.domain.DepartmentVO;
 import com.geomin.demo.domain.DoctorVO;
 import com.geomin.demo.domain.PatientVO;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -34,7 +36,8 @@ public class DiagnosisDTO {
     private String diagnosis;               // 진료기록
     private String prescription;            // 처방기록
 
-    private Boolean diagnosisYn;            // 진료여부
+    @Builder.Default
+    private Boolean diagnosisYn = false;    // 진료여부
     private String modifyDate;              // 수정날짜
     private String diagnosisModifier;       // 수정자
 
