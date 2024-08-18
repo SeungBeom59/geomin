@@ -2,6 +2,8 @@ package com.geomin.demo.service;
 
 import com.geomin.demo.domain.*;
 import com.geomin.demo.dto.DiagnosisDTO;
+import com.geomin.demo.dto.FileInfoDTO;
+import com.geomin.demo.dto.ResponseDTO;
 import com.geomin.demo.repository.DiagnosisRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +20,7 @@ import java.util.List;
 public class DiagnosisServiceImpl implements DiagnosisService{
 
     private final DiagnosisRepository diagnosisRepository;
+    private final FileService fileService;
 
     @Override
     public Page<DiagnosisDTO> getDiagnosisList(Pageable pageable , DiagnosisDTO diagnosisDTO) {
@@ -115,17 +118,28 @@ public class DiagnosisServiceImpl implements DiagnosisService{
 
     @Override
     @Transactional
-    public DiagnosisDTO updateDiagnosisById(DiagnosisDTO diagnosisDTO) {
+    public ResponseDTO updateDiagnosisById(DiagnosisDTO diagnosisDTO) {
         log.info("updateDiagnosisById 실행");
 
-        // 진료 했던 기록이냐? 아니냐?
-
         int updateResult = diagnosisRepository.updateDiagnosisById(diagnosisDTO);
+
+        if(updateResult <= 0){
+            return null;
+        }
+
+        ResponseDTO responseDTO = new ResponseDTO();
+
         DiagnosisVO result = diagnosisRepository.getDiagnosisById(diagnosisDTO.getDiagnosisId());
+
+        if(result != null && result.getFileId() > 0){
+            List<FileInfoDTO> fileList = fileService.getFileById(result.getFileId());
+            responseDTO.setFileInfoDTOList(fileList);
+        }
 
         PatientVO patient = result.getPatient();
         DepartmentVO department = result.getDepartment();
         WaitingVO waiting = result.getWaiting();
+        DoctorVO doctor = result.getDoctor();
 
 
         log.info("result::{}" , result);
@@ -134,6 +148,8 @@ public class DiagnosisServiceImpl implements DiagnosisService{
                 .diagnosisId(result.getDiagnosisId())
                 .patientId(patient.getPatientId())
                 .patientName(patient.getPatientName())
+                .doctorId(doctor.getDoctorId())
+                .doctorName(doctor.getDoctorName())
                 .departmentId(department.getDepartmentId())
                 .departmentName(department.getDepartmentName())
                 .waitingId(waiting.getWaitingId())
@@ -142,20 +158,28 @@ public class DiagnosisServiceImpl implements DiagnosisService{
                 .prescription(result.getPrescription())
                 .diagnosisYn(result.getDiagnosisYn())
                 .fileId(result.getFileId())
-                .diagnosisModifier(result.getDiagnosisModifier())
                 .build();
 
         diagnosis = result.getDateAndModifiedMember(result , diagnosis);
 
-        return diagnosis;
+        responseDTO.setDiagnosisDTO(diagnosis);
+
+        return responseDTO;
     }
 
+    @Transactional
     @Override
-    public void createDiagnosis() {
-
-        //        DiagnosisVO result =  diagnosisRepository.insertDiagnosis(diagnosisDTO);
+    public ResponseDTO createDiagnosis(DiagnosisDTO diagnosisDTO) {
         log.info("createDiagnosis 실행");
 
+        // 마지막 id 가져오기
+        int lastDiagnosisId = diagnosisRepository.getLastDiagnosisId();
+        // 마지막 id + 1 값 대입
+        diagnosisDTO.setDiagnosisId(lastDiagnosisId + 1 );
+//        DiagnosisVO result =  diagnosisRepository.createDiagnosis(diagnosisDTO);
+
+
+        return null;
     }
 
 

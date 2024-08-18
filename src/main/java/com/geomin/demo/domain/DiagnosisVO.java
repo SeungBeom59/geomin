@@ -25,7 +25,8 @@ public class DiagnosisVO {
     private String prescription;            // 처방기록
     private Boolean diagnosisYn;            // 진료여부
     private LocalDateTime modifyDate;       // 수정날짜
-    private String diagnosisModifier;       // 수정자
+//    private String diagnosisModifier;       // 수정자
+    private DoctorVO diagnosisModifier;       // 수정자
     private int fileId;                     // 첨부파일 번호(일종의 fk: 관계는 맺지 않음)
     private Boolean diagnosisDelYn;         // 삭제 여부 (1:true 삭제 | 0:false 존재)
 
@@ -42,7 +43,8 @@ public class DiagnosisVO {
             String modifiedTime = modifiedDate.replace("T" , "/");
             dto.setModifyDate(modifiedTime);
 
-            dto.setDiagnosisModifier(vo.getDiagnosisModifier());
+            dto.setDiagnosisModifier(vo.getDiagnosisModifier().getDoctorId());
+            dto.setModifierName(vo.getDiagnosisModifier().getDoctorName());
         }
 
 

@@ -271,38 +271,6 @@ public class HomeController {
         }
     }
 
-    // 진료대기환자 호출
-    @Transactional
-    @PostMapping("/patient-call")
-    public ResponseEntity<?> callPatient(@RequestBody WaitingDTO waitingDTO){
-
-        log.info("post >> /patient-call... callPatient() 실행.");
-        log.info("waitingDTO::{}" , waitingDTO);
-
-        // action 없이 waiting-modify에 waitingId만 요청 받을 경우, 호출 버튼을 누른 것이므로
-        // action을 "진료중"으로 바꾸어준다.
-        if(waitingDTO.getAction() == null){
-            waitingDTO.setAction("진료중");
-        }
-
-        int result = waitingService.modifyWaitingStatus(waitingDTO);    // waiting status 변경(진료중)
-
-        DiagnosisDTO todayDiagnosisDTO = diagnosisService.getTodayDiagnosis(waitingDTO.getWaitingId());
-
-        PatientDTO patient = new PatientDTO();
-        patient.setPatientId(todayDiagnosisDTO.getPatientId());
-        PatientDTO patientDTO = patientService.getPatientById(patient);
-
-        CallPatientDTO callResponse = new CallPatientDTO(patientDTO , todayDiagnosisDTO);
-
-        if(result != 1 || callResponse.getPatient() == null || callResponse.getTodayDiagnosis() == null){
-            return ResponseEntity.internalServerError().body("서버 요청 처리 실패");
-        }
-
-        return ResponseEntity.status(HttpStatus.OK).body(callResponse);
-    }
-
-
     // 활력징후 가져오기
     @PostMapping("/vitals-search")
     public ResponseEntity<Page<VitalsDTO>> getVitalsList(
@@ -362,13 +330,47 @@ public class HomeController {
 
     }
 
+    // 진료대기환자 호출
+    @Transactional
+    @PostMapping("/patient-call")
+    public ResponseEntity<?> callPatient(@RequestBody WaitingDTO waitingDTO){
+
+        log.info("post >> /patient-call... callPatient() 실행.");
+        log.info("waitingDTO::{}" , waitingDTO);
+
+        // action 없이 waiting-modify에 waitingId만 요청 받을 경우, 호출 버튼을 누른 것이므로
+        // action을 "진료중"으로 바꾸어준다.
+        if(waitingDTO.getAction() == null){
+            waitingDTO.setAction("진료중");
+        }
+
+        int result = waitingService.modifyWaitingStatus(waitingDTO);    // waiting status 변경(진료중)
+
+        DiagnosisDTO todayDiagnosisDTO = diagnosisService.getTodayDiagnosis(waitingDTO.getWaitingId());
+
+        PatientDTO patient = new PatientDTO();
+        patient.setPatientId(todayDiagnosisDTO.getPatientId());
+        PatientDTO patientDTO = patientService.getPatientById(patient);
+
+        ResponseDTO callResponse = ResponseDTO.builder()
+                .diagnosisDTO(todayDiagnosisDTO)
+                .patientDTO(patientDTO)
+                .build();
+
+        if(result != 1 || callResponse.getPatientDTO() == null || callResponse.getDiagnosisDTO() == null){
+            return ResponseEntity.internalServerError().body("서버 요청 처리 실패");
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(callResponse);
+    }
+
     // 진료 기록 작성 | 수정
     @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("/diagnosis-update")
     @Transactional
     public ResponseEntity<?> updateDiagnosis(
             @RequestPart("diagnosis") DiagnosisDTO diagnosisDTO ,
-            @RequestPart("uploadFiles") List<MultipartFile> uploadFiles,
+            @RequestPart(value = "uploadFiles" , required = false) List<MultipartFile> uploadFiles,
             Principal principal){
 
         log.info("post >> /diagnosis-update... updateDiagnosis() 실행.");
@@ -378,37 +380,36 @@ public class HomeController {
 
         UserSecurityDTO user = userService.getUser(principal.getName());    // 신원확인 정보 가져오기
 
-        // 의사인지 체크
-        if(user.getRoleSet() == ROLE_ADMIN){
-            diagnosisDTO.setDoctorId(user.getReferenceId());    //  의사 id 설정
-        }
-        else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한부족으로 인한 진료기록 작성 불가");
-        }
-
-        // 진료했던 진료기록이라면 수정자에 아이디 넣기
-        if(diagnosisDTO.getDiagnosisYn()){
-            diagnosisDTO.setDiagnosisModifier(user.getId());
-        }
+        ResponseDTO result = new ResponseDTO();
 
         // 파일이 존재 한다면 업로드 진행, 파일 저장 id 대입
-        if( !uploadFiles.isEmpty() ){
+        if( uploadFiles != null ){
             int fileId = fileService.upload(uploadFiles);
             diagnosisDTO.setFileId(fileId);
         }
 
+        // 진료했던 진료기록이라면 수정자에 아이디 넣기
+        if(diagnosisDTO.getDiagnosisYn()){
+            diagnosisDTO.setDiagnosisModifier(user.getReferenceId());
+        }
+        // 아니라면 담당의에 의사 id 설정
+        else {
+            diagnosisDTO.setDoctorId(user.getReferenceId());
+        }
+
         // id가 존재(기존 진료기록 또는 진료접수를 통한 진료기록)
         if(diagnosisDTO.getDiagnosisId() > 0){
-            DiagnosisDTO result =  diagnosisService.updateDiagnosisById(diagnosisDTO);
+            result =  diagnosisService.updateDiagnosisById(diagnosisDTO);
             log.info("result::{}", result);
         }
         // id가 0 또는 그 이하인 경우, 진료접수 없이 작성한 새로운 진료기록
         else {
-//            diagnosisDTO.setDiagnosisYn(true);  // 진료완료 처리
-//            diagnosisService.createDiagnosis();
+            diagnosisDTO.setDiagnosisYn(true);  // 진료완료 처리
+            result = diagnosisService.createDiagnosis(diagnosisDTO);
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body("");
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+
     }
 
 

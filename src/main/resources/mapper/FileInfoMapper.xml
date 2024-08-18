@@ -14,7 +14,7 @@
 
     <insert id="insertFiles" >
         INSERT INTO FILE_INFO
-            (FILE_ID , FILE_SEQ, ORG_FILE_NAME , SAVE_FILE_NAME , FILE_PATH , FILE_SIZE )
+            (FILE_ID , FILE_SEQ, ORG_FILE_NAME , SAVE_FILE_NAME , FILE_PATH , FILE_SIZE , IMG )
         VALUES
         <foreach item="file" collection="uploadFiles" separator=",">
             (
@@ -23,9 +23,21 @@
             #{file.orgFileName} ,
             #{file.saveFileName} ,
             #{file.filePath} ,
-            #{file.fileSize})
+            #{file.fileSize},
+            #{file.img})
         </foreach>
     </insert>
+
+    <select id="getFileById" resultType="com.geomin.demo.domain.FileInfoVO">
+        SELECT
+            *
+        FROM
+            FILE_INFO
+        WHERE
+            FILE_ID = #{fileId}
+
+
+    </select>
 
 
 

@@ -39,7 +39,8 @@ public class DiagnosisDTO {
     @Builder.Default
     private Boolean diagnosisYn = false;    // 진료여부
     private String modifyDate;              // 수정날짜
-    private String diagnosisModifier;       // 수정자
+    private int diagnosisModifier;       // 수정자
+    private String modifierName;       // 수정자 이름
 
     private int fileId;                     // 파일정보 번호(fk)
 

@@ -13,16 +13,14 @@
         <result property="prescription" column="prescription" />
         <result property="diagnosisYn" column="diagnosis_yn" />
         <result property="modifyDate" column="modify_date" />
-        <result property="diagnosisModifier" column="diagnosis_modifier" />
+<!--        <result property="diagnosisModifier" column="diagnosis_modifier" />-->
         <result property="fileId" column="file_id" />
         <result property="diagnosisDelYn" column="diagnosis_del_yn" />
 
         <!--  diagnosis_modifier mapping -->
-<!--        <association property="diagnosisModifier" resultMap="doctorMap" column="diagnosis_modifier"/>-->
-
-<!--         doctor_id maaping -->
-        <association property="doctor" resultMap="doctorMap" />
-
+        <association property="diagnosisModifier" resultMap="modifierMap" column="diagnosis_modifier"/>
+        <!--  doctor_id maaping -->
+        <association property="doctor" resultMap="doctorMap"/>
         <association property="patient" resultMap="patientMap" />
         <association property="department" resultMap="departmentMap" />
         <association property="waiting" resultMap="waitingMap" />
@@ -53,6 +51,13 @@
         <result property="postCode" column="post_code" />
     </resultMap>
 
+    <resultMap id="modifierMap" type="com.geomin.demo.domain.DoctorVO">
+        <id property="doctorId" column="modifier_doctorId" />
+        <result property="doctorName" column="modifier_doctorName" />
+        <result property="doctorPhone" column="modifier_doctorPhone" />
+        <association property="department" resultMap="modifierDepartmentMap" />
+    </resultMap>
+
     <resultMap id="doctorMap" type="com.geomin.demo.domain.DoctorVO">
         <id property="doctorId" column="doctor_id" />
         <result property="doctorName" column="doctor_name" />
@@ -60,12 +65,16 @@
         <association property="department" resultMap="departmentMap" />
     </resultMap>
 
-
-
     <resultMap id="departmentMap" type="com.geomin.demo.domain.DepartmentVO">
         <id property="departmentId" column="department_id" />
         <result property="departmentName" column="department_name" />
         <result property="departmentPhone" column="department_phone" />
+    </resultMap>
+
+    <resultMap id="modifierDepartmentMap" type="com.geomin.demo.domain.DepartmentVO">
+        <id property="departmentId" column="modifier_department" />
+        <result property="departmentName" column="modifier_departmentName" />
+        <result property="departmentPhone" column="modifier_departmentPhone" />
     </resultMap>
 
 
@@ -89,11 +98,23 @@
 
     <select id="getDiagnosisList" resultMap="DiagnosisMap">
         SELECT
-            *
+            d.*,
+            d3.*,
+            d2.doctor_name as doctor_name,
+            d2.doctor_phone as doctor_phone,
+            d2.department_id as department,
+            d4.doctor_id as modifier_doctorId,
+            d4.doctor_name as modifier_doctorName,
+            d4.doctor_phone as modifier_doctorPhone,
+            d4.department_id as modifier_department,
+            d5.department_name as modifier_departmentName,
+            d5.department_phone as modifier_departmentPhone
         FROM
             diagnosis d
             LEFT OUTER JOIN DOCTOR d2 ON d2.DOCTOR_ID = d.DOCTOR_ID
             LEFT OUTER JOIN DEPARTMENT d3 ON d3.DEPARTMENT_ID = d.DEPARTMENT_ID
+            LEFT OUTER JOIN DOCTOR d4 ON d4.DOCTOR_ID = d.DIAGNOSIS_MODIFIER
+            LEFT OUTER JOIN DEPARTMENT d5 ON d5.DEPARTMENT_ID = d4.DEPARTMENT_ID
         WHERE
             d.DEPARTMENT_ID = #{diagnosisDTO.departmentId}
         AND
@@ -180,13 +201,25 @@
 
     <select id="getDiagnosisById" resultMap="DiagnosisMap">
         SELECT
-            *
+            d.*,
+            P.*,
+            d3.*,
+            d2.doctor_name as doctor_name,
+            d2.doctor_phone as doctor_phone,
+            d2.department_id as department,
+            d4.doctor_id as modifier_doctorId,
+            d4.doctor_name as modifier_doctorName,
+            d4.doctor_phone as modifier_doctorPhone,
+            d4.department_id as modifier_department,
+            d5.department_name as modifier_departmentName,
+            d5.department_phone as modifier_departmentPhone
         FROM
-        DIAGNOSIS d
-            LEFT OUTER JOIN DEPARTMENT d2 ON d2.DEPARTMENT_ID = d.DEPARTMENT_ID
-            LEFT OUTER JOIN WAITING w ON w.WAITING_ID = d.WAITING_ID
+            diagnosis d
             LEFT OUTER JOIN PATIENT p ON p.PATIENT_ID = d.PATIENT_ID
-            LEFT OUTER JOIN DOCTOR d3 ON d3.DOCTOR_ID = d.DOCTOR_ID
+            LEFT OUTER JOIN DOCTOR d2 ON d2.DOCTOR_ID = d.DOCTOR_ID
+            LEFT OUTER JOIN DEPARTMENT d3 ON d3.DEPARTMENT_ID = d.DEPARTMENT_ID
+            LEFT OUTER JOIN DOCTOR d4 ON d4.DOCTOR_ID = d.DIAGNOSIS_MODIFIER
+            LEFT OUTER JOIN DEPARTMENT d5 ON d5.DEPARTMENT_ID = d4.DEPARTMENT_ID
         WHERE
             d.DIAGNOSIS_ID = #{diagnosisId}
     </select>

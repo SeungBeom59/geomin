@@ -3,6 +3,7 @@ $(document).ready(function (){
 
     var date = new Date();
     var today =  date.getFullYear() + "-" + ("0"+(date.getMonth()+1)).slice(-2) + "-" + ("0"+date.getDate()).slice(-2);
+    $('#todayDiagnosisDate').text(today);   // 진료기록 작성창에 오늘 날짜 넣기
 
     var $tr = $('#vital-sign-table tbody tr:nth-child(2)');
     $tr.find('td').eq(0).find('input').val(today);
@@ -13,8 +14,26 @@ $(document).ready(function (){
     $tr.find('td').eq(5).find('input').val(0);
     $tr.find('td').eq(6).find('input').val(0);
 
-    $('#todayDiagnosisDate').text(today);   // 진료기록 작성창에 오늘 날짜 넣기
 
+
+    // // 첨부파일 박스 html
+    // const fileDragBox = $('#file-drag-box');
+    //
+    // // 첨부파일 드래그 이벤트 추가
+    // fileDragBox.on('dragenter' , highlight );
+    // fileDragBox.on('dragover' , highlight );
+    // fileDragBox.on('dragleave' , unhighlight );
+    // fileDragBox.on('drop' , handleDrop );
+
+    // 파일 업로드 input, label 이용시
+    // $('#file-upload').on('change', fileSelect);
+
+
+});
+
+let uploadFiles = [];           // 파일 업로드 목록
+
+function onFileEvent(){
     // 첨부파일 박스 html
     const fileDragBox = $('#file-drag-box');
 
@@ -24,94 +43,110 @@ $(document).ready(function (){
     fileDragBox.on('dragleave' , unhighlight );
     fileDragBox.on('drop' , handleDrop );
 
-    // 파일 업로드 input, label 이용시
     $('#file-upload').on('change', fileSelect);
+}
 
-    function fileSelect(e){
-        $('#file-drag-box > i').hide();
-        $('#file-drag-box > p').hide();
+function offFileEvent(){
+    // 첨부파일 박스 html
+    const fileDragBox = $('#file-drag-box');
 
-        let files = e.target.files;
-        console.log('선택된 파일' , files);
+    // 첨부파일 드래그 이벤트 추가
+    fileDragBox.off('dragenter' , highlight );
+    fileDragBox.off('dragover' , highlight );
+    fileDragBox.off('dragleave' , unhighlight );
+    fileDragBox.off('drop' , handleDrop );
 
-        processFile(files);
+    $('#file-upload').off('change', fileSelect);
+}
 
-    }
+function fileSelect(e){
+    $('#file-drag-box > i').hide();
+    $('#file-drag-box > p').hide();
 
-    console.log('document.ready 실행됨.');
+    let files = e.target.files;
+    console.log('선택된 파일' , files);
 
-    // 첨부파일 드랍박스 하이라이트
-    function highlight(e){
-        console.log('drag enter or over');
-        e.preventDefault();     // 이벤트 방지
-        fileDragBox.addClass("highlight");
-    }
+    processFile(files);
+
+}
+
+
+// 첨부파일 드랍박스 하이라이트
+function highlight(e){
+    const fileDragBox = $('#file-drag-box');
+
+    console.log('drag enter or over');
+    e.preventDefault();     // 이벤트 방지
+    fileDragBox.addClass("highlight");
+}
+
 // 하이라이트 제거
-    function unhighlight(e){
-        console.log('drag leave');
-        e.preventDefault();
-        fileDragBox.removeClass("highlight");
-    }
+function unhighlight(e){
+    const fileDragBox = $('#file-drag-box');
+    console.log('drag leave');
+    e.preventDefault();
+    fileDragBox.removeClass("highlight");
+}
+
+
+function handleDrop(e){
+
+    $('#file-drag-box > i ').hide();
+    $('#file-drag-box > p').hide();
+
+    console.log('file dropped');
+    unhighlight(e);
+    e.preventDefault();
+
+    var files = e.originalEvent.dataTransfer.files;     // 파일 정보를 담은 유사배열
+
+    processFile(files);
+}
+
+function processFile(files){
 
     const fileList = $('#files');   // 파일 담을 div dom
-    let uploadFiles = [];           // 파일 업로드 목록
 
-    function handleDrop(e){
+    console.log('files' , files);
 
-        $('#file-drag-box > i ').hide();
-        $('#file-drag-box > p').hide();
+    var fileArray = [...files];     // 위의 유사배열인 files의 내용을 복사하여 진짜 배열로 변경.
 
-        console.log('file dropped');
-        unhighlight(e);
-        e.preventDefault();
+    // 파일 업로드 목록 담기 처리 및 파일 목록 출력
+    for(var i=0; i < fileArray.length; i++){
 
-        var files = e.originalEvent.dataTransfer.files;     // 파일 정보를 담은 유사배열
-
-        processFile(files);
-    }
-
-    function processFile(files){
-
-        console.log('files' , files);
-
-        var fileArray = [...files];     // 위의 유사배열인 files의 내용을 복사하여 진짜 배열로 변경.
-
-        // 파일 업로드 목록 담기 처리 및 파일 목록 출력
-        for(var i=0; i < fileArray.length; i++){
-
-            // 중복파일 무효화 처리
-            // 업로드파일 목록에 있는 파일을 순차로 돌면서 파일이름이 fileArray 이번 회차 파일이름과 같은지 확인.
-            if(uploadFiles.some(f => f.name === fileArray[i].name && f.size === fileArray[i].size)){
-                console.log('중복 파일 제외 : ' , fileArray[i].name);
-                continue;   // 루프 건너뜀.
-            }
-
-            fileList.append(renderFile(fileArray[i]));  // div에 만들어진 파일 html 추가
-            uploadFiles.push(fileArray[i]);             // 업로드할 목록에 담아준다.
+        // 중복파일 무효화 처리
+        // 업로드파일 목록에 있는 파일을 순차로 돌면서 파일이름이 fileArray 이번 회차 파일이름과 같은지 확인.
+        if(uploadFiles.some(f => f.name === fileArray[i].name && f.size === fileArray[i].size)){
+            console.log('중복 파일 제외 : ' , fileArray[i].name);
+            continue;   // 루프 건너뜀.
         }
 
-        console.log('uploadFiles[] ' , uploadFiles);
-        // return uploadFiles;
+        fileList.append(renderFile(fileArray[i]));  // div에 만들어진 파일 html 추가
+        uploadFiles.push(fileArray[i]);             // 업로드할 목록에 담아준다.
     }
 
+    console.log('uploadFiles[] ' , uploadFiles);
+    // return uploadFiles;
+}
 
-    // 파일 사이즈 출력
-    function formatFileSize(sizeInBytes) {
-        if (sizeInBytes < 1024) {
-            return `${sizeInBytes} B`; // 바이트 단위로 표시
-        } else if (sizeInBytes < (1024*1024)) {
-            return `${(sizeInBytes / 1024).toFixed(1)} kb`; // KB 단위로 표시
-        } else {
-            return `${(sizeInBytes / 1048576).toFixed(1)} mb`; // MB 단위로 표시
-        }
+
+// 파일 사이즈 출력
+function formatFileSize(sizeInBytes) {
+    if (sizeInBytes < 1024) {
+        return `${sizeInBytes} B`; // 바이트 단위로 표시
+    } else if (sizeInBytes < (1024*1024)) {
+        return `${(sizeInBytes / 1024).toFixed(1)} kb`; // KB 단위로 표시
+    } else {
+        return `${(sizeInBytes / 1048576).toFixed(1)} mb`; // MB 단위로 표시
     }
+}
 
-    // 파일 html 변환
-    function renderFile(file) {
-            var fileHtml = $('<div></div>');
-            fileHtml.addClass('file');
+// 파일 html 변환
+function renderFile(file) {
+    var fileHtml = $('<div></div>');
+    fileHtml.addClass('file');
 
-            fileHtml.append(`
+    fileHtml.append(`
             <div class="thumbnail">
                 
             </div>
@@ -126,98 +161,109 @@ $(document).ready(function (){
             </div>
         `)
 
-        // <img src="" title="${escape(file.name)}">
-        // 파일 미리보기 처리 (이미지 파일만 해당)
-        if (file.type.startsWith('image/')) {
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                // fileHtml.find('img').attr('src', e.target.result);
-                fileHtml.find('.thumbnail').html(`<img src="${e.target.result}" title="${escape(file.name)}" />`);
-            };
-            reader.readAsDataURL(file);
+    // <img src="" title="${escape(file.name)}">
+    // 파일 미리보기 처리 (이미지 파일만 해당)
+    if (file.type.startsWith('image/')) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            // fileHtml.find('img').attr('src', e.target.result);
+            fileHtml.find('.thumbnail').html(`<img src="${e.target.result}" title="${escape(file.name)}" />`);
+        };
+        reader.readAsDataURL(file);
+    }
+    // image 파일이 아닌 다른 유형일 경우 아래의 아이콘 삽입하도록
+    else {
+
+        var iconType = '';
+
+        if(file.type === 'application/pdf'){
+            iconType = 'fa-file-pdf';
         }
-        // image 파일이 아닌 다른 유형일 경우 아래의 아이콘 삽입하도록
+        else if(file.type.startsWith('text/')){
+            iconType = 'fa-file-lines';
+        }
+        else if(file.type.startsWith('video/')){
+            iconType = 'fa-file-video';
+        }
+        else if(file.type.startsWith('audio')){
+            iconType = 'fa-file-audio';
+        }
         else {
-
-            var iconType = '';
-
-            if(file.type === 'application/pdf'){
-                iconType = 'fa-file-pdf';
-            }
-            else if(file.type.startsWith('text/')){
-                iconType = 'fa-file-lines';
-            }
-            else if(file.type.startsWith('video/')){
-                iconType = 'fa-file-video';
-            }
-            else if(file.type.startsWith('audio')){
-                iconType = 'fa-file-audio';
-            }
-            else {
-                iconType = 'fa-file';
-            }
-            fileHtml.find('.thumbnail').html(`<i class="fa-regular ${iconType}"></i>`)
+            iconType = 'fa-file';
         }
-
-        return fileHtml;
+        fileHtml.find('.thumbnail').html(`<i class="fa-regular ${iconType}"></i>`)
     }
 
-
-    var btn = $('#diagnosis-create-btn');
-    btn.on('click' , updateDiagnosis);
-
-
-    // 진료기록 작성|수정
-    function updateDiagnosis(){
-
-        console.log('updateDiagnosis' ,  $('#diagnosis-yn').val());
-
-        var $diagnosisId = $('#new-diagnosisId');
-
-        // diagnosisId가 null 또는 "" 이라면 새로작성, 아니라면 수정
-        // 진료접수를 받으면 diagnosisId가 무조건 생기는데 왜 없는 경우를 가정하느냐는
-        // 진료접수 없이 새로운 진료기록을 작성하는 경우를 고려함.
-        var diagnosisId = $diagnosisId.val() === null || $diagnosisId.val() === ""?
-            0 : $diagnosisId.val();
-
-        // ajax 데이터
-        var data = new FormData();
-
-        data.append("diagnosis" , new Blob([JSON.stringify({
-            diagnosisId : diagnosisId,
-            symptoms : $('#symptoms-record').val().replace('\r\n' , '<br\>'),
-            diagnosis : $('#diagnosis-record').val().replace('\r\n' , '<br\>'),
-            prescription : $('#prescription-record').val().replace('\r\n' , '<br\>'),
-            diagnosisYn : $('#diagnosis-yn').val(),
-        })] , { type: "application/json; charset=utf-8"}));
-
-        uploadFiles.forEach(function (file){
-            data.append("uploadFiles" , file);
-        });
-
-        console.log('data : ' , data);
-
-        $.ajax({
-            url: '/diagnosis-update',
-            type: 'post',
-            processData: false,
-            contentType: false,
-            data : data,
-            success: function (response){
-                alert('성공');
-                console.log(response);
-            },
-            error: function(xhr, status, error) {
-                console.error('AJAX 요청 실패: ' , status , error);
-            }
-        })
+    return fileHtml;
+}
 
 
-    }
+var btn = $('#diagnosis-create-btn');
+btn.on('click' , updateDiagnosis);
 
-});
+
+// 진료기록 작성|수정
+function updateDiagnosis(){
+
+    console.log('updateDiagnosis' ,  $('#diagnosis-yn').val());
+
+    var $diagnosisId = $('#new-diagnosisId');
+
+    // diagnosisId가 null 또는 "" 이라면 새로작성, 아니라면 수정
+    // 진료접수를 받으면 diagnosisId가 무조건 생기는데 왜 없는 경우를 가정하느냐는
+    // 진료접수 없이 새로운 진료기록을 작성하는 경우를 고려함.
+    var diagnosisId = $diagnosisId.val() === null || $diagnosisId.val() === ""?
+        0 : $diagnosisId.val();
+
+    // modifier도 위와 같음.
+    var $diagnosisModifier = $('diagnosisModifier');
+    var diagnosisModifier = $diagnosisModifier.val() === null || $diagnosisModifier === ""?
+        null : $diagnosisModifier.val();
+
+    // ajax 데이터
+    var data = new FormData();
+
+    data.append("diagnosis" , new Blob([JSON.stringify({
+        patientId : $('#new-patientId').val(),
+        diagnosisId : diagnosisId,
+        symptoms : $('#symptoms-record').val().replace('\r\n' , '<br\>'),
+        diagnosis : $('#diagnosis-record').val().replace('\r\n' , '<br\>'),
+        prescription : $('#prescription-record').val().replace('\r\n' , '<br\>'),
+        $diagnosisModifier : diagnosisModifier,
+        // diagnosisYn : $('#diagnosis-yn').val(),
+    })] , { type: "application/json; charset=utf-8"}));
+
+    uploadFiles.forEach(function (file){
+        data.append("uploadFiles" , file);
+    });
+
+    console.log('data : ' , data);
+
+    $.ajax({
+        url: '/diagnosis-update',
+        type: 'post',
+        processData: false,
+        contentType: false,
+        data : data,
+        success: function (response){
+            alert('성공');
+            console.log('updateResponse : ' , response);
+            uploadFiles = [];   // 업로드 파일 리스트 초기화
+            offFileEvent(); // 파일 이벤트 비활성화
 
 
+        },
+        error: function(xhr, status, error) {
+            console.error('AJAX 요청 실패: ' , status , error);
+        }
+    })
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 로그아웃
 function logout(){
     window.location.href = "http://localhost:8080/logout";
@@ -246,7 +292,7 @@ function search(){
     }
 
     var popup = window.open(
-        '/patient-search/' + patinetName , 
+        '/patient-search/' + patinetName ,
         '환자 검색' ,
         'width=1055 , height=503, top=50, left=50, resizable=no');
 }
@@ -1069,8 +1115,8 @@ function callPatient(button){
         success: function (response){
             alert('성공');
             console.log(response);
-            var patientObj = response.patient;
-            var todayDiagnosis = response.todayDiagnosis;
+            var patientObj = response.patientDTO;
+            var todayDiagnosis = response.diagnosisDTO;
             console.log(patientObj);
             console.log(todayDiagnosis);
 
@@ -1235,8 +1281,11 @@ function insertPastDiagnosis(response){
     var diagnosis = content.diagnosis;
     var prescription = content.prescription;
 
-    var attendingDoctor = content.diagnosisModifier !== null?
-        content.diagnosisModifier : content.doctorName;
+    console.log('insertpast : ' , response);
+    // var attendingDoctor = content.diagnosisModifier !== null?
+    //     content.diagnosisModifier : content.doctorName;
+
+    var attendingDoctor = content.doctorName;
 
     var date = content.modifyDate !== null?
         content.modifyDate : content.diagnosisDate;
@@ -1285,10 +1334,22 @@ function clearPreDiagnosisList(){
 
 }
 
+
+
+function diagnosisPageing(response){
+
+}
+
+
+
 // 진료기록 작성칸 활성화 해주기
 function insertDiagnosis(diagnosis){
 
-    $('#diagnosis-yn').val(false);
+    clearDiagnosis();
+
+    console.log('insertDiagnosis : ' , diagnosis);
+
+    $('#diagnosisModifier').val("");
 
     if(diagnosis.diagnosisYn === true){
         // true 라면 진료했던 기록이므로 버튼 설정 변경
@@ -1302,8 +1363,10 @@ function insertDiagnosis(diagnosis){
         $('#symptoms-record').attr('readonly' , true);
         $('#diagnosis-record').attr('readonly' , true);
         $('#prescription').attr('readonly' , true);
+        $('#diagnosisModifier').val(diagnosis.diagnosisModifier);
 
-        $('#diagnosis-yn').val(true);
+        offFileEvent();  // 파일 이벤트 활성화
+
 
     }
     else if(diagnosis.diagnosisYn === false || diagnosis.diagnosisYn == null){
@@ -1312,7 +1375,11 @@ function insertDiagnosis(diagnosis){
 
         $('#symptoms-record').attr('readonly' , false);
         $('#diagnosis-record').attr('readonly' , false);
+        $('#diagnosis-record').val("");
         $('#prescription-record').attr('readonly' , false);
+        $('#prescription-record').val("");
+
+        onFileEvent();  // 파일 이벤트 활성화
     }
 
     if(diagnosis.modifyDate !== null){
@@ -1325,13 +1392,36 @@ function insertDiagnosis(diagnosis){
     $('#diagnosis-write-title > span:nth-child(3)').text(diagnosis.patientName);   // 환자명 넣기
 
     $('#new-diagnosisId').val(diagnosis.diagnosisId);   // hidden에 진료 id 넣기
+    $('#new-patientId').val(diagnosis.patientId);       // hidden에 불러온 환자 id 넣기
     $('#symptoms-record').text(diagnosis.symptoms.replace('\r\n' , '<br\>'));     // 증상 값 넣기
 
 }
 
-function diagnosisPageing(response){
+function clearDiagnosis(){
+
+    var date = new Date();
+    var today =  date.getFullYear() + "-" + ("0"+(date.getMonth()+1)).slice(-2) + "-" + ("0"+date.getDate()).slice(-2);
+    $('#todayDiagnosisDate').text(today);   // 진료기록 작성창에 오늘 날짜 넣기
+
+    $('#symptoms-record').attr('readonly' , false);
+    $('#diagnosis-record').attr('readonly' , false);
+    $('#prescription-record').attr('readonly' , false);
+
+    $('#diagnosis-write-title > span').not(':first-child').hide();
+
+    $('#new-diagnosisId').val("");   // hidden에 진료 id 초기화
+    $('#new-patientId').val("");       // hidden에 불러온 환자 id 초기화
+    $('#diagnosisModifier').val("");        // 수정자 초기화
+
+    uploadFiles = [];   /// uploadFiles 초기화
+
+    $('#files').empty();    // 파일저장목록 html 삭제
 
 }
 
+function readDiagnosis(response){
+
+    console.log('readDiagnosis 실행');
 
 
+}

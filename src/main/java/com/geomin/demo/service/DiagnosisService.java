@@ -1,6 +1,7 @@
 package com.geomin.demo.service;
 
 import com.geomin.demo.dto.DiagnosisDTO;
+import com.geomin.demo.dto.ResponseDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -11,7 +12,7 @@ public interface DiagnosisService {
 
     DiagnosisDTO getTodayDiagnosis(int waitingId);
 
-    DiagnosisDTO updateDiagnosisById(DiagnosisDTO diagnosisDTO);
+    ResponseDTO updateDiagnosisById(DiagnosisDTO diagnosisDTO);
 
-    void createDiagnosis();
+    ResponseDTO createDiagnosis(DiagnosisDTO diagnosisDTO);
 }

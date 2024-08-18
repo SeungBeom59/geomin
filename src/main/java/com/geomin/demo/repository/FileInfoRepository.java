@@ -12,7 +12,5 @@ public interface FileInfoRepository {
 
     void insertFiles(List<FileInfoVO> uploadFiles);
 
-
-
-
+    List<FileInfoVO> getFileById(int fileId);
 }

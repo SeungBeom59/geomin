@@ -805,3 +805,8 @@ th , td {
     font-weight: bold;
     cursor: pointer;
 }
+
+.sf-mbtn {
+    font-size: 12px;
+    width: 100px;
+}

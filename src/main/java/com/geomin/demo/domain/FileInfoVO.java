@@ -15,8 +15,6 @@ public class FileInfoVO {
     private String saveFileName;
     private String filePath;
     private long fileSize;
-
-
-
+    private boolean img;
 
 }
