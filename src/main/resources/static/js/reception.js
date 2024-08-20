@@ -1425,3 +1425,25 @@ function readDiagnosis(response){
 
 
 }
+
+function getMedicinePopup(){
+
+    var patientId = $('#new-patientId').val();
+
+//    if(patientId === null || patientId === ''){
+//        alert('환자 정보를 먼저 찾아주세요');
+//        return;
+//    }
+
+    var popup = window.open(
+       '/medicine-prescription',
+       '의약품 검색',
+       'width=1660 ,  height=865 , top=100 , right=100 , resizeable=no');
+}
+
+
+function receiveMedicineInfo(){
+
+
+}
+

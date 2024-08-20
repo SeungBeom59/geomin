@@ -810,3 +810,25 @@ th , td {
     font-size: 12px;
     width: 100px;
 }
+
+.prescriptionBox {
+    padding-right: 30px;
+    padding-left : 50px;
+    height : 135px
+}
+
+.prescriptionBox > div {
+    display : flex;
+    width : 320px;
+    height : 130px;
+    border : 1px solid #7b7a7a;
+}
+
+.prescriptionBox > #prescription-record {
+    box-sizing : border-box;
+    padding: 0;
+    width : 320px;
+    height : 132px;
+    resize : none;
+    text-align : start;
+}

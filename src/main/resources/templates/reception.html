@@ -283,7 +283,7 @@
                             </div>
 
                             <div class="textarea-box pre-diagnosis-box">
-                                <h4>처방</h4>
+                                <h4>처방 | 조제시 참고사항</h4>
                                 <textarea name="prescription" id="prescription-past-record" readonly placeholder="처방 내용을 입력해주세요.">항히스타민 성분 약 7일치 처방 바람.</textarea>
                             </div>
 
@@ -355,10 +355,21 @@
 
                         <div class="textarea-box big">
                             <div>
-                                <h4>처방</h4>
+                                <h4>처방 | 조제 시 참고사항</h4>
+                                <button type="button" class="btn sf-mbtn" onclick="getMedicinePopup()">의약품 검색</button>
+                            </div>
+
+                            <div class="prescriptionBox">
+                                <div>
+                                    <div>프락시정 델타메인 그렌데르 1정</div>
+                                    <span>1</span><span>3</span><span>2</span>
+                                </div>
+                                <textarea name="prescription" id="prescription-record" readonly>
+
+                                </textarea>
                             </div>
                             
-                            <textarea name="prescription" id="prescription-record" readonly></textarea>
+<!--                            <textarea name="prescription" id="prescription-record" readonly></textarea>-->
                         </div>
 
                         <div id="file-box">
