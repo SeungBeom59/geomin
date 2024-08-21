@@ -112,7 +112,7 @@ tr:not(:nth-child(1)):hover {
     font-weight: bold;
 }
 
-td:not(:nth-last-child()){
+td:not(:nth-last-child){
     border-right: none;
 }
 
@@ -144,10 +144,7 @@ td {
     overflow-y: hidden;
     padding: 5px;
     border-top: none;
-}
-
-#no-data {
-    border: 1px solid;
+    word-break: break-word;
 }
 
 
@@ -166,15 +163,20 @@ td:hover {
 }
 
 /* 1번째(td 품목기준코드)와 9번째(td 낱알 이미지) 열은 스크롤을 주지 않음 */
+/*td:nth-child(2):hover,*/
+/*td:nth-child(3):hover,*/
 td:nth-child(1):hover,
-td:nth-child(2):hover,
-td:nth-child(3):hover,
 td:nth-child(9):hover,
 td:nth-child(10):hover
 {
     overflow-y: hidden;
 }
 
+td:nth-child(9) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
 .imgBox {
     text-align: center;

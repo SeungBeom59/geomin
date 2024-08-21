@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,15 +18,16 @@
     <div id="search-box">
 
       <div>
-        <select name="keyword">
-          <option value="itemName" selected>의약품명</option>
+        <select name="type" id="type">
+          <option value="" selected>선택</option>
+          <option value="itemName">의약품명</option>
           <option value="entpName">회사명</option>
           <option value="itemSeq">품목기준코드 </option>
         </select>
       </div>
 
       <div>
-        <input type="text" placeholder="검색어 입력" id="search-bar">
+        <input type="text" placeholder="검색어 입력" autocomplete="off" id="search-bar">
       </div>
 
       <button type="button" id="search-btn" alt="검색버튼">
@@ -34,7 +36,12 @@
     </div>
 
     <table>
-      <caption><span>아세트아미노펜</span> 검색 결과 총 <span> 74 </span> 건</caption>
+
+      <caption>
+        <span th:text="${keyword != null && keyword != 'null'? keyword : '' }"></span>검색 결과 총
+        <span th:text="${apiResult.getBody().getTotalCount()}"></span>
+      </caption>
+
       <tbody>
 
       <tr>
@@ -52,6 +59,24 @@
       </tr>
 
 
+      <th:block th:if="${medicineDTOList != null}" th:each="medicine : ${medicineDTOList}">
+        <tr>
+          <td th:text="${medicine.getItemSeq()}"></td>
+          <td th:text="${medicine.getItemName()}"></td>
+          <td th:text="${medicine.getEntpName()}"></td>
+          <td th:text="${#strings.isEmpty(medicine.getEfcyQesitm())? '기록없음' : medicine.getEfcyQesitm()}"></td>
+          <td th:text="${#strings.isEmpty(medicine.getUseMethodQesitm())? '기록없음' : medicine.getUseMethodQesitm()}"></td>
+          <td th:text="${#strings.isEmpty(medicine.getAtpnQesitm())? '기록없음' : medicine.getAtpnQesitm()}"></td>
+          <td th:text="${#strings.isEmpty(medicine.getIntrcQesitm())? '기록없음' : medicine.getIntrcQesitm()}"></td>
+          <td th:text="${#strings.isEmpty(medicine.getSeQesitm())? '기록없음' : medicine.getSeQesitm()}"></td>
+
+          <td th:if="${medicine.getItemImage() == null}">이미지 없음</td>
+          <td class="imgBox" th:if="${medicine.getItemImage() != null}">
+            <img th:src="${medicine.getItemImage()}" th:alt="${medicine.getItemName()}">
+          </td>
+          <td><button class="btn">선택</button></td>
+        </tr>
+      </th:block>
 
       <!-- <tr>
           <td>199300758</td>
@@ -75,23 +100,32 @@
       </tbody>
     </table>
 
-    <div id="no-data">
+    <div id="no-data" th:if="${medicineDTOList == null}">
       <span>검색 결과가 없습니다.</span>
     </div>
 
     <div>
       <ul id="vital-sign-pageing">
-        <li>
-          <i class="fa-solid fa-angle-left" style="color: #000000;"></i>
+        <li th:if="${apiResult.getBody().getPageNo() > apiResult.getBody().getNumOfRows() }">
+          <a th:href="@{'/medicine-prescription?type=' + ${type} + '&keyword=' + ${keyword} + '&page=' + ${apiResult.getBody().getPrevGroupStartPage()} }">
+            <i class="fa-solid fa-angle-left" style="color: #000000;"></i>
+          </a>
         </li>
 
-        <li><a href="" class="active">1</a></li>
-        <li><a href="">2</a></li>
-        <li><a href="">3</a></li>
+        <th:block th:each="page : ${#numbers.sequence(apiResult.getBody().getCurrentGroupStartPage() , apiResult.getBody().getCurrentGroupEndPage())}">
+          <li th:classappend="${page == apiResult.getBody().getPageNo()}? 'active' : '' ">
+            <a th:href="@{'/medicine-prescription?type=' + ${type} + '&keyword=' + ${keyword} + '&page=' + ${page} }"
+               th:text="${page}">
+            </a>
+          </li>
+        </th:block>
 
-        <li>
-          <i class="fa-solid fa-angle-right" style="color: #000000;"></i>
+        <li th:if="${apiResult.getBody().getCurrentGroupEndPage() < apiResult.getBody().getTotalPages()}">
+          <a th:href="@{'/medicine-prescription?type=' + ${type} + '&keyword=' + ${keyword} + '&page=' + ${apiResult.getBody().getNextGroupStartPage()} }">
+            <i class="fa-solid fa-angle-right" style="color: #000000;"></i>
+          </a>
         </li>
+
       </ul>
     </div>
 
@@ -112,6 +146,7 @@
       <div id="no-pills">
         선택된 의약품이 없습니다.
       </div>
+
       <!-- <ul class="pill">
           <li>트라몰정160밀리그람(아세트아미노펜)</li>
           <li><input type="text" value="0.5"></li>
@@ -140,7 +175,7 @@
 
 
 <script src="https://code.jquery.com/jquery-latest.min.js"></script>
-<!-- <script src="/js/waiting_popup.js"></script> -->
+ <script src="/js/medicine_prescription_popup.js"></script>
 <script>
 
 </script>

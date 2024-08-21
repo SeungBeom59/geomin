@@ -1436,7 +1436,7 @@ function getMedicinePopup(){
 //    }
 
     var popup = window.open(
-       '/medicine-prescription',
+       '/medicine-prescription' ,
        '의약품 검색',
        'width=1660 ,  height=865 , top=100 , right=100 , resizeable=no');
 }
