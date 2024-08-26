@@ -1,10 +1,9 @@
 package com.geomin.demo.service;
 
 import com.geomin.demo.domain.*;
-import com.geomin.demo.dto.DiagnosisDTO;
-import com.geomin.demo.dto.FileInfoDTO;
-import com.geomin.demo.dto.ResponseDTO;
+import com.geomin.demo.dto.*;
 import com.geomin.demo.repository.DiagnosisRepository;
+import com.geomin.demo.repository.WaitingRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
@@ -21,6 +20,8 @@ public class DiagnosisServiceImpl implements DiagnosisService{
 
     private final DiagnosisRepository diagnosisRepository;
     private final FileService fileService;
+    private final MedicineService medicineService;
+    private final WaitingService waitingService;
 
     @Override
     public Page<DiagnosisDTO> getDiagnosisList(Pageable pageable , DiagnosisDTO diagnosisDTO) {
@@ -120,27 +121,51 @@ public class DiagnosisServiceImpl implements DiagnosisService{
     @Transactional
     public ResponseDTO updateDiagnosisById(DiagnosisDTO diagnosisDTO) {
         log.info("updateDiagnosisById 실행");
+        log.info("diagnosisDTO::{}" , diagnosisDTO);
 
+        // 진료기록에 대한 업데이트 진행
         int updateResult = diagnosisRepository.updateDiagnosisById(diagnosisDTO);
 
+        // 만약 진료기록이 업데이트 되지 못했다면...
         if(updateResult <= 0){
             return null;
         }
 
-        ResponseDTO responseDTO = new ResponseDTO();
 
+        // 파일정보, 의약품 처방 정보, 진료기록 정보를 모두 감싸는 responseDTO 생성
+        ResponseDTO responseDTO = new ResponseDTO();
+        // 진료기록을 id를 통해 가져오고.
         DiagnosisVO result = diagnosisRepository.getDiagnosisById(diagnosisDTO.getDiagnosisId());
 
+        // 진료기록의 진료접수 id를 이용하여 진료접수를 가져오고
+        if(result.getWaiting() != null && result.getWaiting().getWaitingStatus() != 2 ){
+
+            WaitingDTO changeWaitingStatus = WaitingDTO.builder()
+                    .waitingId(result.getWaiting().getWaitingId())
+                    .action("진료완료")
+                    .build();
+
+            waitingService.modifyWaitingStatus(changeWaitingStatus);
+        }
+
+        // 해당 진료기록의 파일 정보 id가 있다면 따로 가져와서 responseDTO에 넣어준다.
+        // 외래키로 사용은 하나 관계는 맺지 않았음. join을 해서 가져오자니,
+        // 파일정보가 몇개의 list 형태일지 모르겠다는 점과 더불어, 검색된 파일정보의 수 만큼 진료기록의 결과가 곱해져서 나오게 됨.
+        // 아래 의약품도 이와 마찬가지임.
         if(result != null && result.getFileId() > 0){
             List<FileInfoDTO> fileList = fileService.getFileById(result.getFileId());
             responseDTO.setFileInfoDTOList(fileList);
+        }
+
+        if(result != null && result.getMedicineId() > 0){
+            List<MedicineDTO> medicines = medicineService.getMedicineListById(result.getMedicineId());
+            responseDTO.setMedicineDTOList(medicines);
         }
 
         PatientVO patient = result.getPatient();
         DepartmentVO department = result.getDepartment();
         WaitingVO waiting = result.getWaiting();
         DoctorVO doctor = result.getDoctor();
-
 
         log.info("result::{}" , result);
 

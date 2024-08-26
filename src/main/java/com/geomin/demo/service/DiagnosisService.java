@@ -9,7 +9,6 @@ public interface DiagnosisService {
 
     Page<DiagnosisDTO> getDiagnosisList(Pageable pageable , DiagnosisDTO diagnosisDTO);
 
-
     DiagnosisDTO getTodayDiagnosis(int waitingId);
 
     ResponseDTO updateDiagnosisById(DiagnosisDTO diagnosisDTO);

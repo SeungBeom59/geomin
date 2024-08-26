@@ -8,6 +8,13 @@ $(document).ready(function (){
     // 없다면 빈 배열로 초기화하게 된다.
     var selectedPills = JSON.parse(localStorage.getItem('selectedPills')) || [];
 
+    if(selectedPills === []){
+        $('#no-pills').css('display' , 'flex');
+    }
+    else {
+        $('#no-pills').css('display' , 'none');
+    }
+
     // selectedPills 배열에 대하여 향상된 for문으로 각각의 pill들을 html로 만들어 추가해주도록 한다.
     selectedPills.forEach(function (pill){
        addPillToPillsBox(pill);
@@ -15,16 +22,17 @@ $(document).ready(function (){
 
 });
 
-// #pills에 각각 html을 만들어 추가해주는 함수
+// #pills에 로컬스토리지 정보를 이용하여 pill html을 만들어 추가해주는 함수
 function addPillToPillsBox(pill){
     var pillsBox = $('#pills');
 
     pillsBox.append(
         '<ul class="pill">' +
+            '<input type="hidden" value="' + pill.itemSeq + '">' +
             '<li>' + pill.itemName +'</li>' +
-            '<li><input type="text" value="' + medicine.dosage + '"></li>' +
-            '<li><input type="text" value="' + medicine.frequency + '"></li>' +
-            '<li><input type="text" value="' + medicine.days + '"></li>' +
+            '<li><input type="text" value="' + pill.dosage + '" autocomplete="off" oninput="checkDouble(this)"></li>' +
+            '<li><input type="text" value="' + pill.frequency + '" autocomplete="off" oninput="checkDouble(this)"></li>' +
+            '<li><input type="text" value="' + pill.days + '" autocomplete="off" oninput="checkDouble(this)"></li>' +
             '<li>X</li>' +
         '</ul>');
 }
@@ -59,6 +67,7 @@ function updateLocalStorage(){
     // 초기화 했던 배열, selectedPills에 넣어준다.
     $('#pills .pill').each(function (){
         let pill = {
+            itemSeq : $(this).find('input').val(),
             itemName: $(this).find('li').eq(0).text(),
             dosage: $(this).find('li').eq(1).find('input').val(),
             frequency: $(this).find('li').eq(2).find('input').val(),
@@ -82,6 +91,52 @@ $('#pills').on('click', 'li:last-child', function() {
     // 일관성을 높이고 즉시 반영되도록 하기 위함이다. 물론 이후에 다시 옵저버가 콜백함수로서 실행하게 된다.
     updateLocalStorage();
 });
+// input에 값이 바뀔 때마다 없데이트
+$('#pills').on('input' , 'input' , function (){
+    updateLocalStorage();
+});
+
+// pills에 pill html 추가해주는 함수
+function clickPill(btn){
+
+    $('#no-pills').css('display' , 'none');
+
+    var tr = btn.closest('tr');
+    var tds = tr.getElementsByTagName('td');
+
+    var itemSeq = tds[0].innerText;
+    var itemName = tds[1].innerText;
+
+    var pillsBox = $('#pills');
+
+    pillsBox.append(
+        '<ul class="pill">' +
+        '<input type="hidden" value="' + itemSeq + '">' +
+        '<li>' + itemName +'</li>' +
+        '<li><input type="text" value="0"></li>' +
+        '<li><input type="text" value="0"></li>' +
+        '<li><input type="text" value="0"></li>' +
+        '<li>X</li>' +
+        '</ul>');
+
+    updateLocalStorage();
+}
+
+// pills 안에 모든 내용 삭제
+function deletePills(){
+
+    $('#pills').empty();
+    $('#no-pills').css('display' , 'flex');
+
+    updateLocalStorage();
+}
+
+// 팝업창 닫기
+function closePopup(){
+    // 로컬스토리지를 사용했기 때문에 전달할 인자는 없고 함수사용만 하도록
+    opener.parent.receiveMedicineInfo();
+    window.self.close();
+}
 
 
 

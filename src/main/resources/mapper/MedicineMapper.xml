@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Maooer 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.geomin.demo.repository.MedicineRepository">
+
+    <resultMap id="medicineMap" type="com.geomin.demo.domain.MedicineVO">
+        <id property="medicineId" column="medicine_id" />
+        <id property="medicineSeq" column="medicine_seq" />
+        <result property="itemSeq" column="item_seq" />
+        <result property="medicineName" column="medicine_name" />
+        <result property="dosage" column="dosage" />
+        <result property="frequency" column="frequency" />
+        <result property="days" column="days" />
+<!--        <association property="patient" resultMap="patientMap" />-->
+    </resultMap>
+
+<!--    <resultMap id="patientMap" type="com.geomin.demo.domain.PatientVO">-->
+<!--        <id property="patientId" column="patient_id" />-->
+<!--        <result property="patientName" column="patient_name" />-->
+<!--        <result property="identify" column="identify" />-->
+<!--        <result property="gender" column="gender" />-->
+<!--        <result property="phone" column="phone" />-->
+<!--        <result property="emergencyPhone" column="emergency_phone" />-->
+<!--        <result property="age" column="age" />-->
+<!--        <result property="bloodType" column="blood_type" />-->
+<!--        <result property="address" column="address" />-->
+<!--        <result property="addressDetail" column="address_detail" />-->
+<!--        <result property="postCode" column="post_code" />-->
+<!--    </resultMap>-->
+
+    <select id="getLastMedicineId">
+        SELECT
+            IFNULL(MAX(MEDICINE_ID) , 0) AS MEDICINE_ID
+        FROM
+            MEDICINE;
+    </select>
+
+    <insert id="insertMedicines">
+        INSERT INTO MEDICINE
+            (MEDICINE_ID, MEDICINE_SEQ, ITEM_SEQ, MEDICINE_NAME, DOSAGE, FREQUENCY, DAYS)
+        VALUES
+        <foreach collection="medicines" item="pill" separator=",">
+            (#{pill.medicineId} , #{pill.medicineSeq}, #{pill.itemSeq} ,
+            #{pill.medicineName} , #{pill.dosage} , #{pill.frequency} ,
+            #{pill.days})
+        </foreach>
+
+    </insert>
+
+    <select id="getMedicineListById">
+        SELECT
+            *
+        FROM
+            MEDICINE
+        WHERE
+            MEDICINE_ID = #{medicineId}
+    </select>
+
+
+</mapper>

@@ -197,15 +197,16 @@ function renderFile(file) {
     return fileHtml;
 }
 
-
 var btn = $('#diagnosis-create-btn');
+var modifyBtn = $('#diagnosis-modify-btn');
+modifyBtn.on('click' , updateDiagnosis);
 btn.on('click' , updateDiagnosis);
 
 
 // 진료기록 작성|수정
 function updateDiagnosis(){
 
-    console.log('updateDiagnosis' ,  $('#diagnosis-yn').val());
+    // console.log('updateDiagnosis' ,  $('#diagnosis-yn').val());
 
     var $diagnosisId = $('#new-diagnosisId');
 
@@ -230,13 +231,17 @@ function updateDiagnosis(){
         diagnosis : $('#diagnosis-record').val().replace('\r\n' , '<br\>'),
         prescription : $('#prescription-record').val().replace('\r\n' , '<br\>'),
         $diagnosisModifier : diagnosisModifier,
-        // diagnosisYn : $('#diagnosis-yn').val(),
     })] , { type: "application/json; charset=utf-8"}));
+
+    var pills = collectPillsData();
+    data.append("pills" ,
+        new Blob([JSON.stringify(pills)], {type : "application/json; charset=utf-8"}));
 
     uploadFiles.forEach(function (file){
         data.append("uploadFiles" , file);
     });
 
+    console.log('pills : ' , pills);
     console.log('data : ' , data);
 
     $.ajax({
@@ -249,18 +254,35 @@ function updateDiagnosis(){
             alert('성공');
             console.log('updateResponse : ' , response);
             uploadFiles = [];   // 업로드 파일 리스트 초기화
-            offFileEvent(); // 파일 이벤트 비활성화
-
-
+            // offFileEvent(); // 파일 이벤트 비활성화
+            readDiagnosis(response);
+            searchWaiting($('#waiting-current-page').val());
         },
         error: function(xhr, status, error) {
             console.error('AJAX 요청 실패: ' , status , error);
         }
     })
 }
+// 처방한 의약품 json 형태로 만들어서 data에 넣기
+function collectPillsData() {
+    var pillsData = [];
 
+    $('#pills .pill').each(function () {
+        var pillData = {
+            itemSeq: $(this).find('.itemSeq').val(),                         // hidden의 value
+            medicineName: $(this).find('li').eq(0).text(),                       // 첫 번째 li의 텍스트 (약명칭)
+            dosage: $(this).find('li').eq(1).find('input').val(),     // 두 번째 li의 input value (용량)
+            frequency: $(this).find('li').eq(2).find('input').val(),  // 세 번째 li의 input value (빈도)
+            days: $(this).find('li').eq(3).find('input').val()        // 네 번째 li의 input value (복용 일수)
+        };
 
+        pillsData.push(pillData);
+    });
 
+    console.log('collectPillsData()\'s pillsData ' , pillsData);
+
+    return pillsData;
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1123,6 +1145,8 @@ function callPatient(button){
             searchWaiting($('#waiting-current-page').val());    // waitingList 새로고침
             insertPatient(patientObj);
             insertDiagnosis(todayDiagnosis);
+
+            localStorage.removeItem('selectedPills');   // 로컬스토리지에 의약품 정보 삭제
         },
         error: function (xhr, status, error){
             console.error('AJAX 요청 실패: ' , status, error);
@@ -1342,22 +1366,23 @@ function diagnosisPageing(response){
 
 
 
-// 진료기록 작성칸 활성화 해주기
+// 진료기록 작성칸 활성화 해주기 | 새로 작성, 수정
 function insertDiagnosis(diagnosis){
 
     clearDiagnosis();
 
     console.log('insertDiagnosis : ' , diagnosis);
 
-    $('#diagnosisModifier').val("");
+    if(diagnosis != null && diagnosis.diagnosisYn === true){
+        var diagnosisRecord = diagnosis.diagnosis.replace('\r\n' , '<br\>');
+        var prescriptionRecord = diagnosis.prescription.replace('\r\n' , '<br\>');
 
-    if(diagnosis.diagnosisYn === true){
         // true 라면 진료했던 기록이므로 버튼 설정 변경
         $('#diagnosis-modify-btn').show();
         $('#diagnosis-delete-btn').show();
         $('#diagnosis-create-btn').hide();
-        $('#diagnosis-record').text(diagnosis.diagnosis.replace('\r\n' , '<br\>'));   // 진료 기록 넣기
-        $('#prescription').text(diagnosis.prescription.replace('\r\n' , '<br\>'));    // 처방 기록 넣기
+        $('#diagnosis-record').val(diagnosisRecord);   // 진료 기록 넣기
+        $('#prescription-record').val(prescriptionRecord);    // 처방 기록 넣기
 
         // 모든 textarea 입력창 readonly로 수정 불가로 처리.
         $('#symptoms-record').attr('readonly' , true);
@@ -1365,7 +1390,7 @@ function insertDiagnosis(diagnosis){
         $('#prescription').attr('readonly' , true);
         $('#diagnosisModifier').val(diagnosis.diagnosisModifier);
 
-        offFileEvent();  // 파일 이벤트 활성화
+        offFileEvent();  // 파일 이벤트 비활성화
 
 
     }
@@ -1393,7 +1418,9 @@ function insertDiagnosis(diagnosis){
 
     $('#new-diagnosisId').val(diagnosis.diagnosisId);   // hidden에 진료 id 넣기
     $('#new-patientId').val(diagnosis.patientId);       // hidden에 불러온 환자 id 넣기
-    $('#symptoms-record').text(diagnosis.symptoms.replace('\r\n' , '<br\>'));     // 증상 값 넣기
+
+    var symptomsRecord = diagnosis.symptoms.replace('\r\n' , '<br\>');
+    $('#symptoms-record').val(symptomsRecord);     // 증상 값 넣기
 
 }
 
@@ -1404,8 +1431,11 @@ function clearDiagnosis(){
     $('#todayDiagnosisDate').text(today);   // 진료기록 작성창에 오늘 날짜 넣기
 
     $('#symptoms-record').attr('readonly' , false);
+    $('#symptoms-record').val("");
     $('#diagnosis-record').attr('readonly' , false);
+    $('#diagnosis-record').val("");
     $('#prescription-record').attr('readonly' , false);
+    $('#prescription-record').val("");
 
     $('#diagnosis-write-title > span').not(':first-child').hide();
 
@@ -1416,24 +1446,167 @@ function clearDiagnosis(){
     uploadFiles = [];   /// uploadFiles 초기화
 
     $('#files').empty();    // 파일저장목록 html 삭제
+    $('#file-drag-box > i').show();
+    $('#file-drag-box > p').show();
+    $('#file-add').show();
+    $('.file-label').show();
+    $('#file-read').hide();
+    $('#diagnosis-delete-btn').hide();
+    $('#medicineSearchBtn').show();
+
+    localStorage.removeItem('selectedPills');   // 로컬스토리지에 의약품 정보 삭제
+    $('#pills').find('.pill').remove();     // 처방 선택된 의약품 html 삭제
 
 }
 
 function readDiagnosis(response){
 
+    clearDiagnosis();
+
     console.log('readDiagnosis 실행');
+    offFileEvent(); // 파일 이벤트 비활성화
+
+    var diagnosis = response.diagnosisDTO;
+    console.log('diagnosis' , diagnosis);
+    console.log('response.diagnosisDTO' , response.diagnosisDTO);
+    console.log('response' , response);
+    // 아래는 js 내장함수 Array의 isArray 배열인지 확인하여 true, false 반환
+    var fileInfo = Array.isArray(response.fileInfoDTOList)? response.fileInfoDTOList : [];
+    var medicine = Array.isArray(response.medicineDTOList)? response.medicineDTOList : [];
+
+    console.log(diagnosis.symptoms)
+
+    $('#diagnosis-modify-btn').show();
+    $('#diagnosis-delete-btn').show();
+    $('#diagnosis-create-btn').hide();
+    $('#medicineSearchBtn').hide();
+
+    var symptomsRecord = diagnosis.symptoms.replace('\r\n' , '<br\>');
+    var diagnosisRecord = diagnosis.diagnosis.replace('\r\n' , '<br\>');
+    var prescriptionRecord = diagnosis.prescription.replace('\r\n' , '<br\>');
+    $('#symptoms-record').val(symptomsRecord);     // 증상 값 넣기
+    $('#diagnosis-record').val(diagnosisRecord);   // 진료 기록 넣기
+    $('#prescription-record').val(prescriptionRecord);    // 처방 기록 넣기
+
+    // 모든 textarea 입력창 readonly로 수정 불가로 처리.
+    $('#symptoms-record').attr('readonly' , true);
+    $('#diagnosis-record').attr('readonly' , true);
+    $('#prescription-record').attr('readonly' , true);
+
+    // hidden input 값 처리, (수정자 id , 환자 id , 진료기록 id)
+    if(diagnosis.diagnosisModifier != null){
+        $('#diagnosisModifier').val(diagnosis.diagnosisModifier);
+    }
+    else {
+        $('#diagnosisModifier').val("");
+    }
+
+    $('#new-diagnosisId').val(diagnosis.diagnosisId);   // hidden에 진료 id 넣기
+    $('#new-patientId').val(diagnosis.patientId);       // hidden에 불러온 환자 id 넣기
+
+    // 수정한 날짜시간 존재여부에 따른 시간, 환자명 처리
+    if(diagnosis.modifyDate !== null){
+        $('#todayDiagnosisDate').text(diagnosis.modifyDate);
+    }
+    else {
+        $('#todayDiagnosisDate').text(diagnosis.diagnosisDate)  // 시간을 넣어준다.
+    }
+    $('#diagnosis-write-title > span').show();              // 모든 span 보여주기(날짜:시간, 환자명)
+    $('#diagnosis-write-title > span:nth-child(3)').text(diagnosis.patientName);   // 환자명 넣기
 
 
+    ///////////////////////////////////////////////////
+    // 파일 처리
+    $('#file-add').hide();
+    $('.file-label').hide();
+    $('#file-read').show();
+    $('#file-drag-box > i').hide();
+    $('#file-drag-box > p').hide();
+    // 파일 목록이 있을 경우
+    if(fileInfo.length > 0){
+        var files =  $('#files');
+
+        fileInfo.forEach(function (file){
+           var fileHtml = readFileRender(file);
+           files.append(fileHtml);
+        });
+    }
+    else {
+        $('#no-files').show();
+    }
+
+    //////////////////////////////////////////////////
+    // 처방한 약이 존재할 경우
+    if(medicine.length > 0){
+        var pillsBox = $('#pills');
+        pillsBox.find('.pill').remove();
+        $('#no-pills').css('display' , 'none');
+
+        medicine.forEach(function (pill){
+
+            pillsBox.append(
+                '<ul class="pill">' +
+                '<input type="hidden" class="itemSeq" value="' + pill.itemSeq + '">' +
+                '<li>' + pill.medicineName +'</li>' +
+                '<li><input type="text" value="' + pill.dosage + '" autocomplete="off" oninput="checkDouble(this)" readonly></li>' +
+                '<li><input type="text" value="' + pill.frequency + '" autocomplete="off" oninput="checkDouble(this)" readonly></li>' +
+                '<li><input type="text" value="' + pill.days + '" autocomplete="off" oninput="checkDouble(this)" readonly></li>' +
+                '</ul>');
+        });
+    }
+    // 처방된 약이 없을 경우
+    else {
+        $('#no-pills').css('display' , 'flex');
+    }
+}
+
+// 보기용 파일 리스트 html 처리
+function readFileRender(file){
+    var fileHtml = $('<div></div>');
+    fileHtml.addClass('file');
+
+    if(file.img === true){
+        fileHtml.append(`
+            <div class="thumbnail">
+                <img src="/files/${file.link}" alt="${file.orgFileName}" onclick="viewImage('${file.saveFileName}')" />
+            </div>
+        `);
+    }
+    else{
+        fileHtml.append(`
+            <div class="thumbnail">
+                <a onclick="viewImage('${file.saveFileName}')">
+                    <i class="fa-regular fa-file"></i>
+                </a>
+            </div>
+        `);
+    }
+
+    var saveFileName = encodeURIComponent(file.saveFileName);
+
+    fileHtml.append(`
+        <div class="file-info">
+           <span class="name">${file.orgFileName}</span>
+           <span class="size">${formatFileSize(file.fileSize)}</span>
+        </div>
+        <div>
+            <a href="/files/download/${saveFileName}" download="${file.orgFileName}">
+                <i class="fa-solid fa-download"></i>
+            </a>
+        </div>
+    `)
+
+    return fileHtml;
 }
 
 function getMedicinePopup(){
 
     var patientId = $('#new-patientId').val();
 
-//    if(patientId === null || patientId === ''){
-//        alert('환자 정보를 먼저 찾아주세요');
-//        return;
-//    }
+   if(patientId === null || patientId === ''){
+       alert('환자 정보를 먼저 설정 해주세요.');
+       return;
+   }
 
     var popup = window.open(
        '/medicine-prescription' ,
@@ -1441,9 +1614,48 @@ function getMedicinePopup(){
        'width=1660 ,  height=865 , top=100 , right=100 , resizeable=no');
 }
 
-
-function receiveMedicineInfo(){
-
-
+function viewImage(saveFileName){
+    var imagePopup = window.open('/files/' + saveFileName , '_blank');
+    imagePopup.focus();
 }
 
+function downloadFile(saveFileName){
+    window.location.href = '/files/' + saveFileName;
+}
+
+
+// 확인 버튼을 눌러 팝업창이 닫히면 로컬스토리지의 데이터를 바탕으로 pills div에 내용을 넣어준다.
+function receiveMedicineInfo(){
+
+    var selectedPills = JSON.parse(localStorage.getItem('selectedPills')) || [];
+
+    if(selectedPills !== []){
+
+        console.log('selectedPills' , selectedPills);
+
+        var pillsBox = $('#pills');
+        pillsBox.find('.pill').remove();
+
+        if(selectedPills.length <= 0){
+            $('#no-pills').css('display' , 'flex');
+            return;
+        }
+
+        $('#no-pills').css('display' , 'none');
+
+        selectedPills.forEach(function (pill){
+
+            pillsBox.append(
+                '<ul class="pill">' +
+                '<input type="hidden" class="itemSeq" value="' + pill.itemSeq + '">' +
+                '<li>' + pill.itemName +'</li>' +
+                '<li><input type="text" value="' + pill.dosage + '" autocomplete="off" oninput="checkDouble(this)"></li>' +
+                '<li><input type="text" value="' + pill.frequency + '" autocomplete="off" oninput="checkDouble(this)"></li>' +
+                '<li><input type="text" value="' + pill.days + '" autocomplete="off" oninput="checkDouble(this)"></li>' +
+                '</ul>');
+        });
+    }
+    else {
+        $('#no-pills').css('display' , 'flex');
+    }
+}

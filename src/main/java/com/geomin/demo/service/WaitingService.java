@@ -1,5 +1,6 @@
 package com.geomin.demo.service;
 
+import com.geomin.demo.domain.WaitingVO;
 import com.geomin.demo.dto.WaitingDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,4 +18,7 @@ public interface WaitingService {
 
     // 진료 대기 환자 상태||종류 변경
     int modifyWaitingStatus(WaitingDTO waitingDTO);
+
+    // 진료 접수 기록 id로 찾아 가져오기
+    WaitingVO getWaitingById(int waitingId);
 }

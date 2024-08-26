@@ -5,9 +5,11 @@ import com.geomin.demo.domain.WaitingVO;
 import com.geomin.demo.dto.*;
 import com.geomin.demo.repository.DiagnosisRepository;
 import com.geomin.demo.service.*;
+import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.Response;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -21,6 +23,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +40,7 @@ public class HomeController {
     private final WaitingService waitingService;
     private final DiagnosisService diagnosisService;
     private final FileService fileService;
+    private final MedicineService medicineService;
 
     // 로그인
     @GetMapping("/login")
@@ -100,20 +104,6 @@ public class HomeController {
         log.info("patients::{}", patients.stream().toList());
 
         return "patient_popup";
-    }
-
-    // 진료기록 가져오기
-    @PostMapping("/diagnosis")
-    public ResponseEntity<?> getDiagnosisList(@PageableDefault(size = 10) Pageable pageable ,
-                                              @RequestBody DiagnosisDTO diagnosisDTO ){
-
-        log.info("post >> /diagnosis... getDiagnosisList() 실행됨.");
-        log.info("diagnosisDTO::{}" , diagnosisDTO);
-
-        Page<DiagnosisDTO> diagnosisList = diagnosisService.getDiagnosisList(pageable, diagnosisDTO);
-
-        return ResponseEntity.status(HttpStatus.OK).body(diagnosisList);
-
     }
 
 
@@ -330,6 +320,21 @@ public class HomeController {
 
     }
 
+    // 진료기록 가져오기
+    @PostMapping("/diagnosis")
+    public ResponseEntity<?> getDiagnosisList(@PageableDefault(size = 10) Pageable pageable ,
+                                              @RequestBody DiagnosisDTO diagnosisDTO ){
+
+        log.info("post >> /diagnosis... getDiagnosisList() 실행됨.");
+        log.info("diagnosisDTO::{}" , diagnosisDTO);
+
+        Page<DiagnosisDTO> diagnosisList = diagnosisService.getDiagnosisList(pageable, diagnosisDTO);
+
+        return ResponseEntity.status(HttpStatus.OK).body(diagnosisList);
+
+    }
+
+
     // 진료대기환자 호출
     @Transactional
     @PostMapping("/patient-call")
@@ -371,21 +376,28 @@ public class HomeController {
     public ResponseEntity<?> updateDiagnosis(
             @RequestPart("diagnosis") DiagnosisDTO diagnosisDTO ,
             @RequestPart(value = "uploadFiles" , required = false) List<MultipartFile> uploadFiles,
+            @RequestPart(value = "pills" , required = false) List<MedicineDTO> pills,
             Principal principal){
 
         log.info("post >> /diagnosis-update... updateDiagnosis() 실행.");
         log.info("diagnosisDTO::{}" , diagnosisDTO);
         log.info("--------------------------------------------------------------------------");
         log.info("uploadFiles::{}" , uploadFiles);
+        log.info("pills::{}" , pills);
 
         UserSecurityDTO user = userService.getUser(principal.getName());    // 신원확인 정보 가져오기
 
         ResponseDTO result = new ResponseDTO();
 
         // 파일이 존재 한다면 업로드 진행, 파일 저장 id 대입
-        if( uploadFiles != null ){
+        if( uploadFiles != null && !uploadFiles.isEmpty()){
             int fileId = fileService.upload(uploadFiles);
             diagnosisDTO.setFileId(fileId);
+        }
+        // 처방 약품들이 존재한다면 처방전 저장, id 대입
+        if(pills != null && !pills.isEmpty() ){
+            int medicineId = medicineService.addMedicine(pills);
+            diagnosisDTO.setMedicineId(medicineId);
         }
 
         // 진료했던 진료기록이라면 수정자에 아이디 넣기
@@ -397,6 +409,7 @@ public class HomeController {
             diagnosisDTO.setDoctorId(user.getReferenceId());
         }
 
+        log.info("업데이트 전 마지막 dto 형태 ::{}" , diagnosisDTO);
         // id가 존재(기존 진료기록 또는 진료접수를 통한 진료기록)
         if(diagnosisDTO.getDiagnosisId() > 0){
             result =  diagnosisService.updateDiagnosisById(diagnosisDTO);
@@ -404,13 +417,30 @@ public class HomeController {
         }
         // id가 0 또는 그 이하인 경우, 진료접수 없이 작성한 새로운 진료기록
         else {
-            diagnosisDTO.setDiagnosisYn(true);  // 진료완료 처리
+//            diagnosisDTO.setDiagnosisYn(true);  // 진료완료 처리 (sql에서 처리하기로 함)
             result = diagnosisService.createDiagnosis(diagnosisDTO);
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(result);
 
     }
+
+    @GetMapping("/files/{fileName}")
+    public ResponseEntity<?> viewFile(@PathVariable String fileName){
+        log.info("post >> /files/ [" + fileName + "] viewFile 실행");
+
+        return fileService.viewFile(fileName);
+    }
+
+    @GetMapping("/files/download/{fileName}")
+    public ResponseEntity<?> downloadFile(@PathVariable String fileName){
+
+        log.info("post >> /files/download/ [" + fileName + "] downloadFile 실행");
+
+        return fileService.downloadFile(fileName);
+    }
+
+
 
 
 

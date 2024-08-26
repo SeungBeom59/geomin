@@ -7,12 +7,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnailator;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -42,8 +49,6 @@ public class FileService {
         int lastFileId = fileInfoRepository.getLastFileId();
 
         AtomicInteger fileSeq = new AtomicInteger(1);
-
-
 
         uploadFiles.forEach(file -> {
             log.info(file.getOriginalFilename());
@@ -117,5 +122,46 @@ public class FileService {
         });
 
         return fileDTOList;
+    }
+
+    public ResponseEntity<Resource> viewFile(String fileName){
+
+        Resource resource = new FileSystemResource(uploadPath + File.separator + fileName);
+        HttpHeaders headers = new HttpHeaders();
+
+        if(!resource.exists()){
+            return ResponseEntity.notFound().build();
+        }
+
+        try{
+            headers.add("Content-Type" , Files.probeContentType(resource.getFile().toPath()));
+        }
+        catch (Exception e){
+            return ResponseEntity.internalServerError().build();
+        }
+        return ResponseEntity.ok().headers(headers).body(resource);
+    }
+
+
+    public ResponseEntity<?> downloadFile(String fileName) {
+
+        Resource resource = new FileSystemResource(uploadPath + File.separator + fileName);
+        HttpHeaders headers = new HttpHeaders();
+
+        if(!resource.exists()){
+            return ResponseEntity.notFound().build();
+        }
+
+        try {
+            String orgFileName = fileName.substring(fileName.indexOf('_') + 1);
+            String encodedFileName = URLEncoder.encode(orgFileName , StandardCharsets.UTF_8).replaceAll("\\+","%20");
+            headers.add("Content-Disposition", "attachment; filename=\"" + encodedFileName + "\"");
+            headers.add("Content-Type", Files.probeContentType(resource.getFile().toPath()));
+        }
+        catch (Exception e){
+            return ResponseEntity.internalServerError().build();
+        }
+
+        return ResponseEntity.ok().headers(headers).body(resource);
     }
 }

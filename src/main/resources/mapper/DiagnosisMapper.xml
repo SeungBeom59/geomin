@@ -13,6 +13,7 @@
         <result property="prescription" column="prescription" />
         <result property="diagnosisYn" column="diagnosis_yn" />
         <result property="modifyDate" column="modify_date" />
+        <result property="medicineId" column="medicine_id" />
 <!--        <result property="diagnosisModifier" column="diagnosis_modifier" />-->
         <result property="fileId" column="file_id" />
         <result property="diagnosisDelYn" column="diagnosis_del_yn" />
@@ -178,11 +179,12 @@
             SYMPTOMS = #{symptoms},
             DIAGNOSIS = #{diagnosis},
             PRESCRIPTION = #{prescription},
-
             <if test="fileId > 0">
                 FILE_ID = #{fileId},
             </if>
-
+            <if test="medicineId > 0">
+                MEDICINE_ID = #{medicineId},
+            </if>
             <if test="diagnosisYn == true">
                 MODIFY_DATE = now(),
                 DIAGNOSIS_MODIFIER = #{diagnosisModifier},
@@ -191,7 +193,7 @@
             <if test="diagnosisYn == false">
                 DIAGNOSIS_DATE = now(),
                 DOCTOR_ID = #{doctorId},
-                DIAGNOSIS_YN = true,
+                DIAGNOSIS_YN = true
             </if>
         </set>
         WHERE
@@ -203,6 +205,7 @@
         SELECT
             d.*,
             P.*,
+            W.*,
             d3.*,
             d2.doctor_name as doctor_name,
             d2.doctor_phone as doctor_phone,
@@ -220,6 +223,7 @@
             LEFT OUTER JOIN DEPARTMENT d3 ON d3.DEPARTMENT_ID = d.DEPARTMENT_ID
             LEFT OUTER JOIN DOCTOR d4 ON d4.DOCTOR_ID = d.DIAGNOSIS_MODIFIER
             LEFT OUTER JOIN DEPARTMENT d5 ON d5.DEPARTMENT_ID = d4.DEPARTMENT_ID
+            LEFT OUTER JOIN WAITING w ON w.WAITING_ID = d.WAITING_ID
         WHERE
             d.DIAGNOSIS_ID = #{diagnosisId}
     </select>

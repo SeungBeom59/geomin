@@ -143,4 +143,13 @@
             WAITING_KEY = #{newWaitingKey}
     </select>
 
+    <select id="getWaitingById" resultMap="WaitingMap">
+        SELECT
+            *
+        FROM
+            WAITING
+        WHERE
+            WAITING_ID = #{waitingId}
+    </select>
+
 </mapper>

@@ -35,4 +35,7 @@ public interface WaitingRepository {
 
     // 방금 생성된 유니크 키로 집어넣었던 waiting 가져오기
     WaitingVO getWaitingByKey(String newWaitingKey);
+
+    // 접수대기 id로 가져오기
+    WaitingVO getWaitingById(int waitingId);
 }

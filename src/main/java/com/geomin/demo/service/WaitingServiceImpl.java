@@ -153,5 +153,14 @@ public class WaitingServiceImpl implements WaitingService {
         return result;
     }
 
+    @Override
+    public WaitingVO getWaitingById(int waitingId) {
+
+        waitingRepository.getWaitingById(waitingId);
+
+
+        return null;
+    }
+
 
 }

@@ -336,10 +336,10 @@
                             <div>
                                 <h4>증상</h4>
                                 <div id="diagnosis-btn-box">
-                                    <button class="btn" id="diagnosis-modify-btn">수정</button>
+                                    <button class="btn" id="diagnosis-modify-btn" >수정</button>
                                     <button class="btn" id="diagnosis-delete-btn">삭제</button>
                                     <button class="btn" id="diagnosis-cancel-btn">취소</button>
-                                    <button class="btn" id="diagnosis-create-btn">등록</button>
+                                    <button class="btn" id="diagnosis-create-btn" >등록</button>
                                 </div>
                             </div>
                             <textarea name="symptoms" id="symptoms-record" readonly ></textarea>
@@ -356,17 +356,24 @@
                         <div class="textarea-box big">
                             <div>
                                 <h4>처방 | 조제 시 참고사항</h4>
-                                <button type="button" class="btn sf-mbtn" onclick="getMedicinePopup()">의약품 검색</button>
+                                <button type="button" class="btn sf-mbtn" id="medicineSearchBtn" onclick="getMedicinePopup()">의약품 검색</button>
                             </div>
 
                             <div class="prescriptionBox">
-                                <div>
-                                    <div>프락시정 델타메인 그렌데르 1정</div>
-                                    <span>1</span><span>3</span><span>2</span>
-                                </div>
-                                <textarea name="prescription" id="prescription-record" readonly>
+                                <div id="pills">
+<!--                                    <ul class="pill">-->
+<!--                                        <input type="hidden" value="">-->
+<!--                                        <li>트라몰정160밀리그람(아세트아미노펜)트라몰정160밀리그람(아세트아미노펜)트라몰정160밀리그람(아세트아미노펜)트라몰정160밀리그람(아세트아미노펜)</li>-->
+<!--                                        <li><input type="text" value="0.5"></li>-->
+<!--                                        <li><input type="text" value="0.5"></li>-->
+<!--                                        <li><input type="text" value="0.5"></li>-->
+<!--                                    </ul>-->
+                                    <div id="no-pills">
+                                        처방된 의약품이 없습니다.
+                                    </div>
 
-                                </textarea>
+                                </div>
+                                <textarea name="prescription" id="prescription-record" readonly></textarea>
                             </div>
                             
 <!--                            <textarea name="prescription" id="prescription-record" readonly></textarea>-->
@@ -374,7 +381,8 @@
 
                         <div id="file-box">
                             <div>
-                                <h4>파일등록</h4>
+                                <h4 id="file-add">파일등록</h4>
+                                <h4 id="file-read">파일목록</h4>
                                 <label for="file-upload" class="btn file-label">내PC</label>
                             </div>
 
@@ -382,7 +390,7 @@
                                 <div id="file-drag-box" class="">
                                     <i class="fa-solid fa-file-image fa-2xl" style="color: #74C0FC;"></i>
                                     <p>File drag and drop</p>
-
+                                    <p id="no-files">저장된 파일이 없습니다.</p>
                                     <div id="files" class="files">
 
                                     </div>

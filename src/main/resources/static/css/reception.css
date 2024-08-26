@@ -687,7 +687,9 @@ th , td {
 
 /*우측 진료기록 작성의 증상 옆 버튼 설정 */
 #diagnosis-delete-btn,
-#diagnosis-modify-btn, #diagnosis-cancel-btn{
+#diagnosis-modify-btn,
+#diagnosis-cancel-btn,
+#diagnosis-create-btn {
     display: none;
 }
 
@@ -706,6 +708,10 @@ th , td {
 
 #file-box {
     /*border: 1px solid black;*/
+}
+
+#file-read {
+    display: none;
 }
 
 /*진료기록 파일등록창*/
@@ -745,6 +751,12 @@ th , td {
     /*display: none;*/
 }
 
+#no-files {
+    display: none;
+    margin-top: 50px;
+    font-weight: bold;
+}
+
 #file-box ul {
     list-style: none;
     margin: 0;
@@ -761,6 +773,11 @@ th , td {
 
 #files {
     /*border: 1px solid red;*/
+}
+
+#files > a {
+    text-decoration: none;
+    color: #0a58ca;
 }
 
 .thumbnail {
@@ -817,11 +834,12 @@ th , td {
     height : 135px
 }
 
-.prescriptionBox > div {
-    display : flex;
-    width : 320px;
+.prescriptionBox > #pills {
+    display : block;
+    width : 360px;
     height : 130px;
     border : 1px solid #7b7a7a;
+    overflow-y: scroll;
 }
 
 .prescriptionBox > #prescription-record {
@@ -832,3 +850,45 @@ th , td {
     resize : none;
     text-align : start;
 }
+
+#pills > .pill {
+    margin: 0; padding: 0;
+    width: 342px;
+    height: 35px;
+    display: flex;
+    list-style: none;
+}
+
+.pill > li {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    border: 1px solid #ccc;
+    text-align: center;
+}
+
+.pill > li > input {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    text-align: center;
+    border: 0;
+}
+
+.pill > li:nth-child(2) {
+    display: inline-block;
+    width: 219px;
+    text-align: left;
+    font-size: 14px;
+    overflow: auto;
+}
+
+#no-pills {
+    box-sizing: border-box;
+    display: flex;
+    height: 130px;
+    align-items: center;
+    justify-content: center;
+}
+

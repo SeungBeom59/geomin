@@ -39,10 +39,11 @@ public class DiagnosisDTO {
     @Builder.Default
     private Boolean diagnosisYn = false;    // 진료여부
     private String modifyDate;              // 수정날짜
-    private int diagnosisModifier;       // 수정자
-    private String modifierName;       // 수정자 이름
+    private int diagnosisModifier;          // 수정자
+    private String modifierName;            // 수정자 이름
 
-    private int fileId;                     // 파일정보 번호(fk)
+    private int medicineId;                 // 의약품 처방 번호(fk : 관계맺지는 않음)
+    private int fileId;                     // 파일정보 번호(fk : 관계맺지는 않음)
 
     private Boolean diagnosisDelYn;         // 삭제 여부 (1:true 삭제 | 0:false 존재)
 
