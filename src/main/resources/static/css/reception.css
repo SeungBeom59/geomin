@@ -392,33 +392,33 @@ th , td {
 
 
 /* 환자 바이탈 정보 테이블 페이징 , 접수대기 페이징 */
-#vital-sign-pageing , #waiting-pageing {
+#vital-sign-paging , #waiting-paging {
     margin: 0; padding: 0;
     padding-right: 10px;
     list-style: none;
     display: none;
 }
 
-#waiting-pageing {
+#waiting-paging {
     display: flex;
     font-weight: bold;
     margin-top: 20px;
     justify-content: center;
 }
 
-#vital-sign-pageing > li , #waiting-pageing > li {
+#vital-sign-paging > li , #waiting-paging > li {
     margin-right: 15px;
     cursor: pointer;
 }
 
 
-#vital-sign-pageing > li > a  , #waiting-pageing > li > a{
+#vital-sign-paging > li > a  , #waiting-paging > li > a{
     color: black;
     font-weight: bold;
     text-decoration: none;
 }
 
-#vital-sign-pageing > li > a:visited , #waiting-pageing > li > a:visited {
+#vital-sign-paging > li > a:visited , #waiting-paging > li > a:visited {
     color: black;
 }
 
@@ -446,6 +446,8 @@ th , td {
     text-align: center;
     margin-top: 20px;
     list-style-type: none;
+    height: 411px;
+    display: none;
 }
 
 /* 진료기록 박스 네비(왼쪽바) */
@@ -455,15 +457,15 @@ th , td {
     width: 108px;
     margin-left: 20px;
     background-color: white;
+    cursor: pointer;
 }
 
-#diagnosis-record-list > li > a {
-    color: black;
-    text-decoration: none;
-    display: block;
-    width: 100%;
-    /* border: 1px solid black; */
-}
+/*#diagnosis-record-list > li > a {*/
+/*    color: black;*/
+/*    text-decoration: none;*/
+/*    display: block;*/
+/*    width: 100%;*/
+/*}*/
 
 #diagnosis-record-list > li:first-child > select {
     border: none;
@@ -480,6 +482,19 @@ th , td {
 
 #diagnosis-record-list > li:not(:first-child) {
     margin-top: 5px;
+}
+
+#diagnosis-record-paging {
+    list-style: none;
+    margin: 0; padding: 0;
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+#diagnosis-record-paging > li {
+    cursor: pointer;
 }
 
 /* 진료기록 우측 입력창 */
@@ -514,8 +529,23 @@ th , td {
     display: none;
 }
 
+.pre-diagnosis-box > h4 {
+    margin-block: 10px;
+}
+
+#past-title-box {
+    height: 50px;
+}
+
 #diagnosis-title span {
     display: none;
+}
+
+#past-modify-box {
+    display: none;
+    margin: 0;
+    margin-top: 5px; margin-right: 15px;
+    text-align: right;
 }
 
 
@@ -543,6 +573,7 @@ th , td {
     height: 36px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     text-indent: 20px;
 }
 
@@ -647,6 +678,41 @@ th , td {
     font-size: x-large;
 }
 
+#pre-symptoms-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 30px;
+}
+
+#pre-symptoms-box > h4 {
+    margin-left: 15px;
+}
+
+#pre-prescription-box {
+    display: flex;
+}
+
+#no-pre-pills , #no-pre-files {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+#pre-pills {
+    width: 290px;
+    height: 94px;
+    border: 1px solid;
+    margin-left: 15px;
+}
+
+#prescription-past-record {
+    height: 90px;
+    width: 279px;
+}
+
 /*담당의*/
 #attending-doctor-box {
     display: none;
@@ -654,30 +720,164 @@ th , td {
     padding-inline: 20px;
     padding-block: 5px;
     color: black;
-    font-size: large;
+    font-size: medium;
     font-weight: bold;
 }
 
-.diagnosis-modify-btn {
-    display: none;
-}
-
-#diagnosis-detail-box {
-    display: none;
-    justify-content: space-between;
-}
-
-#diagnosis-photo-box {
+#past-diagnosis-btn-box {
     display: flex;
-    justify-content: space-around;
-    padding-left: 15px;
+    justify-content: space-between;
+    align-items: center;
+    margin-right: 15px;
 }
 
-#diagnosis-photo-box > div {
-    width: 50px; height: 50px;
-    border: 1px solid #ccc;
+#past-diagnosis-btn-box > span {
+    display: none;
     cursor: pointer;
 }
+
+#past-diagnosis-btn-box > span:hover {
+    color: #5b9fff;
+}
+
+.diagnosis-modify-btn ,
+.diagnosis-delete-btn {
+    display: none;
+    margin-right: 10px;
+}
+
+#pre-pills {
+    border: 1px solid black;
+    overflow-y: scroll;
+}
+
+.pre-pill {
+    list-style: none;
+    border-bottom: 1px solid #ccc;
+    margin: 0;
+    padding: 0;
+    width: 273px;
+    height: 30px;
+    display: flex;
+}
+.pre-pill > li {
+    border: 1px solid #ccc;
+    width: 25px;
+}
+
+.pre-pill > li:nth-child(2) {
+    width: 225px;
+    font-size: 13px;
+    overflow: auto;
+    text-align: left;
+}
+
+.pre-pill input {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+
+#pre-files-box {
+    display: none;
+    width: 578px;
+    margin-left: 15px;
+}
+
+#pre-files-box > h4 {
+    margin-block: 10px;
+}
+
+#pre-files {
+    height: 80px;
+    /*margin-left: 15px;*/
+    width: 578px;
+    border: 1px solid black;
+    overflow-y: auto;
+}
+
+.pre-file {
+    padding: 0; margin: 0;
+    display: flex;
+    list-style: none;
+    border-bottom: 1px solid #807d7d;
+}
+
+.pre-file > li {
+    /*border: 1px solid black;*/
+    height: 23px;
+}
+
+.pre-file > li:nth-child(1) {
+    width: 60px;
+}
+
+.pre-file > li:nth-child(1) > a {
+    display: block;
+    width: inherit; height: inherit;
+}
+
+.pre-file > li:nth-child(1) > a > i {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: inherit;
+}
+
+.pre-file > li:nth-child(1) > img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.pre-file > li:nth-child(2) {
+    width: 460px;
+    display: flex;
+    align-items: center;
+}
+
+.pre-file > li:nth-child(2) > span:first-child {
+    display: block;
+    width: 380px;
+    height: 23px;
+    /*border: 1px solid black;*/
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pre-file > li:nth-child(2) > span:last-child {
+    height: 23px;
+    width: 80px;
+    text-align: right;
+}
+
+.pre-file > li:nth-child(3) {
+    width: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pre-file > li:nth-child(3) > a {
+    cursor: pointer;
+}
+
+
+
+
+    /*#diagnosis-photo-box {*/
+/*    display: flex;*/
+/*    justify-content: space-around;*/
+/*    padding-left: 15px;*/
+/*}*/
+
+/*#diagnosis-photo-box > div {*/
+/*    width: 50px; height: 50px;*/
+/*    border: 1px solid #ccc;*/
+/*    cursor: pointer;*/
+/*}*/
 
 /*우측 진료기록 작성의 증상 옆 버튼 박스*/
 #diagnosis-btn-box {
@@ -693,17 +893,22 @@ th , td {
     display: none;
 }
 
-#diagnosis-modify-btn {
+#diagnosis-modify-btn , #diagnosis-create-btn {
     margin-right: 10px;
 }
-#diagnosis-delete-btn{
+#diagnosis-delete-btn , .diagnosis-delete-btn{
     background-color: #9B2727;
 }
 
 /*진료기록 작성 옆 구분자, 성명 설정*/
-#diagnosis-write-title > span:nth-child(2) ,
-#diagnosis-write-title > span:nth-child(3) {
+/*#diagnosis-write-title > span:nth-child(2) ,*/
+/*#diagnosis-write-title > span:nth-child(3) {*/
+/*    display: none;*/
+/*}*/
+
+#diagnosis-write-sub-title {
     display: none;
+    margin-right: 15px;
 }
 
 #file-box {
@@ -725,7 +930,7 @@ th , td {
 
 .file-label {
     font-weight: normal;
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
 }
@@ -775,7 +980,7 @@ th , td {
     /*border: 1px solid red;*/
 }
 
-#files > a {
+#files > a , #pre-files a {
     text-decoration: none;
     color: #0a58ca;
 }
@@ -844,7 +1049,7 @@ th , td {
 
 .prescriptionBox > #prescription-record {
     box-sizing : border-box;
-    padding: 0;
+    padding: 5px;
     width : 320px;
     height : 132px;
     resize : none;
@@ -868,7 +1073,7 @@ th , td {
     text-align: center;
 }
 
-.pill > li > input {
+.pill > li > input , .pre-pill > li > input {
     width: 100%;
     height: 100%;
     padding: 0;

@@ -3,7 +3,6 @@ package com.geomin.demo.repository;
 import com.geomin.demo.domain.DiagnosisVO;
 import com.geomin.demo.dto.DiagnosisDTO;
 import org.apache.ibatis.annotations.Mapper;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -14,8 +13,8 @@ public interface DiagnosisRepository {
 
     int addOnlySymptoms(DiagnosisDTO diagnosisDTO, int lastDiagnosisId);
 
-    List<DiagnosisVO> getDiagnosisList(Pageable pageable , DiagnosisDTO diagnosisDTO);
-
+//    List<DiagnosisVO> getDiagnosisList(Pageable pageable , DiagnosisDTO diagnosisDTO);
+    List<DiagnosisVO> getDiagnosisList(DiagnosisDTO diagnosisDTO, int page, int size, int offset);
 
     int getTotalDiagnosis(DiagnosisDTO diagnosisDTO);
 
@@ -26,4 +25,8 @@ public interface DiagnosisRepository {
     int updateDiagnosisById(DiagnosisDTO diagnosisDTO);
 
     DiagnosisVO getDiagnosisById(int diagnosisId);
+
+    int createDiagnosis(DiagnosisDTO diagnosisDTO);
+
+    void deleteDiagnosisById(int diagnosisId);
 }

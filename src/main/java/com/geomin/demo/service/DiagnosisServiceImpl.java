@@ -3,10 +3,9 @@ package com.geomin.demo.service;
 import com.geomin.demo.domain.*;
 import com.geomin.demo.dto.*;
 import com.geomin.demo.repository.DiagnosisRepository;
-import com.geomin.demo.repository.WaitingRepository;
+import com.geomin.demo.repository.DoctorRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,66 +21,154 @@ public class DiagnosisServiceImpl implements DiagnosisService{
     private final FileService fileService;
     private final MedicineService medicineService;
     private final WaitingService waitingService;
+    private final DoctorRepository doctorRepository;
+
+//    @Override
+//    public Page<DiagnosisDTO> getDiagnosisList(Pageable pageable , DiagnosisDTO diagnosisDTO) {
+//
+//        Sort sort = diagnosisDTO.isSort() ?
+//                Sort.by(Sort.Order.desc("diagnosis_date")) : Sort.by(Sort.Order.asc("diagnosis_date"));
+//
+//        pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+//
+//        List<DiagnosisVO> result = diagnosisRepository.getDiagnosisList(pageable , diagnosisDTO);
+//
+//        log.info("result::{}",result);
+//
+//        List<DiagnosisDTO> content = new ArrayList<>();
+//
+//        for(DiagnosisVO vo : result){
+//            DiagnosisDTO dto = new DiagnosisDTO();
+//
+//            PatientVO patient = vo.getPatient();
+//            DoctorVO doctor = vo.getDoctor();
+//            DepartmentVO department = vo.getDepartment();
+//
+//            dto = vo.getDateAndModifiedMember(vo, dto);
+//            dto.setDiagnosisId(vo.getDiagnosisId());
+//            dto.setPatientId(patient.getPatientId());
+//            dto.setPatientName(patient.getPatientName());
+//            dto.setDoctorId(doctor.getDoctorId());
+//            dto.setDoctorName(doctor.getDoctorName());
+//            dto.setDepartmentId(department.getDepartmentId());
+//            dto.setDepartmentName(department.getDepartmentName());
+//            dto.setSymptoms(vo.getSymptoms());
+//            dto.setDiagnosis(vo.getDiagnosis());
+//            dto.setPrescription(vo.getPrescription());
+//
+//            dto.setFileId(vo.getFileId());
+//
+//            content.add(dto);
+//        }
+//
+//        log.info("content::{}", content);
+//
+//        int total = diagnosisRepository.getTotalDiagnosis(diagnosisDTO);
+//
+//        return new PageImpl<>(content, pageable, total);
+//    }
 
     @Override
-    public Page<DiagnosisDTO> getDiagnosisList(Pageable pageable , DiagnosisDTO diagnosisDTO) {
+    public ResponseDTO getDiagnosisById(int diagnosisId) {
 
-        Sort sort = diagnosisDTO.isSort() ?
-                Sort.by(Sort.Order.desc("diagnosis_date")) : Sort.by(Sort.Order.asc("diagnosis_date"));
+        DiagnosisVO diagnosisVO = diagnosisRepository.getDiagnosisById(diagnosisId);
 
-        pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
-
-        List<DiagnosisVO> result = diagnosisRepository.getDiagnosisList(pageable , diagnosisDTO);
-
-        log.info("result::{}",result);
-
-        List<DiagnosisDTO> content = new ArrayList<>();
-
-        for(DiagnosisVO vo : result){
-            DiagnosisDTO dto = new DiagnosisDTO();
-
-            PatientVO patient = vo.getPatient();
-            DoctorVO doctor = vo.getDoctor();
-            DepartmentVO department = vo.getDepartment();
-
-            dto = vo.getDateAndModifiedMember(vo, dto);
-
-//            String diagnosisDate = vo.getDiagnosisDate().toString();
-//            String time =  diagnosisDate.replace("T" , "/");
-//
-//            dto.setDiagnosisDate(time);
-//
-//            if(vo.getModifyDate() != null && vo.getDiagnosisModifier() != null) {
-//                String modifiedDate = vo.getModifyDate().toString();
-//                String modifiedTime = modifiedDate.replace("T" , "/");
-//                dto.setModifyDate(modifiedTime);
-//
-//                dto.setDiagnosisModifier(vo.getDiagnosisModifier());
-//            }
-
-            dto.setDiagnosisId(vo.getDiagnosisId());
-
-            dto.setPatientId(patient.getPatientId());
-            dto.setPatientName(patient.getPatientName());
-            dto.setDoctorId(doctor.getDoctorId());
-            dto.setDoctorName(doctor.getDoctorName());
-            dto.setDepartmentId(department.getDepartmentId());
-            dto.setDepartmentName(department.getDepartmentName());
-
-            dto.setSymptoms(vo.getSymptoms());
-            dto.setDiagnosis(vo.getDiagnosis());
-            dto.setPrescription(vo.getPrescription());
-
-            dto.setFileId(vo.getFileId());
-
-            content.add(dto);
+        if(diagnosisVO == null) {
+            return null;
         }
 
-        log.info("content::{}", content);
+        ResponseDTO responseDTO = createResponseDTO(diagnosisVO);
 
-        int total = diagnosisRepository.getTotalDiagnosis(diagnosisDTO);
+        return responseDTO;
+    }
 
-        return new PageImpl<>(content, pageable, total);
+    @Override
+    public boolean deleteDiagnosisById(int diagnosisId) {
+
+      diagnosisRepository.deleteDiagnosisById(diagnosisId);
+
+        DiagnosisVO diagnosisVO = diagnosisRepository.getDiagnosisById(diagnosisId);
+
+        if(diagnosisVO != null ) {
+            if(diagnosisVO.getDiagnosisId() == diagnosisId && diagnosisVO.getDiagnosisDelYn()) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        else{
+            return false;
+        }
+    }
+
+
+    @Override
+    @Transactional
+    public ResponseDTO getDiagnosisList(int page, DiagnosisDTO diagnosisDTO) {
+
+        int size = 15;
+        int offset = page * size;
+
+        List<DiagnosisVO> result = diagnosisRepository.getDiagnosisList(diagnosisDTO , page, size , offset);
+
+        if(result == null){
+            return null;
+        }
+
+        List<DiagnosisDTO> dtos = new ArrayList<>();
+
+        result.forEach(vo -> {
+
+            DiagnosisDTO dto = DiagnosisDTO.builder()
+                    .diagnosisId(vo.getDiagnosisId())
+                    .patientId(vo.getPatient().getPatientId())
+                    .patientName(vo.getPatient().getPatientName())
+                    .doctorId(vo.getDoctor().getDoctorId())
+                    .doctorName(vo.getDoctor().getDoctorName())
+                    .departmentId(vo.getDepartment().getDepartmentId())
+                    .departmentName(vo.getDepartment().getDepartmentName())
+                    .diagnosisYn(vo.getDiagnosisYn())
+                    .symptoms(vo.getSymptoms())
+                    .diagnosis(vo.getDiagnosis())
+                    .prescription(vo.getPrescription())
+                    .fileId(vo.getFileId())
+                    .medicineId(vo.getMedicineId())
+                    .diagnosisDelYn(vo.getDiagnosisDelYn())
+                    .build();
+
+            dto = vo.getDateAndModifiedMember(vo , dto);
+
+            dtos.add(dto);
+        });
+
+        int totalCount = diagnosisRepository.getTotalDiagnosis(diagnosisDTO);
+
+        ResponseDTO responseDTO = createResponseDTO(result.get(0));
+        responseDTO.setDiagnosisDTOList(dtos);
+
+        int totalPages = (int)Math.ceil((double) totalCount / size );
+        int currentGroup = (int)Math.ceil((double) (page + 1) / size);    // 현재 페이지가 속하는 페이지 그룹
+
+        int currentGroupStartPage = (currentGroup - 1) * size + 1;
+        int currentGroupEndPage = Math.min(currentGroup * size, totalPages);
+
+        int prevGroupStartPage = (currentGroup - 2) * size + 1;
+        prevGroupStartPage = Math.max(prevGroupStartPage, 1);       // 1 보다는 작아지지 않도록
+        int nextGroupStartPage = currentGroup * size + 1;
+        nextGroupStartPage = Math.min(nextGroupStartPage, totalPages);  // 전체 페이지 보다는 많아지지 않도록
+
+        responseDTO.setPage(page);
+        responseDTO.setSize(size);
+        responseDTO.setTotalCount(totalCount);
+        responseDTO.setTotalPages(totalPages);
+        responseDTO.setCurrentGroup(currentGroup);
+        responseDTO.setCurrentGroupStartPage(currentGroupStartPage);
+        responseDTO.setCurrentGroupEndPage(currentGroupEndPage);
+        responseDTO.setPrevGroupStartPage(prevGroupStartPage);
+        responseDTO.setNextGroupStartPage(nextGroupStartPage);
+
+        return responseDTO;
     }
 
     @Override
@@ -131,9 +218,6 @@ public class DiagnosisServiceImpl implements DiagnosisService{
             return null;
         }
 
-
-        // 파일정보, 의약품 처방 정보, 진료기록 정보를 모두 감싸는 responseDTO 생성
-        ResponseDTO responseDTO = new ResponseDTO();
         // 진료기록을 id를 통해 가져오고.
         DiagnosisVO result = diagnosisRepository.getDiagnosisById(diagnosisDTO.getDiagnosisId());
 
@@ -147,6 +231,48 @@ public class DiagnosisServiceImpl implements DiagnosisService{
 
             waitingService.modifyWaitingStatus(changeWaitingStatus);
         }
+
+        return createResponseDTO(result);
+    }
+
+    @Transactional
+    @Override
+    public ResponseDTO createDiagnosis(DiagnosisDTO diagnosisDTO) {
+        log.info("createDiagnosis 실행");
+
+        // 마지막 id 가져오기
+        int lastDiagnosisId = diagnosisRepository.getLastDiagnosisId();
+        // 마지막 id + 1 값 대입
+        diagnosisDTO.setDiagnosisId(lastDiagnosisId + 1 );
+
+        // 소속정보 가져오기
+        DoctorVO doc = doctorRepository.findById(diagnosisDTO.getDoctorId());
+        diagnosisDTO.setDepartmentId(doc.getDepartment().getDepartmentId());
+
+        // 새로운 diagnosis 기록 저장
+        int isGood =  diagnosisRepository.createDiagnosis(diagnosisDTO);
+        // 기록 저장 실패한  경우
+        if(isGood <= 0){
+            return null;
+        }
+
+        // id 값으로 사용했던 lastDiagnosisId +1 값으로 정보 가져오기
+        DiagnosisVO result = diagnosisRepository.getDiagnosisById(lastDiagnosisId + 1);
+
+        return createResponseDTO(result);
+    }
+
+
+
+
+    // 중복되는 코드가 너무 길어서 함수로 사용.
+    // 진료기록 정보를 이용하여 파일, 의약품, 진료기록이 모두 감싸진 responseDTO를 만들도록.
+    public ResponseDTO createResponseDTO(DiagnosisVO result){
+
+        log.info("result::{}" , result);
+
+        // 파일정보, 의약품 처방 정보, 진료기록 정보를 모두 감싸는 responseDTO 생성
+        ResponseDTO responseDTO = new ResponseDTO();
 
         // 해당 진료기록의 파일 정보 id가 있다면 따로 가져와서 responseDTO에 넣어준다.
         // 외래키로 사용은 하나 관계는 맺지 않았음. join을 해서 가져오자니,
@@ -167,8 +293,6 @@ public class DiagnosisServiceImpl implements DiagnosisService{
         WaitingVO waiting = result.getWaiting();
         DoctorVO doctor = result.getDoctor();
 
-        log.info("result::{}" , result);
-
         DiagnosisDTO diagnosis = DiagnosisDTO.builder()
                 .diagnosisId(result.getDiagnosisId())
                 .patientId(patient.getPatientId())
@@ -183,6 +307,7 @@ public class DiagnosisServiceImpl implements DiagnosisService{
                 .prescription(result.getPrescription())
                 .diagnosisYn(result.getDiagnosisYn())
                 .fileId(result.getFileId())
+                .medicineId(result.getMedicineId())
                 .build();
 
         diagnosis = result.getDateAndModifiedMember(result , diagnosis);
@@ -190,21 +315,6 @@ public class DiagnosisServiceImpl implements DiagnosisService{
         responseDTO.setDiagnosisDTO(diagnosis);
 
         return responseDTO;
-    }
-
-    @Transactional
-    @Override
-    public ResponseDTO createDiagnosis(DiagnosisDTO diagnosisDTO) {
-        log.info("createDiagnosis 실행");
-
-        // 마지막 id 가져오기
-        int lastDiagnosisId = diagnosisRepository.getLastDiagnosisId();
-        // 마지막 id + 1 값 대입
-        diagnosisDTO.setDiagnosisId(lastDiagnosisId + 1 );
-//        DiagnosisVO result =  diagnosisRepository.createDiagnosis(diagnosisDTO);
-
-
-        return null;
     }
 
 

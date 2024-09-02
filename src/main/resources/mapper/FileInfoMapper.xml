@@ -35,9 +35,27 @@
             FILE_INFO
         WHERE
             FILE_ID = #{fileId}
-
-
     </select>
+
+    <delete id="deleteFile">
+        DELETE FROM
+            FILE_INFO
+        WHERE
+            FILE_ID = #{fileId} AND
+            FILE_SEQ = #{fileSeq}
+    </delete>
+
+    <delete id="deleteFiles">
+        DELETE FROM
+            FILE_INFO
+        WHERE
+            FILE_ID = #{fileId}
+        AND
+            FILE_SEQ IN
+        <foreach collection="deleteFilesSeq" item="seq" open="(" separator="," close=")">
+            #{seq}
+        </foreach>
+    </delete>
 
 
 

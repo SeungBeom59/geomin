@@ -97,9 +97,49 @@
             DIAGNOSIS
     </select>
 
+<!--    <select id="getDiagnosisList" resultMap="DiagnosisMap">-->
+<!--        SELECT-->
+<!--            d.*,-->
+<!--            d3.*,-->
+<!--            d2.doctor_name as doctor_name,-->
+<!--            d2.doctor_phone as doctor_phone,-->
+<!--            d2.department_id as department,-->
+<!--            d4.doctor_id as modifier_doctorId,-->
+<!--            d4.doctor_name as modifier_doctorName,-->
+<!--            d4.doctor_phone as modifier_doctorPhone,-->
+<!--            d4.department_id as modifier_department,-->
+<!--            d5.department_name as modifier_departmentName,-->
+<!--            d5.department_phone as modifier_departmentPhone-->
+<!--        FROM-->
+<!--            diagnosis d-->
+<!--            LEFT OUTER JOIN DOCTOR d2 ON d2.DOCTOR_ID = d.DOCTOR_ID-->
+<!--            LEFT OUTER JOIN DEPARTMENT d3 ON d3.DEPARTMENT_ID = d.DEPARTMENT_ID-->
+<!--            LEFT OUTER JOIN DOCTOR d4 ON d4.DOCTOR_ID = d.DIAGNOSIS_MODIFIER-->
+<!--            LEFT OUTER JOIN DEPARTMENT d5 ON d5.DEPARTMENT_ID = d4.DEPARTMENT_ID-->
+<!--        WHERE-->
+<!--            d.DEPARTMENT_ID = #{diagnosisDTO.departmentId}-->
+<!--        AND-->
+<!--            d.PATIENT_ID = #{diagnosisDTO.patientId}-->
+<!--        AND-->
+<!--            d.DIAGNOSIS_YN = 1-->
+<!--        AND-->
+<!--            d.DIAGNOSIS_DEL_YN = 0-->
+<!--        <if test="pageable.sort != null and !pageable.sort.isEmpty()">-->
+<!--            ORDER BY-->
+<!--            <foreach item="order" index="index" collection="pageable.sort.orders" separator=",">-->
+<!--                ${order.property} ${order.direction}-->
+<!--            </foreach>-->
+<!--        </if>-->
+<!--        OFFSET-->
+<!--            #{pageable.offset} ROWS-->
+<!--        FETCH NEXT-->
+<!--            #{pageable.pageSize} ROWS ONLY-->
+<!--    </select>-->
+
     <select id="getDiagnosisList" resultMap="DiagnosisMap">
         SELECT
             d.*,
+            p.*,
             d3.*,
             d2.doctor_name as doctor_name,
             d2.doctor_phone as doctor_phone,
@@ -112,6 +152,7 @@
             d5.department_phone as modifier_departmentPhone
         FROM
             diagnosis d
+            LEFT OUTER JOIN PATIENT p ON p.PATIENT_ID = d.PATIENT_ID
             LEFT OUTER JOIN DOCTOR d2 ON d2.DOCTOR_ID = d.DOCTOR_ID
             LEFT OUTER JOIN DEPARTMENT d3 ON d3.DEPARTMENT_ID = d.DEPARTMENT_ID
             LEFT OUTER JOIN DOCTOR d4 ON d4.DOCTOR_ID = d.DIAGNOSIS_MODIFIER
@@ -124,16 +165,17 @@
             d.DIAGNOSIS_YN = 1
         AND
             d.DIAGNOSIS_DEL_YN = 0
-        <if test="pageable.sort != null and !pageable.sort.isEmpty()">
-            ORDER BY
-            <foreach item="order" index="index" collection="pageable.sort.orders" separator=",">
-                ${order.property} ${order.direction}
-            </foreach>
-        </if>
+        ORDER BY
+            <if test="diagnosisDTO.isSort == false">
+                d.DIAGNOSIS_DATE ASC
+            </if>
+            <if test="diagnosisDTO.isSort == true">
+                d.DIAGNOSIS_DATE DESC
+            </if>
         OFFSET
-            #{pageable.offset} ROWS
+            ${offset} ROWS
         FETCH NEXT
-            #{pageable.pageSize} ROWS ONLY
+            ${size} ROWS ONLY
     </select>
 
     <select id="getTotalDiagnosis" parameterType="com.geomin.demo.dto.DiagnosisDTO">
@@ -158,6 +200,15 @@
             DIAGNOSIS_DEL_YN = 1
         WHERE
             WAITING_ID = #{waitingId}
+    </update>
+
+    <update id="deleteDiagnosisById">
+        UPDATE
+            DIAGNOSIS
+        SET
+            DIAGNOSIS_DEL_YN = 1
+        WHERE
+            DIAGNOSIS_ID = #{diagnosisId}
     </update>
 
     <select id="getDiagnosisByWaitingId" resultMap="DiagnosisMap">
@@ -185,6 +236,7 @@
             <if test="medicineId > 0">
                 MEDICINE_ID = #{medicineId},
             </if>
+
             <if test="diagnosisYn == true">
                 MODIFY_DATE = now(),
                 DIAGNOSIS_MODIFIER = #{diagnosisModifier},
@@ -227,6 +279,30 @@
         WHERE
             d.DIAGNOSIS_ID = #{diagnosisId}
     </select>
+
+    <insert id="createDiagnosis">
+        INSERT INTO DIAGNOSIS
+            (DIAGNOSIS_ID , PATIENT_ID , DOCTOR_ID , DEPARTMENT_ID , SYMPTOMS, DIAGNOSIS, PRESCRIPTION,
+            <if test="fileId > 0">
+                FILE_ID ,
+            </if>
+            <if test="medicineId > 0">
+                MEDICINE_ID,
+            </if>
+             DIAGNOSIS_YN , DIAGNOSIS_DATE )
+        VALUES
+            ( #{diagnosisId} , #{patientId} , #{doctorId} ,
+              #{departmentId} , #{symptoms} , #{diagnosis} ,
+              #{prescription} ,
+            <if test="fileId > 0">
+                #{fileId} ,
+            </if>
+            <if test="medicineId > 0">
+                #{medicineId} ,
+            </if>
+              true , now()
+            )
+    </insert>
 
 
     

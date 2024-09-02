@@ -1,15 +1,9 @@
 package com.geomin.demo.controller;
 
-import com.geomin.demo.domain.DiagnosisVO;
-import com.geomin.demo.domain.WaitingVO;
 import com.geomin.demo.dto.*;
-import com.geomin.demo.repository.DiagnosisRepository;
 import com.geomin.demo.service.*;
-import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Response;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -23,12 +17,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
-
-import static com.geomin.demo.domain.UserRole.ROLE_ADMIN;
 
 @Slf4j
 @Controller
@@ -321,17 +312,55 @@ public class HomeController {
     }
 
     // 진료기록 가져오기
+//    @PostMapping("/diagnosis")
+//    public ResponseEntity<?> getDiagnosisList(@PageableDefault(size = 10) Pageable pageable ,
+//                                              @RequestBody DiagnosisDTO diagnosisDTO ){
+//
+//        log.info("post >> /diagnosis... getDiagnosisList() 실행됨.");
+//        log.info("diagnosisDTO::{}" , diagnosisDTO);
+//
+//        Page<DiagnosisDTO> diagnosisList = diagnosisService.getDiagnosisList(pageable, diagnosisDTO);
+//
+//        return ResponseEntity.status(HttpStatus.OK).body(diagnosisList);
+//
+//    }
+
     @PostMapping("/diagnosis")
-    public ResponseEntity<?> getDiagnosisList(@PageableDefault(size = 10) Pageable pageable ,
-                                              @RequestBody DiagnosisDTO diagnosisDTO ){
+    public ResponseEntity<?> getDiagnosisList(@RequestParam(name = "page" , required = false) int page,
+                                                       @RequestParam(name = "sort" , defaultValue = "true") boolean isSorted,
+                                                       @RequestBody DiagnosisDTO diagnosisDTO ){
 
-        log.info("post >> /diagnosis... getDiagnosisList() 실행됨.");
-        log.info("diagnosisDTO::{}" , diagnosisDTO);
+        log.info("post >>> /diagnosis?page=" + page + "&sort=" + isSorted + " getDiagnosisList 실행됨");
+        log.info("diagnosisDTO::{}",diagnosisDTO);
+        log.info("isSorted:{}",isSorted);
 
-        Page<DiagnosisDTO> diagnosisList = diagnosisService.getDiagnosisList(pageable, diagnosisDTO);
+        diagnosisDTO.setSort(isSorted);
+        log.info("diagnosisDTO::{}",diagnosisDTO);
 
-        return ResponseEntity.status(HttpStatus.OK).body(diagnosisList);
+        ResponseDTO response = diagnosisService.getDiagnosisList(page , diagnosisDTO);
 
+        log.info("response::{}",response);
+
+        if(response == null){
+            log.info("response = null : server error");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("데이터 정보 없음");
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+
+    }
+
+    @PostMapping("/diagnosis/{diagnosisId}")
+    public ResponseEntity<?> getDiagnosisById(@PathVariable(name = "diagnosisId") int diagnosisId){
+
+        log.info("post >>> /diagnosis?diagnosisId=" + diagnosisId);
+
+        ResponseDTO response = diagnosisService.getDiagnosisById(diagnosisId);
+
+        if(response == null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("데이터 정보 없음");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
 
@@ -377,6 +406,7 @@ public class HomeController {
             @RequestPart("diagnosis") DiagnosisDTO diagnosisDTO ,
             @RequestPart(value = "uploadFiles" , required = false) List<MultipartFile> uploadFiles,
             @RequestPart(value = "pills" , required = false) List<MedicineDTO> pills,
+            @RequestPart(value = "deleteFiles" , required = false) List<Integer> deleteFiles,
             Principal principal){
 
         log.info("post >> /diagnosis-update... updateDiagnosis() 실행.");
@@ -384,15 +414,33 @@ public class HomeController {
         log.info("--------------------------------------------------------------------------");
         log.info("uploadFiles::{}" , uploadFiles);
         log.info("pills::{}" , pills);
+        log.info("deleteFiles::{}" , deleteFiles);
 
         UserSecurityDTO user = userService.getUser(principal.getName());    // 신원확인 정보 가져오기
 
         ResponseDTO result = new ResponseDTO();
 
+        // 기존에 업로드된 파일에 대하여, 삭제요청이 있을 경우.
+        if(deleteFiles != null && deleteFiles.size() > 0){
+            boolean isOk = fileService.deleteFiles(diagnosisDTO.getFileId() , deleteFiles);
+
+            if(!isOk){
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 일괄 삭제 실패");
+            }
+        }
+
+
         // 파일이 존재 한다면 업로드 진행, 파일 저장 id 대입
         if( uploadFiles != null && !uploadFiles.isEmpty()){
-            int fileId = fileService.upload(uploadFiles);
-            diagnosisDTO.setFileId(fileId);
+            if(diagnosisDTO.getFileId() > 0 ){
+                log.info("fileInfoId = " + diagnosisDTO.getFileId());
+                int fileId = fileService.uploadAdditionalFiles(uploadFiles, diagnosisDTO.getFileId());
+                diagnosisDTO.setFileId(fileId);
+            }
+            else {
+                int fileId = fileService.upload(uploadFiles);
+                diagnosisDTO.setFileId(fileId);
+            }
         }
         // 처방 약품들이 존재한다면 처방전 저장, id 대입
         if(pills != null && !pills.isEmpty() ){
@@ -401,7 +449,7 @@ public class HomeController {
         }
 
         // 진료했던 진료기록이라면 수정자에 아이디 넣기
-        if(diagnosisDTO.getDiagnosisYn()){
+        if(diagnosisDTO.getDiagnosisYn() != null && diagnosisDTO.getDiagnosisYn()){
             diagnosisDTO.setDiagnosisModifier(user.getReferenceId());
         }
         // 아니라면 담당의에 의사 id 설정
@@ -417,7 +465,8 @@ public class HomeController {
         }
         // id가 0 또는 그 이하인 경우, 진료접수 없이 작성한 새로운 진료기록
         else {
-//            diagnosisDTO.setDiagnosisYn(true);  // 진료완료 처리 (sql에서 처리하기로 함)
+            log.info("새로운 진료기록 작성 서비스로 넘어갑니다.");
+            log.info("diagnosisDTO::{}" , diagnosisDTO);
             result = diagnosisService.createDiagnosis(diagnosisDTO);
         }
 
@@ -425,19 +474,53 @@ public class HomeController {
 
     }
 
+    // 진료기록 삭제 요청처리 (db에서 논리삭제, 실제 삭제 아님.)
+    @PostMapping("/diagnosis-delete/{diagnosisId}")
+    public ResponseEntity<?> deleteDiagnosis(@PathVariable(name = "diagnosisId") int diagnosisId){
+        log.info("post >> /diagnosis-delete... deleteDiagnosis() 실행" );
+        log.info("diagnosisId::{}" , diagnosisId);
+
+        boolean result = diagnosisService.deleteDiagnosisById(diagnosisId);
+
+        if(result){
+            return ResponseEntity.status(HttpStatus.OK).body("진료기록 삭제 완료");
+        }
+        else{
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("진료기록 삭제 실패");
+        }
+    }
+
+    // 파일 미리보기
     @GetMapping("/files/{fileName}")
     public ResponseEntity<?> viewFile(@PathVariable String fileName){
-        log.info("post >> /files/ [" + fileName + "] viewFile 실행");
+        log.info("get >> /files/ [" + fileName + "] viewFile 실행");
 
         return fileService.viewFile(fileName);
     }
 
+    // 파일 다운로드
     @GetMapping("/files/download/{fileName}")
     public ResponseEntity<?> downloadFile(@PathVariable String fileName){
 
-        log.info("post >> /files/download/ [" + fileName + "] downloadFile 실행");
+        log.info("get >> /files/download/ [" + fileName + "] downloadFile 실행");
 
         return fileService.downloadFile(fileName);
+    }
+
+    // 파일 삭제
+//    @PostMapping("/files/delete")
+    public ResponseEntity<?> deleteFile(@RequestBody FileInfoDTO fileInfoDTO){
+
+        log.info("post >> /files/delete... deleteFile() 실행.");
+
+        boolean isOk = fileService.deleteFile(fileInfoDTO);
+
+        if(isOk){
+            return ResponseEntity.status(HttpStatus.OK).body("파일 처리 성공");
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 처리 실패.");
+        }
     }
 
 

@@ -78,7 +78,7 @@
 
             <input type="hidden" value="0" id="waiting-current-page">
 
-            <ul id="waiting-pageing">
+            <ul id="waiting-paging">
                 <!--<li id="waiting-prev-page">
                     <i class="fa-solid fa-angle-left" style="color: #000000;"></i>
                 </li>-->
@@ -112,7 +112,7 @@
                         <button type="button" class="btn" onclick="clearPatient()">신환등록</button>
                         <button type="button" class="btn" onclick="">수납</button>
                         <button type="button" class="btn" onclick="getWaitingPopup()">접수</button>
-                        <button type="button" class="btn sf-mbtn" onclick="">진료기록작성</button>
+                        <button type="button" class="btn sf-mbtn" onclick="newDiagnosis()">진료기록작성</button>
                     </div>
                 </div>
 
@@ -224,7 +224,7 @@
                                     <button type="button" class="btn" onclick="searchVitals()" id="vital-sign-cancel-btn">취소</button>
                                 </div>
 
-                                <ul id="vital-sign-pageing">
+                                <ul id="vital-sign-paging">
                                     <li id="prev-page">
                                         <i class="fa-solid fa-angle-left" style="color: #000000;"></i>
                                     </li>
@@ -248,66 +248,86 @@
                             <ul id="diagnosis-record-list">
                                 <!-- <li><a href="">최신순</a></li> -->
                                 <li>
-                                    <select name="" id="">
-                                        <option value="desc">최신순</option>
-                                        <option value="asc">오래된순</option>
+                                    <select id="past-record-order" onchange="getDiagnosisOrder()">
+                                        <option id="record-order-desc" value="true">최신순</option>
+                                        <option id="record-order-asc" value="false">오래된순</option>
                                     </select>
                                 </li>
 
-<!--                                <li><a href="">2024-05-11</a></li>-->
-<!--                                <li><a href="">2024-05-04</a></li>-->
-<!--                                <li><a href="">2024-04-27</a></li>-->
 
                             </ul>
+
+                            <ul id="diagnosis-record-paging">
+
+                            </ul>
+                            <input type="hidden" id="past-record-page" value="">
                         </nav>
                         
                         <div>
-                            <div>
-                                <input type="hidden" id="post-diagnosis-id">
+                            <div id="past-title-box">
+                                <input type="hidden" id="past-diagnosis-id">
                                 <h3 id="diagnosis-title">진료기록
                                     <span>2024-05-04</span>
                                     <span> | </span>
                                     <span>임승범</span>
                                 </h3>
-                                <button class="btn diagnosis-modify-btn">수정</button>
+                                <div id="past-diagnosis-btn-box">
+                                    <button class="btn diagnosis-modify-btn" onclick="changeDiagnosis(this)" data-diagnosis-id="past">수정</button>
+                                    <button class="btn diagnosis-delete-btn" onclick="deleteDiagnosis(this)" data-diagnosis-id="past">삭제</button>
+                                    <span id="past-to-read" onclick="changeDiagnosis(this)" data-diagnosis-id="read">
+                                        <i class="fa-solid fa-arrow-up-right-from-square fa-lg"></i>
+                                    </span>
+                                </div>
                             </div>
 
                             <div class="textarea-box pre-diagnosis-box">
-                                <h4>증상</h4>
-                                <textarea name="symptoms" id="symptoms-past-record" readonly placeholder="증상을 입력해주세요.">코 막힘 , 호흡불편 , 코 가려움</textarea>
+                                <div id="pre-symptoms-box">
+                                    <h4>증상</h4>
+                                    <div id="attending-doctor-box">
+                                        <span>담당의 </span>
+                                        <span> : </span>
+                                        <span>임승범</span>
+                                    </div>
+                                </div>
+                                <textarea name="symptoms" id="symptoms-past-record" readonly placeholder="증상 내용이 없습니다.">코 막힘 , 호흡불편 , 코 가려움</textarea>
                             </div>
 
                             <div class="textarea-box pre-diagnosis-box">
                                 <h4>진료</h4>
-                                <textarea name="diagnosis" id="diagnosis-past-record" readonly placeholder="진료 내용을 입력해주세요.">알레르기성 비염, 환경 개선 및 약물요법 병행치료 진행 </textarea>
+                                <textarea name="diagnosis" id="diagnosis-past-record" readonly placeholder="진료 내용이 없습니다.">알레르기성 비염, 환경 개선 및 약물요법 병행치료 진행 </textarea>
                             </div>
 
                             <div class="textarea-box pre-diagnosis-box">
                                 <h4>처방 | 조제시 참고사항</h4>
-                                <textarea name="prescription" id="prescription-past-record" readonly placeholder="처방 내용을 입력해주세요.">항히스타민 성분 약 7일치 처방 바람.</textarea>
+                                <div id="pre-prescription-box">
+                                    <div id="pre-pills">
+                                        <div id="no-pre-pills">
+                                            처방된 의약품이 없습니다.
+                                        </div>
+                                    </div>
+                                    <textarea name="prescription" id="prescription-past-record" readonly placeholder="조제시 참고사항 내용이 없습니다.">항히스타민 성분 약 7일치 처방 바람.</textarea>
+                                </div>
                             </div>
 
                             <div id="no-record-diagnosis">
                                 <span>과거 진료 기록이 없습니다.</span>
                             </div>
 
-                            <div id="diagnosis-detail-box">
-
-                                <div id="diagnosis-photo-box">
-                                    <div>1</div>
-                                    <div>2</div>
-                                    <div>3</div>
-                                    <div>+</div>
+                            <div id="pre-files-box">
+                                <h4>파일목록</h4>
+                                <div id="pre-files">
+                                    <div id="no-pre-files">
+                                        저장된 파일이 없습니다.
+                                    </div>
                                 </div>
-
-                                <div id="attending-doctor-box">
-                                    <span>담당의 </span>
-                                    <span> : </span>
-                                    <span>임승범</span>
-                                </div>
-
                             </div>
 
+                            <h5 id="past-modify-box">
+                                <span>2024-09-02/23:43:36</span>
+                                <span> | </span>
+                                <span>임승범</span>
+                                <span>(마지막 수정자)</span>
+                            </h5>
 
                         </div>
 
@@ -324,22 +344,29 @@
                             <input type="hidden" id="new-diagnosisId">
                             <input type="hidden" id="diagnosisModifier">
                             <input type="hidden" id="new-patientId">
+                            <input type="hidden" id="diagnosisYn">
                             <h3 id="diagnosis-write-title">
                                 진료기록 작성
                                 <span id="todayDiagnosisDate">2024/05/11 15:13</span>
                                 <span> | </span>
-                                <span>임승범</span>
+                                <span>[선택된 환자 없음]</span>
                             </h3>
+                            <h5 id="diagnosis-write-sub-title">
+                                <span>2024-09-02/23:43:36</span>
+                                <span> | </span>
+                                <span>수정자</span>
+                                <span>(수정자)</span>
+                            </h5>
                         </div>
 
                         <div class="textarea-box big">
                             <div>
                                 <h4>증상</h4>
                                 <div id="diagnosis-btn-box">
-                                    <button class="btn" id="diagnosis-modify-btn" >수정</button>
-                                    <button class="btn" id="diagnosis-delete-btn">삭제</button>
-                                    <button class="btn" id="diagnosis-cancel-btn">취소</button>
-                                    <button class="btn" id="diagnosis-create-btn" >등록</button>
+                                    <button class="btn" id="diagnosis-modify-btn" onclick="callDiagnosis(this)" data-diagnosis-id="new">수정</button>
+                                    <button class="btn" id="diagnosis-create-btn" onclick="updateDiagnosis()" >등록</button>
+                                    <button class="btn" id="diagnosis-delete-btn" onclick="deleteDiagnosis(this)" data-diagnosis-id="new">삭제</button>
+                                    <button class="btn" id="diagnosis-cancel-btn" onclick="callDiagnosis(this)" data-diagnosis-id="new">취소</button>
                                 </div>
                             </div>
                             <textarea name="symptoms" id="symptoms-record" readonly ></textarea>
@@ -381,6 +408,7 @@
 
                         <div id="file-box">
                             <div>
+                                <input type="hidden" value="" id="fileId">
                                 <h4 id="file-add">파일등록</h4>
                                 <h4 id="file-read">파일목록</h4>
                                 <label for="file-upload" class="btn file-label">내PC</label>

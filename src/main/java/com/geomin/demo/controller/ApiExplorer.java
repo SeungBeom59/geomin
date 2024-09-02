@@ -107,7 +107,6 @@ public class ApiExplorer {
         // 정수로는 26 / 5 =  5.2 가량으로 남은 페이지가 있는 것이므로 올림 처리하여 6페이지가 되도록 처리.
         int currentGroup = (int)Math.ceil((double) pageNo / pageSize);         // 현재 페이지가 속하는 페이지 그룹
 
-        //  8(22 23 24) << 9 (25 26 27) >> 10 (28 29 30)
         int prevGroupStartPage = (currentGroup - 2) * pageSize + 1;
         prevGroupStartPage = Math.max(prevGroupStartPage, 1);       // 1 보다는 작아지지 않도록
 
