@@ -16,4 +16,7 @@ public interface MedicineRepository {
 
     // 의약품 결과 가져오기 (목록일 수 있음으로 list로 받는다)
     List<MedicineVO> getMedicineListById(int medicineId);
+
+    // id로 의약품 기록들 삭제
+    void deleteById(int medicineId);
 }

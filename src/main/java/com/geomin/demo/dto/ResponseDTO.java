@@ -23,6 +23,8 @@ public class ResponseDTO {
 
     private List<DiagnosisDTO> diagnosisDTOList;    // 진료기록 모음
 
+    private List<KcdDTO> kcdDTOList;                // 질병기록 모음
+
     // 페이징용
     private int page;                   // 페이지
     private int size;                   // 사이즈
@@ -33,5 +35,8 @@ public class ResponseDTO {
     private int currentGroupStartPage;  // 현재 페이지 그룹의 첫번째 페이지
     private int currentGroupEndPage;    // 현재 페이지 그룹의 마지막 페이지
     private int nextGroupStartPage;     // 다음 페이지 그룹의 첫번째 페이지
+
+
+    private PagingDTO pagingDTO;        // 페이징
 
 }

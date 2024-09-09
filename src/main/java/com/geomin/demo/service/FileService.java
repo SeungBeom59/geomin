@@ -270,13 +270,20 @@ public class FileService {
     }
 
     // 파일 일괄 삭제(db에서만 삭제, 실제 파일 삭제 X)
-    public boolean deleteFiles(int fileId, List<Integer> deleteFiles){
+    public int deleteFiles(int fileId, List<Integer> deleteFiles){
 
         int[] deleteFilesSeq = deleteFiles.stream().mapToInt(i -> i).toArray();
 
         int result = fileInfoRepository.deleteFiles(fileId , deleteFilesSeq);
 
-        return result == deleteFilesSeq.length;
+        List<FileInfoVO> fileList = fileInfoRepository.getFileById(fileId);
+        if(fileList == null){
+            return -1;
+        }
+
+        return fileId;
+
+
 
     }
 

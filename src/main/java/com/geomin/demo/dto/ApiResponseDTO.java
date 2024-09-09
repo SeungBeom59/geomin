@@ -13,7 +13,7 @@ import java.util.List;
 public class ApiResponseDTO {
 
     private Header header;
-    private Body body;
+    private Body body = new Body();
 
 
     @Getter
@@ -38,6 +38,7 @@ public class ApiResponseDTO {
         private int nextGroupStartPage;     // 다음 페이지 그룹의 첫번째 페이지
         private int prevGroupStartPage;     // 이전 페이지 그룹의 첫번째 페이지
         private List<MedicineDTO> items;
+        private List<KcdDTO> kcds;
     }
 
 

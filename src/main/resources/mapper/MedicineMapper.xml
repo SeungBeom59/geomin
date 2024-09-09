@@ -34,7 +34,7 @@
         SELECT
             IFNULL(MAX(MEDICINE_ID) , 0) AS MEDICINE_ID
         FROM
-            MEDICINE;
+            MEDICINE
     </select>
 
     <insert id="insertMedicines">
@@ -57,6 +57,13 @@
         WHERE
             MEDICINE_ID = #{medicineId}
     </select>
+
+    <delete id="deleteById">
+        DELETE FROM
+            MEDICINE
+        WHERE
+            MEDICINE_ID = #{medicineId}
+    </delete>
 
 
 </mapper>

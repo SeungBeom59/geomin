@@ -16,6 +16,7 @@
         <result property="medicineId" column="medicine_id" />
 <!--        <result property="diagnosisModifier" column="diagnosis_modifier" />-->
         <result property="fileId" column="file_id" />
+        <result property="kcdId" column="kcd_id" />
         <result property="diagnosisDelYn" column="diagnosis_del_yn" />
 
         <!--  diagnosis_modifier mapping -->
@@ -233,8 +234,22 @@
             <if test="fileId > 0">
                 FILE_ID = #{fileId},
             </if>
+            <if test="fileId == -1">
+                FILE_ID = NULL ,
+            </if>
+
             <if test="medicineId > 0">
                 MEDICINE_ID = #{medicineId},
+            </if>
+            <if test="medicineId == -1">
+                MEDICINE_ID = NULL ,
+            </if>
+
+            <if test="kcdId > 0">
+                KCD_ID = #{kcdId},
+            </if>
+            <if test="kcdId == -1">
+                KCD_ID = NULL ,
             </if>
 
             <if test="diagnosisYn == true">
@@ -243,9 +258,9 @@
             </if>
 
             <if test="diagnosisYn == false">
-                DIAGNOSIS_DATE = now(),
+                DIAGNOSIS_DATE = NOW(),
                 DOCTOR_ID = #{doctorId},
-                DIAGNOSIS_YN = true
+                DIAGNOSIS_YN = TRUE
             </if>
         </set>
         WHERE
@@ -287,7 +302,10 @@
                 FILE_ID ,
             </if>
             <if test="medicineId > 0">
-                MEDICINE_ID,
+                MEDICINE_ID ,
+            </if>
+            <if test="kcdId > 0">
+                KCD_ID ,
             </if>
              DIAGNOSIS_YN , DIAGNOSIS_DATE )
         VALUES
@@ -299,6 +317,9 @@
             </if>
             <if test="medicineId > 0">
                 #{medicineId} ,
+            </if>
+            <if test="kcdId > 0">
+                #{kcdId} ,
             </if>
               true , now()
             )

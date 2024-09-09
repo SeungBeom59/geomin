@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="firetrap5319@gmail.com">
+    <meta name="description" content="연습을 위한 웹사이트 개발" >
+    <!-- favicon -->
+    <link rel="apple-touch-icon" sizes="57x57" href="/img/favicon/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/img/favicon/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/img/favicon/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/img/favicon/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/img/favicon/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/img/favicon/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/img/favicon/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/img/favicon/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192"  href="/img/favicon/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/img/favicon/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/img/favicon/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="/img/favicon/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+    <!-- fontawesome cdn -->
+    <script src="https://kit.fontawesome.com/fa8d81743a.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="/css/kcd_popup.css">
+    <title>Geomin-kcd-search</title>
+</head>
+<body>
+
+<section>
+    <div id="search-box">
+
+        <div>
+            <select name="medTp" id="medTp">
+                <option value="1" selected>양방</option>
+                <option value="2">한방</option>
+            </select>
+        </div>
+
+        <div>
+            <select name="sickType" id="sickType">
+                <option value="1">3단 상병</option>
+                <option value="2" selected>4단 상병</option>
+            </select>
+        </div>
+
+        <div>
+            <select name="diseaseType" id="diseaseType">
+                <option value="SICK_CD">상병코드</option>
+                <option value="SICK_NM" selected>상병명</option>
+            </select>
+        </div>
+
+        <div>
+            <input type="text" placeholder="검색어 입력" id="search-bar">
+        </div>
+
+        <button type="button" id="search-btn" alt="검색버튼">
+            <i class="fa-solid fa-magnifying-glass" style="color: #000000;"></i>
+        </button>
+
+    </div>
+
+    <table>
+        <caption>
+            <span th:text="${keyword != null ? keyword :  ''}">검색어</span> 검색 결과 총
+            <span th:text="${apiResult.getPagingDTO().getTotal()}"></span> 건
+        </caption>
+
+        <tbody>
+        <tr>
+            <th>상병코드</th>
+            <th>상병명</th>
+            <th></th>
+        </tr>
+
+        <th:block th:if="${apiResult.getKcdDTOList() != null}" th:each="kcd : ${apiResult.getKcdDTOList()}">
+            <tr>
+                <td th:text="${kcd.getKcdCode()}"></td>
+                <td th:text="${kcd.getKcdName()}"></td>
+                <td><button class="btn" onclick="clickKcd(this)">선택</button></td>
+            </tr>
+        </th:block>
+
+        </tbody>
+    </table>
+
+
+    <div id="no-data" th:if="${apiResult.getPagingDTO().getTotal() <= 0}">
+        <span>검색 결과가 없습니다.</span>
+    </div>
+
+    <div th:if="${apiResult.getPagingDTO().getTotal() > 0}">
+        <ul id="vital-sign-pageing">
+            <li th:if="${apiResult.getPagingDTO().isPrev() == true}">
+                <a th:href="@{'/kcd-search?medTp=' + ${medTp} + '&sickType=' + ${sickType} + '&diseaseType=' + ${diseaseType} + '&keyword=' + ${keyword} + '&page=' +  ${apiResult.getPagingDTO().getStartPage() - 1} }">
+                    <i class="fa-solid fa-angle-left" style="color: #000000;"></i>
+                </a>
+            </li>
+
+            <th:block
+                    th:each="page : ${#numbers.sequence(apiResult.getPagingDTO().getStartPage() , apiResult.getPagingDTO().getEndPage())}">
+                <li th:classappend="${page == apiResult.getPagingDTO().getPage()}? 'active' : ''">
+                    <a th:href="@{'/kcd-search?medTp=' + ${medTp} + '&sickType=' + ${sickType} + '&diseaseType=' + ${diseaseType} + '&keyword=' + ${keyword} + '&page=' +  ${page} }"
+                            th:text="${page}"></a>
+                </li>
+            </th:block>
+
+            <li th:if="${apiResult.getPagingDTO().isNext() == true}">
+                <a th:href="@{'/kcd-search?medTp=' + ${medTp} + '&sickType=' + ${sickType} + '&diseaseType=' + ${diseaseType} + '&keyword=' + ${keyword} + '&page=' +  ${apiResult.getPagingDTO().getEndPage() + 1} }">
+                    <i class="fa-solid fa-angle-right" style="color: #000000;"></i>
+                </a>
+            </li>
+        </ul>
+    </div>
+</section>
+
+
+<script src="https://code.jquery.com/jquery-latest.min.js"></script>
+<script src="/js/kcd_popup.js"></script>
+</body>
+</html>

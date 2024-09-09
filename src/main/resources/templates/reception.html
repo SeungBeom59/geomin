@@ -5,6 +5,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="firetrap5319@gmail.com">
+    <meta name="description" content="연습을 위한 웹사이트 개발" >
+    <!-- favicon -->
+    <link rel="apple-touch-icon" sizes="57x57" href="/img/favicon/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/img/favicon/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/img/favicon/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/img/favicon/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/img/favicon/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/img/favicon/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/img/favicon/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/img/favicon/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192"  href="/img/favicon/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/img/favicon/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/img/favicon/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="/img/favicon/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
     <!-- fontawesome cdn -->
     <script src="https://kit.fontawesome.com/fa8d81743a.js" crossorigin="anonymous"></script>
     <!-- css -->
@@ -79,9 +99,6 @@
             <input type="hidden" value="0" id="waiting-current-page">
 
             <ul id="waiting-paging">
-                <!--<li id="waiting-prev-page">
-                    <i class="fa-solid fa-angle-left" style="color: #000000;"></i>
-                </li>-->
 
                 <th:block th:if="${waitingList.getTotalPages() != 0}" th:each="page : ${#numbers.sequence(1 , waitingList.getTotalPages())}">
                     <li th:if="${page <= 3}" th:classappend="${waitingList.number + 1 == page}? 'active' " th:text="${page}" th:onclick="'searchWaiting(' + (${page} - 1) + ')'">
@@ -246,7 +263,6 @@
                     <article id="diagnosis-article">
                         <nav>
                             <ul id="diagnosis-record-list">
-                                <!-- <li><a href="">최신순</a></li> -->
                                 <li>
                                     <select id="past-record-order" onchange="getDiagnosisOrder()">
                                         <option id="record-order-desc" value="true">최신순</option>
@@ -375,9 +391,29 @@
                         <div class="textarea-box big">
                             <div>
                                 <h4>진료</h4>
+                                <button class="btn" id="kcdsSearchBtn" onclick="getKcdPopup()">상병 검색</button>
                             </div>
-                            
-                            <textarea name="diagnosis" id="diagnosis-record" readonly></textarea>
+                            <div id="diagnosisBox">
+                                <textarea name="diagnosis" id="diagnosis-record" readonly></textarea>
+                                <div id="sortable-container" class="kcds">
+                                    <input type="hidden" value="" id="kcdId">
+                                    <div id="no-kcd">
+                                        선택된 상병이 없습니다.
+                                    </div>
+<!--                                    <ul class="kcd">-->
+<!--                                        <li>C023</li>-->
+<!--                                        <li>혀의 앞쪽 3분의2, 상세불명 부분의 악성 신생물</li>-->
+<!--                                        <li>-->
+<!--                                            <select>-->
+<!--                                                <option selected>주상병</option>-->
+<!--                                                <option>기타상병</option>-->
+<!--                                                <option>배제된상병</option>-->
+<!--                                            </select>-->
+<!--                                        </li>-->
+<!--                                        <li>X</li>-->
+<!--                                    </ul>-->
+                                </div>
+                            </div>
                         </div>
 
                         <div class="textarea-box big">
@@ -387,23 +423,14 @@
                             </div>
 
                             <div class="prescriptionBox">
+                                <input type="hidden" value="" id="pillId">
                                 <div id="pills">
-<!--                                    <ul class="pill">-->
-<!--                                        <input type="hidden" value="">-->
-<!--                                        <li>트라몰정160밀리그람(아세트아미노펜)트라몰정160밀리그람(아세트아미노펜)트라몰정160밀리그람(아세트아미노펜)트라몰정160밀리그람(아세트아미노펜)</li>-->
-<!--                                        <li><input type="text" value="0.5"></li>-->
-<!--                                        <li><input type="text" value="0.5"></li>-->
-<!--                                        <li><input type="text" value="0.5"></li>-->
-<!--                                    </ul>-->
                                     <div id="no-pills">
                                         처방된 의약품이 없습니다.
                                     </div>
-
                                 </div>
                                 <textarea name="prescription" id="prescription-record" readonly></textarea>
                             </div>
-                            
-<!--                            <textarea name="prescription" id="prescription-record" readonly></textarea>-->
                         </div>
 
                         <div id="file-box">
@@ -473,9 +500,13 @@
 
     </div>
 
-    <!-- js -->
+    <!-- jquery -->
     <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+    <!-- jquery ui -->
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <!-- daum postcode -->
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <!-- js -->
     <script src="/js/reception.js"></script>
 </body>
 </html>

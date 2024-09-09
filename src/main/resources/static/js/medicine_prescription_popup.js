@@ -113,13 +113,17 @@ function clickPill(btn){
         '<ul class="pill">' +
         '<input type="hidden" value="' + itemSeq + '">' +
         '<li>' + itemName +'</li>' +
-        '<li><input type="text" value="0"></li>' +
-        '<li><input type="text" value="0"></li>' +
-        '<li><input type="text" value="0"></li>' +
+        '<li><input type="text" value="0" autocomplete="off" oninput="checkDouble(this)"></li>' +
+        '<li><input type="text" value="0" autocomplete="off" oninput="checkDouble(this)"></li>' +
+        '<li><input type="text" value="0" autocomplete="off" oninput="checkDouble(this)"></li>' +
         '<li>X</li>' +
         '</ul>');
 
     updateLocalStorage();
+}
+
+function checkDouble(input){
+    input.value = input.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
 }
 
 // pills 안에 모든 내용 삭제

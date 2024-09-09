@@ -3,7 +3,6 @@ package com.geomin.demo.service;
 import com.geomin.demo.domain.MedicineVO;
 import com.geomin.demo.dto.MedicineDTO;
 import com.geomin.demo.repository.MedicineRepository;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -81,6 +80,44 @@ public class MedicineServiceImpl implements MedicineService {
 
 
         return medicineDTOs;
+    }
+
+    @Override
+    public int deleteAndCreateMedicine(int medicineId, List<MedicineDTO> pills) {
+
+        // 기존 의약품 정보 삭제
+        medicineRepository.deleteById(medicineId);
+
+        if(pills == null || pills.size() <= 0) {
+            return -1;
+        }
+
+        List<MedicineVO> medicines = new ArrayList<>();
+        AtomicInteger medicineSeq = new AtomicInteger(1);
+
+        pills.forEach(pill -> {
+
+            MedicineVO medicine = MedicineVO.builder()
+                    .medicineId(medicineId)
+                    .medicineSeq(medicineSeq.getAndIncrement())
+                    .itemSeq(pill.getItemSeq())
+                    .medicineName(pill.getMedicineName())
+                    .dosage(pill.getDosage())
+                    .frequency(pill.getFrequency())
+                    .days(pill.getDays())
+                    .build();
+
+            medicines.add(medicine);
+        });
+
+        int successCnt = medicineRepository.insertMedicines(medicines);
+
+        if(successCnt != medicines.size()) {
+            log.error("addMedicine failed");
+            throw new IllegalArgumentException("addMedicine failed");
+        }
+
+        return medicineId;
     }
 
 

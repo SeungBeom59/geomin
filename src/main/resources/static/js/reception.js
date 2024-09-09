@@ -343,10 +343,11 @@ function updateDiagnosis(){
     var diagnosisModifier = $diagnosisModifier.val() === null || $diagnosisModifier === ""?
         null : $diagnosisModifier.val();
 
-    // fileId가 있는 경우, 해당 fileId에 업로드 및 수정처리를 해줘야 함.
+    // 첨부 자료들에 대한 Id가 있는 경우, 해당 Id에 업로드 및 수정처리를 해줘야 함.
     // 없을 경우 0으로 값 보냄.
     var fileId = $('#fileId').val() === '' || $('#fileId').val() === null ? 0 : $('#fileId').val();
-
+    var kcdId = $('#kcdId').val() === '' || $('#kcdId').val() === null ? 0 : $('#kcdId').val();
+    var medicineId = $('#pillId').val() === '' || $('#pillId').val() === null ? 0 : $('#pillId').val();
     // ajax 데이터
     var data = new FormData();
 
@@ -359,16 +360,23 @@ function updateDiagnosis(){
         diagnosisModifier : diagnosisModifier,
         diagnosisYn : $('#diagnosisYn').val(),
         fileId : fileId,
+        kcdId : kcdId,
+        medicineId : medicineId,
     })] , { type: "application/json; charset=utf-8"}));
 
+    // 의약품 처방 데이터 가져오기
     var pills = collectPillsData();
-    data.append("pills" ,
-        new Blob([JSON.stringify(pills)], {type : "application/json; charset=utf-8"}));
+    if(pills.length > 0){
+        data.append("pills" ,
+            new Blob([JSON.stringify(pills)], {type : "application/json; charset=utf-8"}));
+    }
 
+    // 업로드 파일 데이터 가져오기
     uploadFiles.forEach(function (file){
         data.append("uploadFiles" , file);
     });
 
+    // 삭제예정 파일들 데이터 가져오기
     var deleteFiles = [];
     $('.deleteFile').each(function() {
         deleteFiles.push($(this).val());
@@ -379,9 +387,35 @@ function updateDiagnosis(){
             new Blob([JSON.stringify(deleteFiles)] , {type : "application/json; charset=utf-8"}));
     }
 
+    // 질병기록 kcd 데이터 가져오기
+    sortKcds();
+    var kcds = [];
+    $('#sortable-container .kcd').each(function () {
+
+        var kcdData = {
+            kcdCode : $(this).find('li:nth-child(1)').text(),
+            kcdName : $(this).find('li:nth-child(2)').text(),
+            kcdType : $(this).find('li:nth-child(3) > select').val(),
+            kcdRank : $(this).attr('data-rank')
+        }
+        kcds.push(kcdData);
+    });
+    if(kcds.length > 0){
+        data.append("kcds",
+            new Blob([JSON.stringify(kcds)] , {type : "application/json; charset=utf-8"}));
+    }
+    // 삭제예정 질병기록코드 데이터 가져오기
+    // var deleteKcds = [];
+    // $('.deleteKcd').each(function (){deleteKcds.push($(this).val()); });
+    // if(deleteKcds.length > 0){
+    //     data.append("deleteKcds",
+    //         new Blob([JSON.stringify(deleteKcds)] , {type : "application/json; charset=utf-8"}));
+    // }
+
     console.log('pills : ' , pills);
     console.log('data : ' , data);
     console.log('deleteFiles : ' , deleteFiles);
+    // console.log('deleteKcds' , deleteKcds);
 
     $.ajax({
         url: '/diagnosis-update',
@@ -402,6 +436,12 @@ function updateDiagnosis(){
             console.error('AJAX 요청 실패: ' , status , error);
         }
     })
+}
+
+function sortKcds(){
+    $('#sortable-container .kcd').each(function (index){
+       $(this).attr('data-rank' , index + 1);
+    });
 }
 
 function newDiagnosis(){
@@ -430,6 +470,7 @@ function newDiagnosis(){
     $('#diagnosis-write-title > span:nth-child(2)').show();
     $('#diagnosis-write-title > span:nth-child(3)').text(patientName);   // 환자명 넣기
 
+    $('#sortable-container').sortable({item: 'ul.kcd'}); // .kcds div안에 .kcd를 갖는 ul 정렬 기능 활성화.
 }
 
 // 처방한 의약품 json 형태로 만들어서 data에 넣기
@@ -1794,6 +1835,7 @@ function insertDiagnosis(response){
     let diagnosis = response.diagnosisDTO;
     var fileInfo = Array.isArray(response.fileInfoDTOList)? response.fileInfoDTOList : [];
     var medicine = Array.isArray(response.medicineDTOList)? response.medicineDTOList : [];
+    var kcds = Array.isArray(response.kcdDTOList)? response.kcdDTOList : [];
 
     console.log('response' , response);
     console.log('fileInfo' , fileInfo);
@@ -1823,7 +1865,7 @@ function insertDiagnosis(response){
         $('#no-files').hide();  // 저장된 파일 없음 설명글 비활성화
 
         if(fileInfo !== null && fileInfo.length > 0 ){
-
+            console.log("이게 된다고???????????????????????")
             $('#file-drag-box > i').hide();
             $('#file-drag-box > p').hide();
 
@@ -1835,12 +1877,14 @@ function insertDiagnosis(response){
             console.log($('#fileId').val(fileInfo.at(0).fileId));
         }
         else{
+            console.log('실행되었어어어어ㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓ')
             $('#file-drag-box > i').show();
-            $('#file-drag-box > p').show();
+            $('#file-drag-box > p:nth-child(2)').show();
         }
 
         if(medicine.length > 0){
             $('#no-pills').hide();
+            $('#pillId').val(medicine.at(0).medicineId);
 
             medicine.forEach(function (pill){
                renderPills(pill);
@@ -1849,6 +1893,19 @@ function insertDiagnosis(response){
         }
         else {
             $('#no-pills').css('display' , 'flex');
+        }
+
+        if(kcds.length > 0){
+            $('#no-kcd').hide();
+
+            $('#kcdId').val(kcds.at(0).kcdId);
+            kcds.forEach(function (kcd){
+                renderKcdForUpdate(kcd);
+            });
+
+        }
+        else {
+            $('#no-kcd').css('display' , 'flex');
         }
 
     }
@@ -1881,6 +1938,43 @@ function insertDiagnosis(response){
     var symptomsRecord = diagnosis.symptoms.replace('\r\n' , '<br\>');
     $('#symptoms-record').val(symptomsRecord);     // 증상 값 넣기
 
+    // $('#sortable-container').removeClass("ui-sortable-disabled"); // disabled가 적용되있다면 삭제되도록.
+    // $('#sortable-container').removeClass("ui-sortable"); // disabled가 적용되있다면 삭제되도록.
+
+    $('#sortable-container').sortable({item: 'ul.kcd'}); // .kcds div안에 .kcd를 갖는 ul 정렬 기능 활성화.
+
+}
+
+function renderKcdForUpdate(kcd){
+
+    var kcdsBox = $('#sortable-container');
+
+    var kcdHtml = $('<ul data-rank="' + kcd.kcdRank + '" data-kcd-seq="' + kcd.kcdSeq +'"></ul>');
+    kcdHtml.addClass('kcd');
+
+    var kcdTypeOption = '';
+    kcdTypeOption += '<option value="1"' + (kcd.kcdType === 1? 'selected' : '') + '>주상병</option>';
+    kcdTypeOption += '<option value="2"' + (kcd.kcdType === 2? 'selected' : '') + '>기타상병</option>';
+    kcdTypeOption += '<option value="3"' + (kcd.kcdType === 3? 'selected' : '') + '>배제된상병</option>';
+
+    kcdHtml.append(
+        '<li>' + kcd.kcdCode + '</li>' +
+        '<li>' + kcd.kcdName + '</li>' +
+        '<li><select class="kcdType">' + kcdTypeOption + '</select></li>' +
+        '<li onclick="deleteUploadedKcd(this)">X</li>'
+    );
+
+    kcdsBox.append(kcdHtml);
+
+}
+
+function deleteUploadedKcd(clickedBox){
+
+    var kcdBox = $(clickedBox).closest('.kcd');
+    // var kcdSeq = kcdBox.data('kcd-seq');
+    // var kcdsBox = $('#sortable-container');
+    // kcdsBox.append('<input type="hidden" class="deleteKcd" value="' + kcdSeq + '">');
+    kcdBox.remove();
 }
 
 // 수정할때, 의약품 로컬스토리지에 저장해주기
@@ -1999,8 +2093,10 @@ function clearDiagnosis(){
     $('#new-diagnosisId').val("");     // hidden에 진료 id 초기화
     $('#new-patientId').val("");       // hidden에 불러온 환자 id 초기화
     $('#diagnosisModifier').val("");   // 수정자 초기화
-    $('#fileId').val("");              // fileId 초기화
+    $('#fileId').val("");              // hidden fileId 초기화
     $('#diagnosisYn').val(false);      // 초기화
+    $('#kcdId').val("");                    // hidden kcd 질병기록 id 초기화
+    $('#pillId').val("");                       // hidden pillId 의약품 id 초기화
 
     uploadFiles = [];   /// uploadFiles 초기화
 
@@ -2013,13 +2109,25 @@ function clearDiagnosis(){
     $('#diagnosis-delete-btn').hide();
     $('#diagnosis-cancel-btn').hide();
     $('#medicineSearchBtn').show();
+    $('#kcdsSearchBtn').show();
     $('#no-pills').css('display' , 'flex');
     $('#no-files').hide();
+    $('#no-kcd').css('display' , 'flex');
     $('#diagnosis-write-sub-title').hide();
 
     localStorage.removeItem('selectedPills');   // 로컬스토리지에 의약품 정보 삭제
     $('#pills').find('.pill').remove();     // 처방 선택된 의약품 html 삭제
+    $('#sortable-container .kcd').remove();      // 질병기록 kcd html 삭제
+    // $('#sortable-container').sortable("disable");
 
+    // if ($('#sortable-container').data('ui-sortable')) {
+    //     $('#sortable-container').sortable("disable");
+    // }
+
+    if ($('#sortable-container').data('ui-sortable')) {
+        $('#sortable-container').sortable("destroy");
+        $('#sortable-container').removeClass("ui-sortable ui-sortable-disabled");
+    }
 }
 
 function readDiagnosis(response){
@@ -2036,12 +2144,14 @@ function readDiagnosis(response){
     // 아래는 js 내장함수 Array의 isArray 배열인지 확인하여 true, false 반환
     var fileInfo = Array.isArray(response.fileInfoDTOList)? response.fileInfoDTOList : [];
     var medicine = Array.isArray(response.medicineDTOList)? response.medicineDTOList : [];
+    var kcds = Array.isArray(response.kcdDTOList)? response.kcdDTOList : [];
 
     $('#diagnosis-modify-btn').show();
     $('#diagnosis-delete-btn').show();
     $('#diagnosis-create-btn').hide();
     $('#diagnosis-cancel-btn').hide();
     $('#medicineSearchBtn').hide();
+    $('#kcdsSearchBtn').hide();
 
     var symptomsRecord = diagnosis.symptoms.replace('\r\n' , '<br\>');
     var diagnosisRecord = diagnosis.diagnosis.replace('\r\n' , '<br\>');
@@ -2076,6 +2186,27 @@ function readDiagnosis(response){
     $('#todayDiagnosisDate').text(diagnosis.diagnosisDate)  // 시간을 넣어준다.
     $('#diagnosis-write-title > span').show();              // 모든 span 보여주기(날짜:시간, 환자명)
     $('#diagnosis-write-title > span:nth-child(3)').text(diagnosis.patientName);   // 환자명 넣기
+
+    ///////////////////////////////////////////////////
+    // 질병기록 처리
+    if(kcds.length > 0){
+        $('#no-kcd').hide();
+
+        var kcdBox = $('#sortable-container');
+
+        // a-b 오름차순 정렬
+        kcds.sort(function (a , b){
+           return a.kcdRank - b.kcdRank;
+        });
+
+        kcds.forEach(function (kcd){
+           var kcdHtml = readKcdRender(kcd);
+           kcdBox.append(kcdHtml);
+        });
+    }
+    else{
+        $('#no-kcd').css('display' , 'flex');
+    }
 
 
     ///////////////////////////////////////////////////
@@ -2161,6 +2292,79 @@ function readFileRender(file){
 
     return fileHtml;
 }
+
+function readKcdRender(kcd){
+
+    var kcdHtml = $('<ul data-rank="' + kcd.kcdRank + '"></ul>');
+    kcdHtml.addClass('kcd');
+
+    var kcdTypeOption = '';
+    kcdTypeOption += '<option value="1"' + (kcd.kcdType === 1? 'selected' : '') + '>주상병</option>';
+    kcdTypeOption += '<option value="2"' + (kcd.kcdType === 2? 'selected' : '') + '>기타상병</option>';
+    kcdTypeOption += '<option value="3"' + (kcd.kcdType === 3? 'selected' : '') + '>배제된상병</option>';
+
+    kcdHtml.append(
+        '<li>' + kcd.kcdCode + '</li>' +
+        '<li>' + kcd.kcdName + '</li>' +
+        '<li><select class="kcdType" disabled>' + kcdTypeOption + '</select></li>'
+    );
+
+    return kcdHtml;
+}
+
+function getKcdPopup(){
+
+    var patientId = $('#new-patientId').val();
+
+    if(patientId === null || patientId === ''){
+        alert('환자 정보를 먼저 설정 해주세요.');
+        return;
+    }
+
+    var popup = window.open(
+        `/kcd-search`,
+        '질병분류코드 검색',
+        'width=800 , height=531 , screenX=500,screenY=100, resizeable=no'
+    );
+}
+
+function receiveKcdInfo(kcd){
+
+    var kcdObj = JSON.parse(kcd);
+    var kcdCode= kcdObj.kcdCode;
+    var kcdName = kcdObj.kcdName;
+
+    console.log(kcdCode);
+    console.log(kcdName);
+
+    $('#no-kcd').hide();
+
+    var kcdsBox = $('#sortable-container');
+
+    var kcdHtml = $('<ul data-rank=""></ul>');
+    kcdHtml.addClass('kcd');
+
+
+    kcdHtml.append(
+        '<li>' + kcdCode + '</li>' +
+        '<li>' + kcdName + '</li>' +
+        '<li><select class="kcdType">' +
+            '<option value="1">주상병' + '</option>' +
+            '<option value="2">기타상병' + '</option>' +
+            '<option value="3">배제된상병' + '</option>' +
+        '</select></li>' +
+        '<li onclick="deleteKcd(this)">X</li>'
+    );
+
+    kcdsBox.append(kcdHtml);
+}
+
+function deleteKcd(li){
+    console.log('kcd 삭제처리 해줘야함.')
+    var kcd = li.closest('ul');
+    kcd.remove();
+}
+
 
 function getMedicinePopup(){
 

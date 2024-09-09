@@ -29,6 +29,8 @@ html, body {
     text-align: center;
 }
 
+
+
 #wrap {
     display: flex;
     min-height: 100%;
@@ -608,6 +610,93 @@ th , td {
     margin-left: 43px;
 }
 
+/* 우측 진료 칸*/
+#diagnosisBox {
+    margin-left: 45px;
+    display: flex;
+    justify-content: normal;
+}
+
+#diagnosis-record {
+    width: 360px;
+    resize: none;
+    text-align: start;
+    height: 135px;
+}
+
+#no-kcd {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 139px;
+}
+
+.kcds {
+    width: 315px;
+    height: 139px;
+    border: 1px solid #807d7d;
+    overflow-y: scroll;
+}
+
+#kcdsSearchBtn {
+    font-size: small;
+}
+
+.kcd {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+    font-size: small;
+    width: 298px;
+    border-bottom: 1px solid #7b7a7a;
+}
+
+.kcd > li {
+    border-left: 1px solid #7b7a7a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 32px; width: 50px;
+    box-sizing: border-box;
+}
+
+.kcd > li:nth-child(1){
+    font-weight: bold;
+    border: 0;
+}
+
+.kcd > li:nth-child(2) {
+    /*border: 1px solid #9B2727;*/
+    width: 170px;
+    display: block;
+    overflow-x: hidden;
+}
+
+.kcd > li:nth-child(3) {
+    width: 50px;
+}
+
+.kcd > li:nth-child(3) > select {
+    width: 50px;
+    border: 0;
+}
+
+.kcd > li:nth-child(3) > select:focus {
+    outline: 0;
+    border: 0;
+}
+
+.kcd > li:nth-child(4){
+    width: 30px;
+    color: #9B2727;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+
+
+
 /*#right-section > article > div:last-child {*/
 /*    display: flex;*/
 /*    justify-content: end;*/
@@ -906,6 +995,15 @@ th , td {
 /*    display: none;*/
 /*}*/
 
+/* 의약품 검색 버튼 */
+#medicineSearchBtn {
+    display: none;
+}
+/* 상병 검색 버튼 */
+#kcdsSearchBtn {
+    display: none;
+}
+
 #diagnosis-write-sub-title {
     display: none;
     margin-right: 15px;
@@ -1035,13 +1133,13 @@ th , td {
 
 .prescriptionBox {
     padding-right: 30px;
-    padding-left : 50px;
+    padding-left : 45px;
     height : 135px
 }
 
 .prescriptionBox > #pills {
     display : block;
-    width : 360px;
+    width : 365px;
     height : 130px;
     border : 1px solid #7b7a7a;
     overflow-y: scroll;

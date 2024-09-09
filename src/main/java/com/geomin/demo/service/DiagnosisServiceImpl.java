@@ -20,6 +20,7 @@ public class DiagnosisServiceImpl implements DiagnosisService{
     private final DiagnosisRepository diagnosisRepository;
     private final FileService fileService;
     private final MedicineService medicineService;
+    private final KcdService kcdService;
     private final WaitingService waitingService;
     private final DoctorRepository doctorRepository;
 
@@ -267,17 +268,19 @@ public class DiagnosisServiceImpl implements DiagnosisService{
 
     // 중복되는 코드가 너무 길어서 함수로 사용.
     // 진료기록 정보를 이용하여 파일, 의약품, 진료기록이 모두 감싸진 responseDTO를 만들도록.
+    // + 질병기록 (24/09/06)
     public ResponseDTO createResponseDTO(DiagnosisVO result){
 
         log.info("result::{}" , result);
 
         // 파일정보, 의약품 처방 정보, 진료기록 정보를 모두 감싸는 responseDTO 생성
+        // + 질병기록
         ResponseDTO responseDTO = new ResponseDTO();
 
         // 해당 진료기록의 파일 정보 id가 있다면 따로 가져와서 responseDTO에 넣어준다.
         // 외래키로 사용은 하나 관계는 맺지 않았음. join을 해서 가져오자니,
         // 파일정보가 몇개의 list 형태일지 모르겠다는 점과 더불어, 검색된 파일정보의 수 만큼 진료기록의 결과가 곱해져서 나오게 됨.
-        // 아래 의약품도 이와 마찬가지임.
+        // 아래 의약품도 이와 마찬가지임. + 질병기록
         if(result != null && result.getFileId() > 0){
             List<FileInfoDTO> fileList = fileService.getFileById(result.getFileId());
             responseDTO.setFileInfoDTOList(fileList);
@@ -286,6 +289,11 @@ public class DiagnosisServiceImpl implements DiagnosisService{
         if(result != null && result.getMedicineId() > 0){
             List<MedicineDTO> medicines = medicineService.getMedicineListById(result.getMedicineId());
             responseDTO.setMedicineDTOList(medicines);
+        }
+
+        if(result != null && result.getKcdId() > 0){
+            List<KcdDTO> kcds = kcdService.getKcdListById(result.getKcdId());
+            responseDTO.setKcdDTOList(kcds);
         }
 
         PatientVO patient = result.getPatient();

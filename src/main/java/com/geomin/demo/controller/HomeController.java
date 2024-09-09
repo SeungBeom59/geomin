@@ -30,6 +30,7 @@ public class HomeController {
     private final PatientService patientService;
     private final WaitingService waitingService;
     private final DiagnosisService diagnosisService;
+    private final KcdService kcdService;
     private final FileService fileService;
     private final MedicineService medicineService;
 
@@ -407,6 +408,7 @@ public class HomeController {
             @RequestPart(value = "uploadFiles" , required = false) List<MultipartFile> uploadFiles,
             @RequestPart(value = "pills" , required = false) List<MedicineDTO> pills,
             @RequestPart(value = "deleteFiles" , required = false) List<Integer> deleteFiles,
+            @RequestPart(value = "kcds" , required = false) List<KcdDTO> kcds ,
             Principal principal){
 
         log.info("post >> /diagnosis-update... updateDiagnosis() 실행.");
@@ -415,23 +417,31 @@ public class HomeController {
         log.info("uploadFiles::{}" , uploadFiles);
         log.info("pills::{}" , pills);
         log.info("deleteFiles::{}" , deleteFiles);
+        log.info("kcds::{}" , kcds);
 
         UserSecurityDTO user = userService.getUser(principal.getName());    // 신원확인 정보 가져오기
+        ResponseDTO result;
 
-        ResponseDTO result = new ResponseDTO();
-
-        // 기존에 업로드된 파일에 대하여, 삭제요청이 있을 경우.
-        if(deleteFiles != null && deleteFiles.size() > 0){
-            boolean isOk = fileService.deleteFiles(diagnosisDTO.getFileId() , deleteFiles);
-
-            if(!isOk){
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 일괄 삭제 실패");
-            }
+        // kcdId, 질병기록이 존재하지 않고  저장시킬 kcd가 존재하는가? (신규)
+        if(diagnosisDTO.getKcdId() <= 0 && kcds != null){
+            int kcdId = kcdService.addKcd(kcds);
+            diagnosisDTO.setKcdId(kcdId);
+        }
+        // kcdId, 이미 질병기록이 존재하는가? (수정)
+        else if(diagnosisDTO.getKcdId() > 0){
+            // 이미 있던 기존의 질병기록 코드에 대한 수정
+            int kcdId = kcdService.deleteAndCreateKcds(diagnosisDTO.getKcdId() , kcds);
+            diagnosisDTO.setKcdId(kcdId);
         }
 
+        // 기존에 업로드된 파일에 대하여, 삭제요청이 있을 경우.
+        if(deleteFiles != null){
+            int fileId = fileService.deleteFiles(diagnosisDTO.getFileId() , deleteFiles);
+            diagnosisDTO.setFileId(fileId);
+        }
 
         // 파일이 존재 한다면 업로드 진행, 파일 저장 id 대입
-        if( uploadFiles != null && !uploadFiles.isEmpty()){
+        if( uploadFiles != null){
             if(diagnosisDTO.getFileId() > 0 ){
                 log.info("fileInfoId = " + diagnosisDTO.getFileId());
                 int fileId = fileService.uploadAdditionalFiles(uploadFiles, diagnosisDTO.getFileId());
@@ -442,9 +452,15 @@ public class HomeController {
                 diagnosisDTO.setFileId(fileId);
             }
         }
-        // 처방 약품들이 존재한다면 처방전 저장, id 대입
-        if(pills != null && !pills.isEmpty() ){
+
+        // medicineId가 존재하지 않고 저장시킬 의약품 정보는 있는가? (신규)
+        if(diagnosisDTO.getMedicineId() <= 0 && pills != null){
             int medicineId = medicineService.addMedicine(pills);
+            diagnosisDTO.setMedicineId(medicineId);
+        }
+        // 기존의 medicineId, 의약품정보가 존재하는가? (수정)
+        else if(diagnosisDTO.getMedicineId() > 0){
+            int medicineId = medicineService.deleteAndCreateMedicine(diagnosisDTO.getMedicineId() , pills);
             diagnosisDTO.setMedicineId(medicineId);
         }
 

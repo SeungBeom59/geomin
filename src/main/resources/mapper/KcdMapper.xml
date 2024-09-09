@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Maooer 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.geomin.demo.repository.KcdRepository">
+
+    <resultMap id="KcdMap" type="com.geomin.demo.domain.KcdVO">
+        <id property="kcdId" column="kcd_id" />
+        <id property="kcdSeq" column="kcd_seq" />
+        <result property="kcdName" column="kcd_name" />
+        <result property="kcdCode" column="kcd_code" />
+        <result property="kcdType" column="kcd_type" />
+        <result property="kcdRank" column="kcd_rank" />
+        <!--        <association property="patient" resultMap="patientMap" />-->
+    </resultMap>
+
+    <!--    <resultMap id="patientMap" type="com.geomin.demo.domain.PatientVO">-->
+    <!--        <id property="patientId" column="patient_id" />-->
+    <!--        <result property="patientName" column="patient_name" />-->
+    <!--        <result property="identify" column="identify" />-->
+    <!--        <result property="gender" column="gender" />-->
+    <!--        <result property="phone" column="phone" />-->
+    <!--        <result property="emergencyPhone" column="emergency_phone" />-->
+    <!--        <result property="age" column="age" />-->
+    <!--        <result property="bloodType" column="blood_type" />-->
+    <!--        <result property="address" column="address" />-->
+    <!--        <result property="addressDetail" column="address_detail" />-->
+    <!--        <result property="postCode" column="post_code" />-->
+    <!--    </resultMap>-->
+
+    <select id="getLastKcdId">
+        SELECT
+            IFNULL(MAX(KCD_ID) , 0) AS KCD_ID
+        FROM
+            KCD
+    </select>
+
+    <delete id="deleteById">
+        DELETE FROM
+            KCD
+        WHERE
+            KCD_ID = #{kcdId}
+    </delete>
+
+
+    <select id="getKcdListById">
+        SELECT
+            *
+        FROM
+            KCD
+        WHERE
+            KCD_ID = #{kcdId}
+    </select>
+
+    <insert id="insertKcds">
+        INSERT INTO KCD
+            (KCD_ID , KCD_SEQ , KCD_CODE , KCD_NAME , KCD_TYPE , KCD_RANK)
+        VALUES
+        <foreach collection="kcdVOs" item="kcd" separator=",">
+            ( #{kcd.kcdId} , #{kcd.kcdSeq} , #{kcd.kcdCode} ,
+                #{kcd.kcdName} , #{kcd.kcdType} , #{kcd.kcdRank} )
+        </foreach>
+    </insert>
+
+</mapper>

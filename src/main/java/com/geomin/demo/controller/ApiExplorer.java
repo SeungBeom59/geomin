@@ -3,7 +3,6 @@ package com.geomin.demo.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.geomin.demo.dto.ApiResponseDTO;
 import com.geomin.demo.dto.MedicineDTO;
-import com.geomin.demo.dto.ResponseDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -11,15 +10,16 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.util.List;
 
-// 공공데이터 : e약은요 api
+// 공공데이터
+// 식품의약품안전처 : e약은요 api
 @Controller
 @Slf4j
 public class ApiExplorer {
@@ -74,7 +74,6 @@ public class ApiExplorer {
         URL url = new URL(urlBuilder.toString());
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
-        conn.setRequestProperty("Content-type", "application/json");
         System.out.println("Response code: " + conn.getResponseCode());
         BufferedReader rd;
         if(conn.getResponseCode() >= 200 && conn.getResponseCode() <= 300) {
@@ -89,7 +88,7 @@ public class ApiExplorer {
         }
         rd.close();
         conn.disconnect();
-        System.out.println(sb.toString());
+//        System.out.println(sb.toString());
         System.out.println("******************************************************************************");
 
         // json 형태 StringBuilder to DTO

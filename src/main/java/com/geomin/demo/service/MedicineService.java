@@ -9,4 +9,6 @@ public interface MedicineService {
     int addMedicine(List<MedicineDTO> pills);
 
     List<MedicineDTO> getMedicineListById(int medicineId);
+
+    int deleteAndCreateMedicine(int medicineId, List<MedicineDTO> pills);
 }
