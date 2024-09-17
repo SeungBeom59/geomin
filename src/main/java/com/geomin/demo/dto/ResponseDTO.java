@@ -25,6 +25,10 @@ public class ResponseDTO {
 
     private List<KcdDTO> kcdDTOList;                // 질병기록 모음
 
+    private List<WaitingDTO> waitingDTOList;        // 진료대기 또는 진료완료 환자 모음
+
+    private List<BillDTO> billDTOList;              // 수가 기록 모음 또는 청구서 모음
+
     // 페이징용
     private int page;                   // 페이지
     private int size;                   // 사이즈

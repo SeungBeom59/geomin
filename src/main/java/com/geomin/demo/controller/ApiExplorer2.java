@@ -1,6 +1,5 @@
 package com.geomin.demo.controller;
 
-import com.geomin.demo.dto.ApiResponseDTO;
 import com.geomin.demo.dto.KcdDTO;
 import com.geomin.demo.dto.PagingDTO;
 import com.geomin.demo.dto.ResponseDTO;
@@ -26,7 +25,6 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 // 공공데이터
 // 건강보험심사평가원 : 질병정보서비스 api

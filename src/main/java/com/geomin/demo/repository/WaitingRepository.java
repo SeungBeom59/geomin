@@ -9,11 +9,14 @@ import java.util.List;
 @Mapper
 public interface WaitingRepository {
 
-    // 접수대기 가져오기
+    // 접수대기 가져오기 (size 4 고정, sql에 하드코딩으로 넣어둠)
     List<WaitingVO> getWaitingList(long offset, int departmentId);
 
+    // 접수완료 목록 가져오기 (size 4 고정)
+    List<WaitingVO> getEndWaitingList(int offset, int departmentId);
+
     // 접수대기 총 인원 가져오기
-    int getTotal(int departmentId);
+    int getWaitingTotal(int departmentId);
 
     // 진료완료 총 인원 가져오기
     int getEndCount(int departmentId);
@@ -38,4 +41,6 @@ public interface WaitingRepository {
 
     // 접수대기 id로 가져오기
     WaitingVO getWaitingById(int waitingId);
+
+
 }

@@ -35,6 +35,7 @@
         <result property="waitingStatus" column="waiting_status" />
         <result property="waitingType" column="waiting_type" />
         <result property="receptionist" column="receptionist" />
+        <result property="payStatus" column="pay_status" />
         <association property="patient" resultMap="patientMap" />
         <association property="department" resultMap="departmentMap" />
     </resultMap>

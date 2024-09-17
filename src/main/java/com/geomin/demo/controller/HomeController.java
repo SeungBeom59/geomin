@@ -161,6 +161,20 @@ public class HomeController {
         return ResponseEntity.status(HttpStatus.OK).body(waitingList);
     }
 
+    // 진료 완료 접수 환자 리스트 가져오기 (사이드바)
+    @PostMapping("/waiting/end/{page}")
+    public ResponseEntity<?> endWaiting(@PathVariable(name = "page" , required = false) int page,
+                                        Principal principal){
+
+        UserSecurityDTO user = userService.getUser(principal.getName());
+        int departmentId = user.getDepartmentId();
+
+        ResponseDTO response = waitingService.getEndWaitingList(page , departmentId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+
     // 진료접수 상태||종류 변경
     @PostMapping("/waiting-modify")
     public ResponseEntity<?> modifyWaitingStatus(@RequestBody WaitingDTO waitingDTO){

@@ -12,6 +12,7 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class PagingDTO {
 
     private int total;  // 총 객체 갯수
@@ -32,6 +33,7 @@ public class PagingDTO {
         this.startPage = ((currentGroupPage - 1) * btnCnt) + 1;
         this.endPage = Math.min(currentGroupPage * btnCnt, totalPages);
         this.prev = page > btnCnt;
-        this.next = page + (btnCnt-1) < totalPages;
+//        this.next = page + (btnCnt-1) < totalPages;
+        this.next = page < totalPages;
     }
 }

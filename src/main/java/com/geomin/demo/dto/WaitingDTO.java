@@ -35,8 +35,10 @@ public class WaitingDTO {
 
     private String action;                  // 수정할 접수값
 
-    private int waitingEndCnt;              // 진료완료 환자수
+    private int waitingEndCnt;              // 진료완료(대기) 환자수
 
     private String receptionist;            // 최초 접수자
+
+    private int payStatus;                  // 수납상태
 
 }

@@ -12,6 +12,7 @@
         <result property="waitingStatus" column="waiting_status" />
         <result property="waitingType" column="waiting_type" />
         <result property="receptionist" column="receptionist" />
+        <result property="payStatus" column="pay_status" />
         <association property="patient" resultMap="patientMap" />
         <association property="department" resultMap="departmentMap" />
     </resultMap>
@@ -52,7 +53,7 @@
         AND
         w.DEPARTMENT_ID = #{departmentId}
     ORDER BY
-        WAITING_KEY ASC
+        WAITING_DATE  ASC
     OFFSET
         #{offset} ROWS
     FETCH NEXT
@@ -60,13 +61,11 @@
 
     </select>
 
-    <select id="getTotal" resultType="int" parameterType="int">
+    <select id="getWaitingTotal" resultType="int" parameterType="int">
         SELECT
             COUNT(*) tocnt
         FROM
             WAITING W
-            JOIN PATIENT P ON W.PATIENT_ID = P.PATIENT_ID
-            JOIN DEPARTMENT D ON W.DEPARTMENT_ID = D.DEPARTMENT_ID
         WHERE
             DATE(waiting_date) = CURDATE()
         AND
@@ -150,6 +149,28 @@
             WAITING
         WHERE
             WAITING_ID = #{waitingId}
+    </select>
+
+    <select id="getEndWaitingList" resultMap="WaitingMap">
+        SELECT
+            *
+        FROM
+            WAITING W
+            JOIN PATIENT P ON W.PATIENT_ID = P.PATIENT_ID
+            JOIN DEPARTMENT D ON W.DEPARTMENT_ID = D.DEPARTMENT_ID
+        WHERE
+            DATE(waiting_date) = CURDATE()
+        AND
+            WAITING_STATUS = 2
+        AND
+            w.DEPARTMENT_ID = #{departmentId}
+        ORDER BY
+            WAITING_DATE DESC
+        OFFSET
+            #{offset} ROWS
+        FETCH NEXT
+            4 ROWS ONLY
+
     </select>
 
 </mapper>

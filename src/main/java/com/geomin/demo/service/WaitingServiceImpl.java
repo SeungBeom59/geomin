@@ -1,10 +1,11 @@
 package com.geomin.demo.service;
 
 import com.geomin.demo.domain.DepartmentVO;
-import com.geomin.demo.domain.DiagnosisVO;
 import com.geomin.demo.domain.PatientVO;
 import com.geomin.demo.domain.WaitingVO;
 import com.geomin.demo.dto.DiagnosisDTO;
+import com.geomin.demo.dto.PagingDTO;
+import com.geomin.demo.dto.ResponseDTO;
 import com.geomin.demo.dto.WaitingDTO;
 import com.geomin.demo.repository.DiagnosisRepository;
 import com.geomin.demo.repository.PatientRepository;
@@ -29,6 +30,66 @@ public class WaitingServiceImpl implements WaitingService {
     private final WaitingRepository waitingRepository;
     private final PatientRepository patientRepository;
     private final DiagnosisRepository diagnosisRepository;
+
+    @Override
+    public ResponseDTO getEndWaitingList(int page, int departmentId) {
+        log.info("service단 page = " + page);
+
+        int total = waitingRepository.getEndCount(departmentId);
+        int size = 4;
+        int btnCnt = 3;
+        int offset = page * size;
+
+        List<WaitingVO> waitingVOList = waitingRepository.getEndWaitingList(offset , departmentId);
+        log.info("waitingVOList::{}", waitingVOList);
+
+        // 페이징
+        PagingDTO paging = PagingDTO.builder()
+                .page(page + 1)
+                .total(total)
+                .size(size)
+                .btnCnt(btnCnt)
+                .build();
+
+        paging.init();
+
+        int waitingTotal = waitingRepository.getWaitingTotal(departmentId);
+        List<WaitingDTO> waitingDTOList = new ArrayList<>();
+
+        for (WaitingVO vo : waitingVOList) {
+
+            String waitingDate = vo.getWaitingDate().toString();
+            String time = waitingDate.substring(waitingDate.indexOf("T")+1);
+
+            WaitingDTO dto = WaitingDTO.builder()
+                    .waitingId(vo.getWaitingId())
+                    .patientId(vo.getPatient().getPatientId())
+                    .patientName(vo.getPatient().getPatientName())
+                    .identify(WaitingUtil.getIdentify(vo.getPatient().getIdentify()))
+                    .gender(vo.getPatient().isGender())
+                    .age(vo.getPatient().getAge())
+                    .departmentId(vo.getDepartment().getDepartmentId())
+                    .waitingKey(vo.getWaitingKey())
+                    .waitingDate(time)
+                    .waitingStatus(WaitingUtil.getWaitingStatus(vo.getWaitingStatus()))
+                    .waitingType(WaitingUtil.getWaitingType(vo.getWaitingType()))
+                    .payStatus(vo.getPayStatus())
+                    .build();
+
+            waitingDTOList.add(dto);
+        }
+
+        if(!waitingDTOList.isEmpty()) {
+            waitingDTOList.get(0).setWaitingEndCnt(waitingTotal);
+        }
+
+        ResponseDTO response = new ResponseDTO();
+        response.setPagingDTO(paging);
+        response.setWaitingDTOList(waitingDTOList);
+        log.info("response::{}", response);
+
+        return response;
+    }
 
     //
     @Override
@@ -74,7 +135,7 @@ public class WaitingServiceImpl implements WaitingService {
             content.add(dto);
         }
 
-        int total = waitingRepository.getTotal(departmentId);
+        int total = waitingRepository.getWaitingTotal(departmentId);
         int waitingEndCnt = waitingRepository.getEndCount(departmentId);
 
         if(!content.isEmpty()){
@@ -153,14 +214,17 @@ public class WaitingServiceImpl implements WaitingService {
         return result;
     }
 
-    @Override
-    public WaitingVO getWaitingById(int waitingId) {
+//    @Override
+//    public WaitingVO getWaitingById(int waitingId) {
+//
+//        waitingRepository.getWaitingById(waitingId);
+//
+//
+//        return null;
+//    }
 
-        waitingRepository.getWaitingById(waitingId);
 
 
-        return null;
-    }
 
 
 }

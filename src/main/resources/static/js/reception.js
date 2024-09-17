@@ -1,6 +1,8 @@
 // 시작시 활력징후 ,  입력표 초기화
 $(document).ready(function (){
 
+    $('#endWaitingBtn').addClass('off');
+
     var date = new Date();
     var today =  date.getFullYear() + "-" + ("0"+(date.getMonth()+1)).slice(-2) + "-" + ("0"+date.getDate()).slice(-2);
     $('#todayDiagnosisDate').text(today);   // 진료기록 작성창에 오늘 날짜 넣기
@@ -573,6 +575,8 @@ function clearPatient(){
     $('#patient-btn').css('display', 'inline-block');
 
     $('#vital-sign-cancel-btn').css('display' , 'none');
+
+    $('#patient_name').focus();
 }
 
 // 접수 환자 정보 칸 값 넣기 및 readonly와 수정 버튼 활성화
@@ -1169,6 +1173,8 @@ function receiveWaitingInfo(response) {
 
 // 진료 접수 명단 html 넣기
 function insertWaiting(content){
+    $('#waitingBtn').removeClass('off');
+    $('#endWaitingBtn').addClass('off');
 
     $('#waiting-list').empty(); // 하위 html 모두 삭제
 
@@ -1235,8 +1241,6 @@ function waitingpaging(waitingList){
 
     $('#waiting-user-count').text(totalElements);   // 진료 대기 환자수 변경
 
-
-    // 진료 완료 환자수 변경 필요
 
     // var html = '<ul id="waiting-paging>"';
     var waitingpaging = '';
@@ -1308,6 +1312,7 @@ function searchWaiting(page){
        success: function (response){
            var waitingList = JSON.stringify(response);
            receiveWaitingInfo(waitingList);
+           console.log(response);
        } ,
        error : function (xhr, status, error){
            console.error('AJAX 요청 실패: ', status, error);
@@ -1315,6 +1320,156 @@ function searchWaiting(page){
     });
 
 }
+
+function findWaiting(button){
+    $(button).removeClass('off');
+    $('#endWaitingBtn').addClass('off');
+    searchWaiting();
+}
+
+function findEndWaiting(button){
+    $(button).removeClass('off');
+    $('#waitingBtn').addClass('off');
+
+    // 위처럼 searchEndWaiting() 만들어주는게 좋겠음.
+    var page = 0;
+    searchEndWaiting(page);
+}
+
+function searchEndWaiting(page) {
+    console.log('searchEndWaiting() 실행됨');
+    $('#endWaitingBtn').removeClass('off');
+    $('#waitingBtn').addClass('off');
+
+    $('#waiting-list').empty(); // 하위 html 모두 삭제
+    $('#waiting-paging').empty(); // 페이징도 삭제해줘야함.
+
+    // var data = {
+    //
+    // }
+    console.log('page = ' , page);
+    $.ajax({
+        url : '/waiting/end/' + page,
+        type: 'post',
+        contentType: 'application/json; charset=utf-8',
+        // data: JSON.stringify(data),
+        success: function (response){
+            // alert('searchEndWaiting() 성공');
+            console.log(response);
+            processWaiting(response);
+        },
+        error: function (xhr , status, error){
+            console.log('ajax 요청 실패' , status , error);
+        }
+    })
+
+}
+
+function processWaiting(response){
+
+    var waitings = Array.isArray(response.waitingDTOList)? response.waitingDTOList : [];
+
+    $('#waiting-list').empty(); // 하위 html 모두 삭제
+    $('#waiting-paging').empty(); // 페이징도 삭제해줘야함.
+
+    if(waitings.length > 0){
+       insertEndWaiting(waitings);
+    }
+    if(response.pagingDTO != null){
+        endWaitingPaging(response);
+    }
+}
+
+function endWaitingPaging(response){
+    console.log('endWaitingpaging()실행');
+    var paging = response.pagingDTO;
+    $('#waiting-paging').empty();
+
+    var btnCnt = paging.btnCnt;
+    var total = paging.total;
+    var currentGroupPage = paging.currentGroupPage;
+    var endPage = paging.endPage;
+    var page = paging.page;
+    var size = paging.size;
+    var startPage = paging.startPage;
+    var totalPages = paging.totalPages;
+    var next =  page < totalPages;
+    var prev = paging.prev;
+
+    $('#waiting-current-page').val(page);   // hidden page값 변경
+    $('#waiting-end-count').text(total);    // 진료완료 환자 수 변경
+
+    var waitingPaging = '';
+
+    if(prev === true){
+        waitingPaging +=
+            `<li id="waiting-prev-page" onclick="searchEndWaiting(${startPage - 2})">` +
+            `<i class="fa-solid fa-angle-left" style="color: #000000;"></i>` +
+            `</li>`;
+    }
+
+    for(var p = startPage; p <= endPage; p++){
+        var isActive = (page === p)? 'active' : '';
+        waitingPaging += `<li class="` + isActive + `" onclick="searchEndWaiting(` + (p - 1) + `)">` + p + `</li>`;
+    }
+
+    if(next === true){
+        waitingPaging += `<li id="waiting-next-page" onclick="searchEndWaiting(` + endPage + `)">` +
+            `<i class="fa-solid fa-angle-right" style="color: #000000;"></i>` +
+            `</li>`;
+    }
+    $('#waiting-paging').append(waitingPaging);
+}
+
+function insertEndWaiting(content){
+
+    var waitingCnt = content[0].waitingEndCnt;
+    $('#waiting-user-count').text(waitingCnt);
+
+    content.forEach(function (waitingUser){
+
+        var html = '<div class="name-card">';
+
+        html += '<div>' +
+            '<input type="hidden" value="' + waitingUser.waitingId + '" class="waitingId">';
+        html +=     '<span class="name">' + waitingUser.patientName;
+
+
+        switch (waitingUser.payStatus){
+            case 0 :
+                html += '</span><button class="btn" onclick="">수납대기</button></div>';
+                break;
+            case 1 :
+                html += '</span><button class="btn3" onclick="">수납완료</button></div>';
+                break;
+            case 2 :
+                html += '</span><button class="btn4" onclick="">일부수납</button></div>';
+                break;
+        }
+
+        // 수납여부에 따라 구분
+
+
+        html += '<div>' +
+            '<span>' + waitingUser.identify + '</span>';
+
+        if(waitingUser.age != null && waitingUser.age >= 0){
+            html += '<span>' + waitingUser.age + '세</span>';
+        }
+
+        html += '<span>' + (waitingUser.gender? '남' : '여') + '</span></div>';
+
+        html += '<div><span>' + waitingUser.waitingDate + '접수</span>';
+        html += '<span>' + waitingUser.waitingType + '</span></div>';
+
+        html += '<div><span>' + waitingUser.waitingStatus + '</span></div></div>';
+
+        $('#waiting-list').append(html);
+    });
+
+
+}
+
 
 
 // 진료대기 환자 호출 함수 waitingList patient call
@@ -1364,6 +1519,15 @@ function callPatient(button){
     })
 }
 
+function checkDashAndNumbers(input) {
+    input.value = input.value.replace(/[^0-9-]/g, '');
+
+    // 하이픈이 입력값의 첫 번째 문자로 오지 않도록 처리
+    if (input.value.startsWith('-')) {
+        input.value = '-' + input.value.replace(/^-/, '');
+    }
+}
+
 
 function checkDouble(input){
     input.value = input.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
@@ -1406,6 +1570,7 @@ function checkPatient(){
 }
 
 // 서브메뉴 contextmenu 이벤트 설정
+// waiting-type-menu에 마우스가 올라가면 추가 서브 메뉴의 활성화 여부 부여
 $(".waiting-type-menu").mouseover(function(){
     $(this).children(".submenu").show();
 });
@@ -1413,13 +1578,14 @@ $(".waiting-type-menu").mouseleave(function(){
     $(this).children(".submenu").hide();
 });
 
+// name-card 클래스를 갖는 접수대기환자카드에서 우클릭(contextmenu) 이벤트가 발생한다면
 $(document).on('contextmenu', '.name-card', function(event) {
-    event.preventDefault();
+    event.preventDefault(); // 기본 contextmenu 이벤트 방지
 
     var waitingId = $(this).find('.waitingId').val();
 
     console.log('waitingId : ' , waitingId);
-
+    // 접수대기환자의 id를 가진 채 만들어뒀던 context 메뉴를 마우스 위치 좌표에 보여줘라
     $('#custom-context-menu')
         .data(
             'waiting-id' , waitingId
@@ -1430,12 +1596,19 @@ $(document).on('contextmenu', '.name-card', function(event) {
     }).show();
 });
 
+// 클릭 이벤트가 발생할때, 그게 커스텀 콘텍스트 메뉴가 아니라면 메뉴는 비활성화해라.
+// 여기서 length를 쓰는 이유는 클릭 이벤트 타켓은 클릭된 html dom을 알려주는데
+// 거기서 closest() 메서드로 찾고자 하는 것이 몇개가 있는지 확인하는 방식이 됨.
+// 해당 id의 태그가 존재한다면 1 아니라면 0.
 $(document).on('click' , function(event){
+    // console.log(event.target);
     if(!$(event.target).closest('#custom-context-menu').length){
         $('#custom-context-menu').hide();
     }
 });
 
+// 커스텀 메뉴에서 제공하는 서브메뉴에 li가 클릭될 경우 실행.
+// 커스텀 메뉴에 갖고 있던 대기환자 id와 클릭된 태그의 문장을 가져와서 ajax 요청을 보낸다.
 $('#custom-context-menu .submenu li').on('click' , function (){
 
     var waitingId = $('#custom-context-menu').data('waiting-id');
@@ -1457,18 +1630,16 @@ $('#custom-context-menu .submenu li').on('click' , function (){
         data: JSON.stringify(data),
         success: function (response){
             alert('성공');
-
+            // 처리한 뒤에는 접수대기환자 최신화
             searchWaiting($('#waiting-current-page').val());
         } ,
         error : function (xhr, status, error){
             console.error('AJAX 요청 실패: ', status, error);
         }
     });
-
-
 });
 
-// 진료완료 환자 보기 버튼 누를 경우 처리함수
+// 접수대기환자에서 호출 후, 진료중 버튼 누를 경우.
 function endPatient() {
 
 }
@@ -1606,6 +1777,38 @@ function insertPastDiagnosis(response){
 
     var fileInfo = Array.isArray(response.fileInfoDTOList)? response.fileInfoDTOList : [];
     var medicine = Array.isArray(response.medicineDTOList)? response.medicineDTOList : [];
+    var kcds = Array.isArray(response.kcdDTOList)? response.kcdDTOList : [];
+
+    ////////////////// 질병정보
+    var kcdBox = $('#pre-kcds');
+    kcdBox.find('.pre-kcd').remove();
+
+    if(kcds.length > 0){
+        $('#no-pre-kcds').hide();
+
+        kcds.sort(function (a , b) {
+           return a.kcdRank - b.kcdRank;
+        });
+
+        kcds.forEach(function (kcd){
+
+            var kcdTypeOption = whatKcdType(kcd.kcdType);
+            // kcdTypeOption += '<option value="1"' + (kcd.kcdType === 1? 'selected' : '') + '>주상병</option>';
+            // kcdTypeOption += '<option value="2"' + (kcd.kcdType === 2? 'selected' : '') + '>기타상병</option>';
+            // kcdTypeOption += '<option value="3"' + (kcd.kcdType === 3? 'selected' : '') + '>배제된상병</option>';
+
+            kcdBox.append(
+                '<ul class="pre-kcd" data-rank="' + kcd.kcdRank +'">' +
+                '<li>' + kcd.kcdCode + '</li>' +
+                '<li>' + kcd.kcdName + '</li>' +
+                '<li>' + kcdTypeOption+ '</li>' +
+                '</ul>'
+            );
+        });
+    }
+    else {
+        $('#no-pre-kcds').css('display' , 'flex');
+    }
 
 
     ////////////////// 의약품
@@ -1620,9 +1823,12 @@ function insertPastDiagnosis(response){
                 '<ul class="pre-pill">' +
                     '<input type="hidden" class="itemSeq" value="' + pill.itemSeq + '">' +
                     '<li>' + pill.medicineName +'</li>' +
-                    '<li><input type="text" value="' + pill.dosage + '" autocomplete="off" oninput="checkDouble(this)" readonly></li>' +
-                    '<li><input type="text" value="' + pill.frequency + '" autocomplete="off" oninput="checkDouble(this)" readonly></li>' +
-                    '<li><input type="text" value="' + pill.days + '" autocomplete="off" oninput="checkDouble(this)" readonly></li>' +
+                    // '<li><input type="text" value="' + pill.dosage + '" autocomplete="off" oninput="checkDouble(this)" readonly></li>' +
+                    // '<li><input type="text" value="' + pill.frequency + '" autocomplete="off" oninput="checkDouble(this)" readonly></li>' +
+                    // '<li><input type="text" value="' + pill.days + '" autocomplete="off" oninput="checkDouble(this)" readonly></li>' +
+                    '<li>' + pill.dosage + '</li>' +
+                    '<li>' + pill.frequency + '</li>' +
+                    '<li>' + pill.days + '</li>' +
                 '</ul>'
             );
         });
@@ -1647,6 +1853,26 @@ function insertPastDiagnosis(response){
         $('#no-pre-files').css('display' , 'flex');
     }
 
+}
+
+function whatKcdType(kcdType){
+
+    var kcdTypeOption = '';
+
+    switch (kcdType){
+        case 1:
+            kcdTypeOption = '주상';
+            break;
+        case 2:
+            kcdTypeOption = '기타';
+            break;
+        case 3 :
+            kcdTypeOption = '배제';
+            break;
+        default :
+            kcdTypeOption = '미정';
+    }
+    return kcdTypeOption;
 }
 
 function readPastFileRender(file){
@@ -1740,6 +1966,8 @@ function clearPreDiagnosisList(){
     $('.diagnosis-delete-btn').hide();
     $('#past-to-read').hide();
     $('#past-modify-box').hide();
+    $('#pre-files-box').hide();
+    $('.pre-file').remove();
 
     var name = $('#patient_name').val();
     $('#diagnosis-title span:last-child').text(name);
@@ -1922,6 +2150,10 @@ function insertDiagnosis(response){
     $('#symptoms-record').attr('readonly' , false);
     $('#diagnosis-record').attr('readonly' , false);
     $('#prescription-record').attr('readonly' , false);
+
+    $('#feeSearch').show();
+    $('#medicineSearchBtn').show();
+    $('#kcdsSearchBtn').show();
 
     if(diagnosis.modifyDate !== null){
         $('#diagnosis-write-sub-title').show();
@@ -2108,8 +2340,9 @@ function clearDiagnosis(){
     $('#file-read').hide();
     $('#diagnosis-delete-btn').hide();
     $('#diagnosis-cancel-btn').hide();
-    $('#medicineSearchBtn').show();
-    $('#kcdsSearchBtn').show();
+    $('#medicineSearchBtn').hide();
+    $('#kcdsSearchBtn').hide();
+    $('#feeSearch').hide();
     $('#no-pills').css('display' , 'flex');
     $('#no-files').hide();
     $('#no-kcd').css('display' , 'flex');
@@ -2299,14 +2532,29 @@ function readKcdRender(kcd){
     kcdHtml.addClass('kcd');
 
     var kcdTypeOption = '';
-    kcdTypeOption += '<option value="1"' + (kcd.kcdType === 1? 'selected' : '') + '>주상병</option>';
-    kcdTypeOption += '<option value="2"' + (kcd.kcdType === 2? 'selected' : '') + '>기타상병</option>';
-    kcdTypeOption += '<option value="3"' + (kcd.kcdType === 3? 'selected' : '') + '>배제된상병</option>';
+
+    switch (kcd.kcdType){
+        case 1:
+            kcdTypeOption = '주상병';
+            break;
+        case 2:
+            kcdTypeOption = '기타상병';
+            break;
+        case 3 :
+            kcdTypeOption = '배제된상병';
+            break;
+        default :
+            kcdTypeOption = '미선택상병';
+    }
+    // kcdTypeOption += '<option value="1"' + (kcd.kcdType === 1? 'selected' : '') + '>주상병</option>';
+    // kcdTypeOption += '<option value="2"' + (kcd.kcdType === 2? 'selected' : '') + '>기타상병</option>';
+    // kcdTypeOption += '<option value="3"' + (kcd.kcdType === 3? 'selected' : '') + '>배제된상병</option>';
 
     kcdHtml.append(
         '<li>' + kcd.kcdCode + '</li>' +
         '<li>' + kcd.kcdName + '</li>' +
-        '<li><select class="kcdType" disabled>' + kcdTypeOption + '</select></li>'
+        '<li class="read-kcd">' + kcdTypeOption + '</li>'
+        // '<li><select class="kcdType" disabled>' + kcdTypeOption + '</select></li>'
     );
 
     return kcdHtml;

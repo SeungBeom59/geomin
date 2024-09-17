@@ -16,7 +16,7 @@ html, body {
 }
 
 /* 버튼 기본양식 */
-.btn , .btn2 {
+.btn , .btn2 , .btn3 , .btn4 {
     display: block;
     border-radius: 10px;
     border: 0;
@@ -29,6 +29,10 @@ html, body {
     text-align: center;
 }
 
+
+.off {
+    background-color: #909090;
+}
 
 
 #wrap {
@@ -112,6 +116,8 @@ aside > div:nth-child(3) > div > span {
 }
 
 /* 진료대기자 또는 진료완료 인원 목록 */
+
+
 #waiting-list {
     /* border: 1px solid black; */
     /*min-height: 560px;*/
@@ -142,6 +148,10 @@ aside > div:nth-child(3) > div > span {
 .name-card > div:first-child > button {
     background-color: #569EC7;
 }
+
+.btn3 {background: #B7B7B7 !important;}
+.btn4 {background: #279B33 !important;}
+
 
 /* 인적사항 */
 .name-card > div:nth-child(2) {
@@ -254,6 +264,8 @@ section {
     width: 761px;
     background-color: white;
 }
+
+
 
 #patient-article {
     height: 261px;
@@ -565,7 +577,36 @@ th , td {
 /* 우측 진료기록 작성칸 */
 #right-section > article {
     height: 891px;
+    overflow-y: scroll;
 }
+
+/* ( 크롬, 사파리, 오페라, 엣지 ) 동작 */
+#right-article::-webkit-scrollbar {
+    display: none;
+}
+
+#right-article  {
+    -ms-overflow-style: none; /* 인터넷 익스플로러 */
+    scrollbar-width: none; /* 파이어폭스 */
+}
+
+.mt {
+    margin-top: 17px;
+}
+
+/*.prescriptionBox > #pills,*/
+/*.kcds ,#file-drag-box {*/
+/*    overflow-y: scroll;*/
+/*    -ms-overflow-style: scrollbar; !* 인터넷 익스플로러 *!*/
+/*    scrollbar-width: auto; !* 파이어폭스 *!*/
+/*}*/
+
+/*.prescriptionBox > #pills::-webkit-scrollbar,*/
+/*.kcds::-webkit-scrollbar ,*/
+/*#file-drag-box::-webkit-scrollbar {*/
+/*    display: block;*/
+/*}*/
+
 /* 진료기록 작성칸 상단 회색바 */
 #right-section > article > div:first-child {
     /* border: 1px solid black; */
@@ -677,6 +718,10 @@ th , td {
     width: 50px;
 }
 
+.read-kcd {
+    width: 60px !important;
+}
+
 .kcd > li:nth-child(3) > select {
     width: 50px;
     border: 0;
@@ -692,6 +737,17 @@ th , td {
     color: #9B2727;
     font-weight: bold;
     cursor: pointer;
+}
+
+#pay {
+    border: 1px solid black;
+    width: 681px;
+    height: 135px;
+    margin-left: 43px;
+}
+
+#feeSearch{
+    display: none;
 }
 
 
@@ -778,11 +834,75 @@ th , td {
     margin-left: 15px;
 }
 
+#pre-diagnosis-box {
+    display: flex;
+}
+
+#pre-kcds , #pre-pills {
+    width: 290px;
+    height: 94px;
+    border: 1px solid #807d7d;
+    overflow-y: scroll;
+}
+
+.pre-kcd {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+    font-size: small;
+    border-bottom: 1px solid #7b7a7a;
+}
+
+.pre-kcd > li {
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-right: 1px solid #7b7a7a;
+}
+
+.pre-kcd > li:nth-child(1) {
+    width: 40px;
+    font-weight: bold;
+}
+
+.pre-kcd > li:nth-child(2){
+    display: block;
+    overflow-x: hidden;
+    width: 182px;
+}
+
+.pre-kcd > li:nth-child(3) {
+    width: 45px;
+    border-right: 0;
+    font-weight: bold;
+}
+
+/*.pre-kcd > li:nth-child(3) > select {*/
+/*    border: 0;*/
+/*    background: white;*/
+/*    font-size: smaller;*/
+/*    width: 100%;*/
+/*    height: 100%;*/
+/*}*/
+
+#diagnosis-past-record {
+    margin-left: 15px;
+}
+
+#diagnosis-past-record , #prescription-past-record {
+    height: 90px;
+    width: 279px;
+    resize: none;
+}
+
+
 #pre-prescription-box {
     display: flex;
 }
 
-#no-pre-pills , #no-pre-files {
+#no-pre-pills , #no-pre-files , #no-pre-kcds {
     display: flex;
     width: 100%;
     height: 100%;
@@ -791,15 +911,7 @@ th , td {
 }
 
 #pre-pills {
-    width: 290px;
-    height: 94px;
-    border: 1px solid;
     margin-left: 15px;
-}
-
-#prescription-past-record {
-    height: 90px;
-    width: 279px;
 }
 
 /*담당의*/
@@ -836,8 +948,7 @@ th , td {
 }
 
 #pre-pills {
-    border: 1px solid black;
-    overflow-y: scroll;
+
 }
 
 .pre-pill {
@@ -852,12 +963,18 @@ th , td {
 .pre-pill > li {
     border: 1px solid #ccc;
     width: 25px;
+    height: 28px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 11px;
 }
 
 .pre-pill > li:nth-child(2) {
+    display: block;
     width: 225px;
     font-size: 13px;
-    overflow: auto;
+    overflow-x: hidden;
     text-align: left;
 }
 
@@ -866,7 +983,6 @@ th , td {
     width: 100%;
     height: 100%;
 }
-
 
 #pre-files-box {
     display: none;
@@ -1011,6 +1127,7 @@ th , td {
 
 #file-box {
     /*border: 1px solid black;*/
+    margin-bottom: 50px;
 }
 
 #file-read {
@@ -1132,9 +1249,10 @@ th , td {
 }
 
 .prescriptionBox {
-    padding-right: 30px;
+    padding-right: 35px;
     padding-left : 45px;
-    height : 135px
+    height : 135px;
+    justify-content: center;
 }
 
 .prescriptionBox > #pills {
@@ -1143,6 +1261,7 @@ th , td {
     height : 130px;
     border : 1px solid #7b7a7a;
     overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 .prescriptionBox > #prescription-record {
@@ -1156,7 +1275,7 @@ th , td {
 
 #pills > .pill {
     margin: 0; padding: 0;
-    width: 342px;
+    width: 347px;
     height: 35px;
     display: flex;
     list-style: none;

@@ -20,5 +20,6 @@ public class WaitingVO {
     private int waitingStatus;          // 접수상태 (0: 대기중 , 1: 진료중 , 2: 진료완료 , 3:검사중 , 4:검사대기 , 5: 접수취소... 등)
     private int waitingType;            // 접수종류 (0: 일반진료, 1: 전문진료 , 2: 입원진료, 3: 응급진료, 4: 외래진료, 5:재활진료... 등)
     private String receptionist;        // 최초 접수자
+    private int payStatus;              // 납부상태 (0: 미수납 , 1: 수납완료 , 2: 일부수납)
 
 }

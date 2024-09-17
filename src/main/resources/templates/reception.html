@@ -51,12 +51,12 @@
 
             <div>
                 <div>
-                    <button class="btn">진료대기</button>
+                    <button id="waitingBtn" class="btn" onclick="findWaiting(this)">진료대기</button>
                     <span id="waiting-user-count" th:text="${waitingList.getTotalElements()}">3</span> 명
                 </div>
 
                 <div>
-                    <button class="btn">진료완료</button>
+                    <button id="endWaitingBtn" class="btn" onclick="findEndWaiting(this)">진료완료</button>
                     <span id="waiting-end-count" th:text="${waitingEnd}">5</span> 명
                 </div>
             </div>
@@ -70,7 +70,7 @@
                         <div>
                             <span class="name" th:text="${waitingUser.getPatientName()}">이름</span>
                             <input type="hidden" th:value="${waitingUser.getWaitingId()}" class="waitingId">
-                            <button th:if="${waitingUser.getWaitingStatus() == '진료중'}" class="btn2" onclick="endPatient(this)">진료중</button>
+                            <button th:if="${waitingUser.getWaitingStatus() == '진료중'}" class="btn2" onclick="">진료중</button>
                             <button th:if="${waitingUser.getWaitingStatus() != '진료중'}" class="btn" onclick="callPatient(this)">호출</button>
                         </div>
 
@@ -197,10 +197,10 @@
 
                             <div>
                                 <label for="phone">연락처 : </label>
-                                <input type="text" id="phone" name="phone" value="" autocomplete="off" placeholder="000-0000-0000">
+                                <input type="text" id="phone" name="phone" value="" oninput="checkDashAndNumbers()" autocomplete="off" placeholder="000-0000-0000">
 
                                 <label for="emergency-phone">비상연락처 : </label>
-                                <input type="text" id="emergency-phone" name="emergencyPhone" value="" autocomplete="off" placeholder="000-0000-0000">
+                                <input type="text" id="emergency-phone" name="emergencyPhone" value="" oninput="checkDashAndNumbers()" autocomplete="off" placeholder="000-0000-0000">
                             </div>
 
                             <hr>
@@ -310,7 +310,12 @@
 
                             <div class="textarea-box pre-diagnosis-box">
                                 <h4>진료</h4>
-                                <textarea name="diagnosis" id="diagnosis-past-record" readonly placeholder="진료 내용이 없습니다.">알레르기성 비염, 환경 개선 및 약물요법 병행치료 진행 </textarea>
+                                <div id="pre-diagnosis-box">
+                                    <textarea name="diagnosis" id="diagnosis-past-record" readonly placeholder="진료 내용이 없습니다.">알레르기성 비염, 환경 개선 및 약물요법 병행치료 진행 </textarea>
+                                    <div id="pre-kcds">
+                                        <div id="no-pre-kcds">선택된 상병이 없습니다.</div>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="textarea-box pre-diagnosis-box">
@@ -354,7 +359,7 @@
 
                 <section id="right-section">
 
-                    <article>
+                    <article id="right-article">
 
                         <div>
                             <input type="hidden" id="new-diagnosisId">
@@ -375,7 +380,7 @@
                             </h5>
                         </div>
 
-                        <div class="textarea-box big">
+                        <div class="textarea-box big mt" >
                             <div>
                                 <h4>증상</h4>
                                 <div id="diagnosis-btn-box">
@@ -400,25 +405,24 @@
                                     <div id="no-kcd">
                                         선택된 상병이 없습니다.
                                     </div>
-<!--                                    <ul class="kcd">-->
-<!--                                        <li>C023</li>-->
-<!--                                        <li>혀의 앞쪽 3분의2, 상세불명 부분의 악성 신생물</li>-->
-<!--                                        <li>-->
-<!--                                            <select>-->
-<!--                                                <option selected>주상병</option>-->
-<!--                                                <option>기타상병</option>-->
-<!--                                                <option>배제된상병</option>-->
-<!--                                            </select>-->
-<!--                                        </li>-->
-<!--                                        <li>X</li>-->
-<!--                                    </ul>-->
                                 </div>
                             </div>
                         </div>
 
                         <div class="textarea-box big">
                             <div>
-                                <h4>처방 | 조제 시 참고사항</h4>
+                                <h4>처방</h4>
+                                <button class="btn sf-mbtn" id="feeSearch">처방 검색</button>
+                            </div>
+
+                            <div id="pay">
+
+                            </div>
+                        </div>
+
+                        <div class="textarea-box big">
+                            <div>
+                                <h4>의약품 | 조제 시 참고사항</h4>
                                 <button type="button" class="btn sf-mbtn" id="medicineSearchBtn" onclick="getMedicinePopup()">의약품 검색</button>
                             </div>
 

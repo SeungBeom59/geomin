@@ -113,7 +113,7 @@ public class DiagnosisServiceImpl implements DiagnosisService{
 
         List<DiagnosisVO> result = diagnosisRepository.getDiagnosisList(diagnosisDTO , page, size , offset);
 
-        if(result == null){
+        if(result.isEmpty()){
             return null;
         }
 
