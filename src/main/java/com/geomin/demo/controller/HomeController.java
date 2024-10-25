@@ -77,6 +77,7 @@ public class HomeController {
         return "reception";
     }
 
+
     // 환자 검색 팝업창
     @GetMapping("/patient-search/{name}")
     public String getPatientList( @PathVariable(name = "name") String patientName ,

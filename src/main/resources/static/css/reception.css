@@ -511,6 +511,37 @@ th , td {
     cursor: pointer;
 }
 
+#past-box {
+    height: 610px;
+    overflow-y: scroll;
+}
+
+#past-box::-webkit-scrollbar {
+    display: none;
+}
+
+.pre-pay-box {
+    display: none;
+}
+
+.pre-pay-box > h4 {
+    margin-block: 10px;
+}
+
+#past-box {
+    -ms-overflow-style: none; /* 인터넷 익스플로러 */
+    scrollbar-width: none; /* 파이어폭스 */
+}
+
+#past-pay {
+    margin-left: 15px;
+    border: 1px solid rgb(122, 122, 122);
+    width: 578px;
+    height: 100px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
 /* 진료기록 우측 입력창 */
 #diagnosis-article > div {
     /* border: 1px solid red; */
@@ -579,6 +610,7 @@ th , td {
     height: 891px;
     overflow-y: scroll;
 }
+
 
 /* ( 크롬, 사파리, 오페라, 엣지 ) 동작 */
 #right-article::-webkit-scrollbar {
@@ -740,7 +772,7 @@ th , td {
 }
 
 #pay {
-    border: 1px solid black;
+    border: 1px solid rgb(122, 122, 122);
     width: 681px;
     height: 135px;
     margin-left: 43px;
@@ -988,6 +1020,7 @@ th , td {
     display: none;
     width: 578px;
     margin-left: 15px;
+    margin-bottom: 25px;
 }
 
 #pre-files-box > h4 {
@@ -998,7 +1031,7 @@ th , td {
     height: 80px;
     /*margin-left: 15px;*/
     width: 578px;
-    border: 1px solid black;
+    border: 1px solid rgb(122, 122, 122);
     overflow-y: auto;
 }
 
@@ -1155,7 +1188,7 @@ th , td {
     width: 681px;
     height: 130px;
     max-height: 130px;
-    border: 1px solid black;
+    border: 1px solid rgb(122, 122, 122);
     text-align: center;
     overflow-y: auto;
 }

@@ -39,6 +39,8 @@ public class FileService {
     private String uploadPath;
 
     // 파일 업로드
+    // apache tika 라이브러리 이용하여 확장자 검사 필요, 파일 스트림 앞에 매직넘버를 읽어서 파일 타입을 유추함으로
+    // 파일확장자명을 바꾼 경우를 찾아낼 수 있음.
     @Transactional
     public int upload(List<MultipartFile> uploadFiles){
 

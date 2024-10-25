@@ -228,7 +228,7 @@ function deleteDiagnosis(button){
     var dataDiagnosisId = $(button).data('diagnosis-id');
 
     if(dataDiagnosisId === 'new'){
-        diagnosisId = $('new-diagnosisId').val();
+        diagnosisId = $('#new-diagnosisId').val();
     }
     else if(dataDiagnosisId === 'past'){
         diagnosisId = $('#past-diagnosis-id').val();
@@ -1765,6 +1765,7 @@ function insertPastDiagnosis(response){
     $('#past-to-read').show();                                          // 우측 창에서 조회 버튼 활성화
     $('#pre-files-box').show();     // 추가 정보 박스 활성화
     $('#attending-doctor-box').css('display' , 'flex');     // 담당의 박스 활성화
+    $('.pre-pay-box').show();
 
     var name = content.patientName;
     $('#diagnosis-title span:last-child').text(name);       // 진료기록 환자 성명
@@ -1836,6 +1837,8 @@ function insertPastDiagnosis(response){
     else {
         $('#no-pre-pills').css('display' , 'flex');
     }
+
+
 
     ///////////////// 파일
     var filesBox = $('#pre-files');
@@ -1968,6 +1971,7 @@ function clearPreDiagnosisList(){
     $('#past-modify-box').hide();
     $('#pre-files-box').hide();
     $('.pre-file').remove();
+    $('.pre-pay-box').hide();
 
     var name = $('#patient_name').val();
     $('#diagnosis-title span:last-child').text(name);
@@ -2340,6 +2344,7 @@ function clearDiagnosis(){
     $('#file-read').hide();
     $('#diagnosis-delete-btn').hide();
     $('#diagnosis-cancel-btn').hide();
+    $('#diagnosis-modify-btn').hide();
     $('#medicineSearchBtn').hide();
     $('#kcdsSearchBtn').hide();
     $('#feeSearch').hide();
@@ -2691,3 +2696,19 @@ function renderPills(pill){
 
 }
 
+
+//function getMdfeePopup(){
+//
+//    var patientId = $('#new-patientId').val();
+//
+//    if(patientId === null || patientId === ''){
+//            alert('환자 정보를 먼저 설정 해주세요.');
+//            return;
+//    }
+//
+//    var popup = window.open(
+//        `/mdfee-search`,
+//        '수가검색',
+//        'width=800 , height=531 , screenX=500,screenY=100, resizeable=no'
+//    );
+//}

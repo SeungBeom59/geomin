@@ -129,7 +129,7 @@
                         <button type="button" class="btn" onclick="clearPatient()">신환등록</button>
                         <button type="button" class="btn" onclick="">수납</button>
                         <button type="button" class="btn" onclick="getWaitingPopup()">접수</button>
-                        <button type="button" class="btn sf-mbtn" onclick="newDiagnosis()">진료기록작성</button>
+<!--                        <button type="button" class="btn sf-mbtn" onclick="newDiagnosis()">진료기록작성</button>-->
                     </div>
                 </div>
 
@@ -279,7 +279,7 @@
                             <input type="hidden" id="past-record-page" value="">
                         </nav>
                         
-                        <div>
+                        <div id="past-box">
                             <div id="past-title-box">
                                 <input type="hidden" id="past-diagnosis-id">
                                 <h3 id="diagnosis-title">진료기록
@@ -318,8 +318,20 @@
                                 </div>
                             </div>
 
+                            <div class="textarea-box pre-pay-box">
+                                <h4>처방</h4>
+
+                                <div id="past-pay">
+                                    <div>
+                                        1
+                                    </div>
+                                </div>
+                            </div>
+
+
+
                             <div class="textarea-box pre-diagnosis-box">
-                                <h4>처방 | 조제시 참고사항</h4>
+                                <h4>의약품 | 조제시 참고사항</h4>
                                 <div id="pre-prescription-box">
                                     <div id="pre-pills">
                                         <div id="no-pre-pills">
@@ -412,7 +424,7 @@
                         <div class="textarea-box big">
                             <div>
                                 <h4>처방</h4>
-                                <button class="btn sf-mbtn" id="feeSearch">처방 검색</button>
+                                <button class="btn sf-mbtn" id="feeSearch" onclick="getMdfeePopup()">처방 검색</button>
                             </div>
 
                             <div id="pay">

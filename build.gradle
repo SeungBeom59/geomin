@@ -56,6 +56,16 @@ dependencies {
     // logging
     implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16'
 
+    // exel 파일 읽기
+    // HSSF 지원 (xls 형식 지원)
+    implementation group: 'org.apache.poi', name: 'poi', version: '4.1.2'
+    // XSSF 지원 (xlsx 형식 지원)
+    implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
+    // exel 확장자 가져오기
+    implementation 'commons-io:commons-io:2.14.0'
+    // 파일확장자 검사 (스트림의 넘버 가져와서 파일 유형 추정)
+    implementation 'org.apache.tika:tika-core:2.3.0'
+
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.3'
