@@ -2,29 +2,34 @@ package com.geomin.demo.controller;
 
 import com.geomin.demo.dto.MedicalMaterialDTO;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.apache.tika.Tika;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 public class ExelUpload {
 
-    public static String fileName = "★2024.9.1.적용_(인체조직포함)_파일(급여).xlsx";
+//    public static String fileName = "★2024.9.1.적용_(인체조직포함)_파일(급여).xlsx";
+    public static String fileName = "★2024.9.1.적용_(인체조직포함)_파일(정액수가).xlsx";
     public static String filePath = "C:\\Users\\py\\Downloads";
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
+
+        PreparedStatement pstmt = null;
+        Connection con = null;
+
+        // 시작 시간 기록
+        long startTime = System.currentTimeMillis();
 
         try{
             FileInputStream file = new FileInputStream(new File(filePath , fileName));
@@ -37,16 +42,21 @@ public class ExelUpload {
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
+            AtomicInteger id = new AtomicInteger(26056);
 
             // Row, Cell 은 Sheet 안에 있는 행과 열을 의미
             // 첫번째 행 부터 끝까지 읽어라.
-            for(int i = 1; i < 5; i++){
+            // workSheet.getPhysicalNumberOfRows()
+            for(int i = 1; i < workSheet.getPhysicalNumberOfRows(); i++){
 
                 Row row = workSheet.getRow(i);
 
                 MedicalMaterialDTO data = new MedicalMaterialDTO();
+
+                data.setMmId(id.getAndIncrement());
+
                 // row 첫번째에 있는 걸 문자열로 읽어서 가져와서 넣어라.
-                data.setMmCoed(row.getCell(0).getStringCellValue());
+                data.setMmCode(row.getCell(0).getStringCellValue());
 
                 Cell fdCell = row.getCell(1);
 
@@ -67,11 +77,34 @@ public class ExelUpload {
                 }
 
                 data.setMidDivNm(row.getCell(4).getStringCellValue());
-                data.setMidDivCode(row.getCell(5).getStringCellValue());
+
+                Cell mdcCell = row.getCell(5);
+                if(mdcCell.getCellType() == CellType.STRING){
+                    data.setMidDivCode(row.getCell(5).getStringCellValue());
+                }else if(mdcCell.getCellType() == CellType.NUMERIC){
+                    data.setMidDivCode(String.valueOf(row.getCell(5).getNumericCellValue()));
+                }
+
                 data.setMmName(row.getCell(6).getStringCellValue());
-                data.setMmStandard(row.getCell(7).getStringCellValue());
+
+
+                Cell mmsCell = row.getCell(7);
+                if(mmsCell.getCellType() == CellType.STRING){
+                    data.setMmStandard(row.getCell(7).getStringCellValue());
+                }
+                else if(mmsCell.getCellType() == CellType.NUMERIC){
+                    data.setMmStandard(String.valueOf(row.getCell(7).getNumericCellValue()));
+                }
+
                 data.setMmEa(row.getCell(8).getStringCellValue());
-                data.setMmMaxPrc((int) row.getCell(9).getNumericCellValue());
+
+                Cell mmpCell = row.getCell(9);
+                if(mmpCell.getCellType() == CellType.NUMERIC){
+                    data.setMmMaxPrc((int) row.getCell(9).getNumericCellValue());
+                }else if(mmpCell.getCellType() == CellType.STRING){
+                    data.setMmMaxPrc(0);
+                }
+
                 data.setManufacturer(row.getCell(10).getStringCellValue());
                 data.setMmType(row.getCell(11).getStringCellValue());
                 data.setDistributor(row.getCell(12).getStringCellValue());
@@ -80,14 +113,74 @@ public class ExelUpload {
             }
 
 
-            log.info("dataList::{}",dataList);
+//            log.info("dataList::{}",dataList);
 
 
+            Class.forName("org.mariadb.jdbc.Driver");
+
+            con = DriverManager.getConnection(
+                    "jdbc:mariadb://localhost:3306/geomin", "root" , "mariadb");
+
+            String sql
+                    = "Insert into medical_material(mm_id , mm_code, first_date, start_date, mid_div_nm," +
+                    "mid_div_code, mm_name, mm_standard, mm_ea, mm_max_prc, manufacturer, mm_type, distributor)" +
+                    "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+            pstmt = con.prepareStatement(sql);
 
 
-        } catch (IOException e) {
+            int cnt = 0;
+
+            for(MedicalMaterialDTO data : dataList){
+
+                ++cnt;
+
+                pstmt.setInt(1, data.getMmId());
+                pstmt.setString(2, data.getMmCode());
+                pstmt.setString(3, data.getFirstDate());
+                pstmt.setString(4, data.getStartDate());
+                pstmt.setString(5, data.getMidDivNm());
+                pstmt.setString(6, data.getMidDivCode());
+                pstmt.setString(7, data.getMmName());
+                pstmt.setString(8, data.getMmStandard());
+                pstmt.setString(9, data.getMmEa());
+                pstmt.setInt(10, data.getMmMaxPrc());
+                pstmt.setString(11, data.getManufacturer());
+                pstmt.setString(12, data.getMmType());
+                pstmt.setString(13, data.getDistributor());
+
+                pstmt.addBatch();
+                pstmt.clearParameters();
+
+                if((cnt%50) == 0){
+                    pstmt.executeBatch();
+                    pstmt.clearBatch();
+                    con.commit();
+                }
+            }
+
+            pstmt.executeBatch();
+            con.commit();
+        }
+        catch (Exception e){
             e.printStackTrace();
-            throw new RuntimeException(e);
+            con.rollback();
+            throw new RuntimeException();
+        }
+        finally {
+            if(pstmt != null){
+                pstmt.close();
+            }
+            if(con != null){
+                con.close();
+            }
+
+            // 종료 시간 기록
+            long endTime = System.currentTimeMillis();
+            long duration = (endTime - startTime) / 1000; // 초 단위로 변환
+
+            System.out.println(fileName + " 파일의 데이터, DB에 일괄 업데이트 완료.");
+            System.out.println("총 소요 시간: " + duration + "초");
         }
 
     }

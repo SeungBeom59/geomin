@@ -2697,18 +2697,18 @@ function renderPills(pill){
 }
 
 
-//function getMdfeePopup(){
-//
-//    var patientId = $('#new-patientId').val();
-//
-//    if(patientId === null || patientId === ''){
-//            alert('환자 정보를 먼저 설정 해주세요.');
-//            return;
-//    }
-//
-//    var popup = window.open(
-//        `/mdfee-search`,
-//        '수가검색',
-//        'width=800 , height=531 , screenX=500,screenY=100, resizeable=no'
-//    );
-//}
+function getTreatmentPopup(){
+
+    var patientId = $('#new-patientId').val();
+
+    if(patientId === null || patientId === ''){
+            alert('환자 정보를 먼저 설정 해주세요.');
+            return;
+    }
+
+    var popup = window.open(
+        `/treatment-search`,
+        '수가검색',
+        'width=800 , height=535 , screenX=500,screenY=100, resizeable=no'
+    );
+}

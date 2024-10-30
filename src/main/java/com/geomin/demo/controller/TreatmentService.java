@@ -1,11 +1,16 @@
 package com.geomin.demo.controller;
 
-import com.geomin.demo.dto.BillDTO;
+import com.geomin.demo.dto.MedicalMaterialDTO;
 import com.geomin.demo.dto.PagingDTO;
 import com.geomin.demo.dto.ResponseDTO;
+import com.geomin.demo.dto.TreatmentDTO;
+import com.geomin.demo.repository.MedicalMaterialRepository;
+import com.geomin.demo.service.MedicalMaterialService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -26,28 +31,67 @@ import java.util.Date;
 import java.util.List;
 
 // 수가기준정보조회서비스
-@Controller
+@Service
 @Slf4j
-public class MdfeeCrtrInfo {
+@RequiredArgsConstructor
+public class TreatmentService {
 
     @Value("${apis.data.mdfeeCrtrInfoService}")
     private String key;
 
-    public ResponseDTO getApi(String keyword , String code , int page) throws IOException {
+    private final MedicalMaterialService medicalMaterialService;
+
+    public ResponseDTO search(int type , String keyword) throws IOException {
+
+        ResponseDTO result = null;
+        List<MedicalMaterialDTO> dtos = null;
+
+        switch (type){
+            case 1:
+                result = getApi(keyword);
+                dtos = medicalMaterialService.searchMedicalMaterial(keyword);
+                result.setMedicalMaterialDTOList(dtos);
+                break;
+            case 2:
+                result = getApi(keyword);
+                break;
+            case 3:
+                dtos = medicalMaterialService.searchMedicalMaterial(keyword);
+                result = new ResponseDTO();
+                result.setMedicalMaterialDTOList(dtos);
+                break;
+        }
+
+        return result;
+    }
+
+    public ResponseDTO getApi(String keyword) throws IOException {
 
         int pageSize = 5;
+        int page = 0;
 
         StringBuilder urlBuilder = new StringBuilder("http://apis.data.go.kr/B551182/mdfeeCrtrInfoService/getDiagnossMdfeeList"); /*URL*/
         urlBuilder.append("?" + URLEncoder.encode("serviceKey","UTF-8") + "=" + URLEncoder.encode(key , "UTF-8")); /*Service Key*/
         urlBuilder.append("&" + URLEncoder.encode("numOfRows","UTF-8") + "=" + pageSize); /*한 페이지 결과 수*/
         urlBuilder.append("&" + URLEncoder.encode("pageNo","UTF-8") + "=" + page); /*페이지 번호*/
 
-        if(keyword != null){
-            urlBuilder.append("&" + URLEncoder.encode("korNm","UTF-8") + "=" + URLEncoder.encode("재진", "UTF-8")); /*수가 한글명 (검색 유형 : %A%)*/
-        }
-        else if(code != null){
+
+        // code인지 keyword인지 구분 함수 필요.
+
+        if (keyword.matches("^[A-Za-z]{2}\\d+$") || keyword.matches("^[A-Za-z]\\d+$")){
             urlBuilder.append("&" + URLEncoder.encode("mdfeeCd","UTF-8") + "=" + URLEncoder.encode("M6561", "UTF-8")); /*수가코드(검색 유형 : A%)*/
         }
+        else {
+            urlBuilder.append("&" + URLEncoder.encode("korNm","UTF-8") + "=" + URLEncoder.encode("재진", "UTF-8")); /*수가 한글명 (검색 유형 : %A%)*/
+        }
+
+
+//        if(keyword != null){
+//            urlBuilder.append("&" + URLEncoder.encode("korNm","UTF-8") + "=" + URLEncoder.encode("재진", "UTF-8")); /*수가 한글명 (검색 유형 : %A%)*/
+//        }
+//        else if(code != null){
+//            urlBuilder.append("&" + URLEncoder.encode("mdfeeCd","UTF-8") + "=" + URLEncoder.encode("M6561", "UTF-8")); /*수가코드(검색 유형 : A%)*/
+//        }
 //        urlBuilder.append("&" + URLEncoder.encode("mdfeeDivNo","UTF-8") + "=" + URLEncoder.encode("자656가", "UTF-8")); /*수가코드에 대한 분류번호 (검색 유형 : A%)*/
 
 
@@ -117,7 +161,7 @@ public class MdfeeCrtrInfo {
             responseDTO.setPagingDTO(pagingDTO);
 
             NodeList nodeList = doc.getDocumentElement().getElementsByTagName("item");
-            List<BillDTO> bills = new ArrayList<>();
+            List<TreatmentDTO> bills = new ArrayList<>();
 
             for(int i = 0; i < nodeList.getLength(); i++){
                 Node node = nodeList.item(i);
@@ -139,7 +183,7 @@ public class MdfeeCrtrInfo {
                     int unitPrice = Integer.parseInt(element.getElementsByTagName("unprc2").item(0).getTextContent());
                     double costScore = Double.parseDouble(element.getElementsByTagName("cvalPnt").item(0).getTextContent());
 
-                    BillDTO billDTO = BillDTO.builder()
+                    TreatmentDTO billDTO = TreatmentDTO.builder()
                             .startDate(startDate)
                             .benefitType(benefitType)
                             .unitPrice(unitPrice)
@@ -156,7 +200,7 @@ public class MdfeeCrtrInfo {
                 }
             }
 
-            responseDTO.setBillDTOList(bills);
+            responseDTO.setTreatmentDTOList(bills);
             log.info("bills::{}", bills);
 
             return responseDTO;

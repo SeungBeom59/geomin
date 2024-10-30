@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- fontawesome cdn -->
+    <script src="https://kit.fontawesome.com/fa8d81743a.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="/css/treatment_popup.css">
+    <title>Geomin-mdefee-search</title>
+</head>
+<body>
+
+    <section>
+        <article>
+            <div id="search-box">
+    
+                <div>
+                    <input type="text" placeholder="검색어 입력" id="search-bar" autocapitalize="none" onkeyup="search()">
+                </div>
+
+                <div id="search-output">
+                    <ul id="search-nav">
+                        <li class="clicked" value="1">전체검색</li>
+                        <li value="2">진료수가</li>
+                        <li value="3">치료재료</li>
+                    </ul>
+
+                    <div id="output-values">
+                        <ul id="" class="values mdFee">
+                            <li>진료수가</li>
+<!--                            <li><span>A1100190</span><span>의료최고도 입원환자군, 의사3·간호5등급/오전0-6시입원, 9인 이상 병실입원</span> <span class="benefit">급여</span> <span class="no-surgery">비수술</span> </li>-->
+<!--                            <li><span>M6561</span><span>경피적관상동맥스텐트삽입술-단일혈관/</span> <span class="benefit">급여</span> <span class="surgery">수술</span> </li>-->
+<!--                            <li><span>M6561</span><span>경피적관상동맥스텐트삽입술-단일혈관/</span> <span class="benefit">급여</span> <span class="surgery">수술</span> </li>-->
+<!--                            <li><span>M6561</span><span>경피적관상동맥스텐트삽입술-단일혈관/</span> <span class="benefit">급여</span> <span class="surgery">수술</span> </li>-->
+<!--                            <li><span>M6561</span><span>경피적관상동맥스텐트삽입술-단일혈관/</span> <span class="benefit">급여</span> <span class="surgery">수술</span> </li>-->
+                             <div class="no-data" id="treatment-no-data">검색 결과를 찾을 수 없습니다...</div>
+                        </ul>
+
+                        
+    
+                        <ul id="" class="values medinceFee">
+                            <li>치료재료</li>
+<!--                            <li><span>BC1001KZ</span> <span>기능성무릎보호대</span> <span class="entpNm">헬스메드</span></li>-->
+<!--                            <li><span>BC1001KZ</span> <span>기능성무릎보호대</span> <span class="entpNm">헬스메드</span></li>-->
+<!--                            <li><span>BC1001KZ</span> <span>기능성무릎보호대</span> <span class="entpNm">헬스메드</span></li>-->
+<!--                            <li><span>BC1001KZ</span> <span>기능성무릎보호대</span> <span class="entpNm">헬스메드</span></li>-->
+<!--                            <li><span>BC1001KZ</span> <span>기능성무릎보호대</span> <span class="entpNm">헬스메드</span></li>-->
+                            <div class="no-data" id="material-no-data">검색 결과를 찾을 수 없습니다...</div>
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="selected-box">
+                    
+                </div>
+
+                <div id="btn-box">
+                    <button class="btn">확인</button>
+                </div>
+    
+            </div>
+
+    
+
+
+
+        </article>
+    </section>
+
+    
+<script src="https://code.jquery.com/jquery-latest.min.js"></script>
+<script src="/js/treatment_popup.js"></script>
+
+</body>
+</html>

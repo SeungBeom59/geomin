@@ -10,10 +10,10 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BillDTO {
+public class TreatmentDTO {
 
-    private int diagnosisId;            // 진료기록 번호(pk)
-    private int billSeq;                // 수가내역 번호(pk)
+    private int treatmentId;            // 처방수가번호(pk)
+    private int treatmentSeq;                // 처방수가 일련번호(pk)
     private Date startDate;             // 적용시작날짜
     private boolean benefitType;        // 급여구분 (급여|비급여)
     private String feeCode;             // 수가코드

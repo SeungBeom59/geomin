@@ -27,7 +27,9 @@ public class ResponseDTO {
 
     private List<WaitingDTO> waitingDTOList;        // 진료대기 또는 진료완료 환자 모음
 
-    private List<BillDTO> billDTOList;              // 수가 기록 모음 또는 청구서 모음
+    private List<TreatmentDTO> treatmentDTOList;    // 처방수가 기록 모음
+
+    private List<MedicalMaterialDTO> medicalMaterialDTOList;    // 치료재료 모음
 
     // 페이징용
     private int page;                   // 페이지

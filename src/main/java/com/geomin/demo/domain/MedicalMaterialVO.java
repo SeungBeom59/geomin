@@ -1,18 +1,14 @@
-package com.geomin.demo.dto;
+package com.geomin.demo.domain;
 
 import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import java.util.Date;
 
 @ToString
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
-@Setter
 @Builder
-// 의료재료
-public class MedicalMaterialDTO {
+public class MedicalMaterialVO {
+
     private int mmId;               // 진료재료 번호(pk)
     private String mmCode;          // 진료재료 코드
     private String firstDate;       // 최초등재일
@@ -26,4 +22,5 @@ public class MedicalMaterialDTO {
     private String manufacturer;    // 제조회사
     private String mmType;          // 재질
     private String distributor;     // 수입회사
+
 }

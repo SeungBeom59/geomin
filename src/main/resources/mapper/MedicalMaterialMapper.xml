@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Maooer 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.geomin.demo.repository.MedicalMaterialRepository">
+
+    <resultMap id="MedicalMaterialMap" type="com.geomin.demo.domain.MedicalMaterialVO">
+        <id property="mmId" column="mm_id" />
+        <result property="mmCode" column="mm_code" />
+        <result property="firstDate" column="first_date" />
+        <result property="startDate" column="start_date" />
+        <result property="midDivNm" column="mid_div_nm" />
+        <result property="midDivCode" column="mid_div_code" />
+        <result property="mmName" column="mm_name" />
+        <result property="mmStandard" column="mm_standard" />
+        <result property="mmEa" column="mm_ea" />
+        <result property="mmMaxPrc" column="mm_max_prc" />
+        <result property="manufacturer" column="manufacturer" />
+        <result property="mmType" column="mm_type" />
+        <result property="distributor" column="distributor" />
+    </resultMap>
+
+    <select id="getMedicalByName" resultMap="MedicalMaterialMap">
+        SELECT
+            *
+        FROM
+            MEDICAL_MATERIAL
+        WHERE
+            MM_NAME LIKE CONCAT (#{keyword} , '%')
+        LIMIT
+            5
+    </select>
+
+    <select id="getMedicalByCode" resultMap="MedicalMaterialMap">
+        SELECT
+            *
+        FROM
+            MEDICAL_MATERIAL
+        WHERE
+            MM_CODE LIKE CONCAT (#{keyword} , '%')
+        LIMIT
+            5
+    </select>
+
+
+</mapper>

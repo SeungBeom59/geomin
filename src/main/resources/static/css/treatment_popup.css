@@ -1,0 +1,230 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard-dynamic-subset.css');
+/* pretendard 폰트 cdn */
+
+/* 기본 설정 */
+/* http://meyerweb.com/eric/tools/css/reset/ 
+    v2.0 | 20110126
+    License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+    box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+}
+
+
+/****************************************************************************************/
+
+body {
+    background-color: #e8edf6;
+    font-family: 'Pretendard' , 'sans-serif';
+    box-sizing: border-box;
+    width: 800px;
+    height: 500px;
+    /*border: 1px solid black;*/
+}
+
+section {
+
+}
+
+article {
+    background-color: #FFFFFF;
+    /* border: 1px solid black; */
+    height: 450px;
+    width: 750px;
+    margin-left: 25px;
+    margin-top: 25px;
+}
+
+#search-box {
+    width: 650px;
+    box-sizing: border-box;
+    /* border: 1px solid black; */
+    margin-left: 50px;
+    padding-top: 50px;
+}
+
+/* #search-box > div > select {
+    display: block;
+    height: 30px;
+}
+
+#search-btn {
+    cursor: pointer;
+}
+*/
+
+#search-box > div > input {
+    width: 630px; height: 24px;
+    font-size: 20px;
+}
+
+/* #search-box > div > input:focus {
+    border-radius: 2px;
+} */
+
+#search-output {
+    position: absolute;
+     display: none;
+    border: 1px;
+    border-top: 0;
+    height: 250px;
+    border-radius: 0 0 10px 10px;
+    z-index: 9999;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    background-color: #FFFFFF;
+}
+
+#output-values {
+    /* border: 1px solid red; */
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: 200px;
+    margin-top: 5px;
+}
+
+#output-values::-webkit-scrollbar {
+    display: none;
+}
+
+#output-values {
+    -ms-overflow-style: none; 
+    scrollbar-width: none; 
+}
+
+#search-nav {
+    list-style: none;
+    display: flex;
+    border-bottom: 1px solid rgb(120, 120, 120);
+    justify-content: space-around;
+    padding-block: 5px;
+}
+
+#search-nav > li {
+    /* border: 1px solid; */
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.clicked {
+    border-bottom: 3px solid #569EC7;
+    color: #569EC7;
+}
+
+/**************************************************************/
+
+.values {
+    list-style: none;
+    /* border: 1px solid; */
+    width: 620px;
+    height: 140px;
+    margin-left: 15px;
+    margin-top: 20px;
+    overflow-y: auto;
+}
+
+.values::-webkit-scrollbar {
+    display: none;
+}
+
+.values {
+    -ms-overflow-style: none; 
+    scrollbar-width: none; 
+}
+
+.values > li:first-child {
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size: 18px;
+}
+
+.values > li:not(li:first-child):hover {
+    font-weight: bold;
+    background-color: #93b4c7bb;
+    cursor: pointer;
+}
+
+.values > li:not(li:first-child) {
+    text-indent: 5px;
+    padding-top: 3px;
+    font-size: 14px;
+}
+
+.values > li:not(li:first-child) > span {
+    margin-right: 10px;
+}
+
+.values > li:not(li:first-child) > span:first-child {
+    font-weight: bold;
+}
+
+.benefit , .non-benefit , .surgery , .no-surgery , .entpNm {
+    font-weight: bold;
+}
+
+.entpNm , .benefit {color: #279B33;}
+.non-benefit {color: #569EC7;}
+.surgery {color: #c45b15;}
+.no-surgery {color: red;}
+
+
+.no-data {
+    /* border: 1px solid; */
+    height: 90px;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 20px;
+    color: #c45b15;
+}
+
+/****************************************************************/
+#selected-box {
+    border: 1px solid rgb(120, 120, 120);
+    margin-top: 20px;
+    height: 280px;
+    border-radius: 5px;
+    width: 638px;
+}
+
+
+
+/****************************************************************/
+
+/* 버튼 기본양식 */
+.btn {
+    display: inline-block;
+    border-radius: 10px;
+    border: 0;
+    width: 60px; height: 24px;
+    background-color: #444343;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+#btn-box {
+    display: flex;
+    justify-content: end;
+    margin-top: 20px;
+    margin-right: 10px;
+}

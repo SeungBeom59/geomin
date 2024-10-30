@@ -99,7 +99,9 @@ public class WaitingServiceImpl implements WaitingService {
 
         List<WaitingVO> result = waitingRepository.getWaitingList(offset , departmentId);
 
-//        log.info("result::{}" , result);
+        log.info("result::{}" , result);
+        log.info("***********************************************************");
+        log.info("departmentId::{}" , departmentId);
 
         List<WaitingDTO> content = new ArrayList<>();
 
