@@ -13,14 +13,14 @@ import java.util.Date;
 public class TreatmentDTO {
 
     private int treatmentId;            // 처방수가번호(pk)
-    private int treatmentSeq;                // 처방수가 일련번호(pk)
+    private int treatmentSeq;           // 처방수가 일련번호(pk)
     private Date startDate;             // 적용시작날짜
     private boolean benefitType;        // 급여구분 (급여|비급여)
     private String feeCode;             // 수가코드
     private String feeDivNum;           // 수가분류번호
     private boolean surgeryYn;          // 수술구분
     private int unitPrice;              // 단가
-    private String unitPriceType;       // 단가구분
+//    private String unitPriceType;       // 단가구분
     private double costScore;           // 상대가치점수
     private String codeName;            // 수가명
     private int benefit;                // 공단부담금

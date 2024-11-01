@@ -34,6 +34,7 @@ public class MedicalMaterialServiceImpl implements MedicalMaterialService{
         for(MedicalMaterialVO vo : result){
 
             MedicalMaterialDTO dto = MedicalMaterialDTO.builder()
+                    .mmId(vo.getMmId())
                     .mmCode(vo.getMmCode())
                     .mmName(vo.getMmName())
                     .manufacturer(vo.getManufacturer())

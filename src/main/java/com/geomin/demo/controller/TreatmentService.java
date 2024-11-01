@@ -27,6 +27,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -67,8 +68,8 @@ public class TreatmentService {
 
     public ResponseDTO getApi(String keyword) throws IOException {
 
-        int pageSize = 5;
-        int page = 0;
+        int pageSize = 10;
+        int page = 1;
 
         StringBuilder urlBuilder = new StringBuilder("http://apis.data.go.kr/B551182/mdfeeCrtrInfoService/getDiagnossMdfeeList"); /*URL*/
         urlBuilder.append("?" + URLEncoder.encode("serviceKey","UTF-8") + "=" + URLEncoder.encode(key , "UTF-8")); /*Service Key*/
@@ -79,10 +80,10 @@ public class TreatmentService {
         // code인지 keyword인지 구분 함수 필요.
 
         if (keyword.matches("^[A-Za-z]{2}\\d+$") || keyword.matches("^[A-Za-z]\\d+$")){
-            urlBuilder.append("&" + URLEncoder.encode("mdfeeCd","UTF-8") + "=" + URLEncoder.encode("M6561", "UTF-8")); /*수가코드(검색 유형 : A%)*/
+            urlBuilder.append("&" + URLEncoder.encode("mdfeeCd","UTF-8") + "=" + URLEncoder.encode(keyword, "UTF-8")); /*수가코드(검색 유형 : A%)*/
         }
         else {
-            urlBuilder.append("&" + URLEncoder.encode("korNm","UTF-8") + "=" + URLEncoder.encode("재진", "UTF-8")); /*수가 한글명 (검색 유형 : %A%)*/
+            urlBuilder.append("&" + URLEncoder.encode("korNm","UTF-8") + "=" + URLEncoder.encode(keyword, "UTF-8")); /*수가 한글명 (검색 유형 : %A%)*/
         }
 
 
@@ -115,7 +116,7 @@ public class TreatmentService {
                 response.append(inputLine);
             }
             br.close(); // 마지막으로 버퍼리더는 닫아라.
-            System.out.println(response.toString());
+            log.info(response.toString());
             responseDTO = parseXML(response.toString());
 
         } else {
@@ -173,18 +174,31 @@ public class TreatmentService {
                     String codeName = element.getElementsByTagName("korNm").item(0).getTextContent();
                     String feeDivNum = element.getElementsByTagName("mdfeeDivNo").item(0).getTextContent();
                     String sd = element.getElementsByTagName("adtStaDd").item(0).getTextContent();
-                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+                    SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
                     Date startDate = format.parse(sd);
 
-                    boolean benefitType = element.getElementsByTagName("payTpCd").item(0).getTextContent().equals("1");
-                    boolean surgeryYn = element.getElementsByTagName("soprTpNm").item(0).getTextContent().equals("1");
-                    boolean deductibleA = element.getElementsByTagName("slfBrdnRtCzaApvYn").item(0).getTextContent().equals("1");
-                    boolean deductibleB = element.getElementsByTagName("slfBrdnRtCzaBpvYn").item(0).getTextContent().equals("1");
+                    // jvm에서는 utc 기준이기 때문에, 한국시간보다 9시간 빠진 2023/12/31 15:00 로 값이 나오고 있음.
+                    // LocalDate를 사용해서  timezone을 Asia/seoul로 잡아주면 문제를 해결할 수는 있는데,
+                    // 여태 모두 Date로 사용하고 있어서 모두 바꾸기에는 시간이 안될 것 같음.
+                    // 아래와 같이 일단 9시간 여기에만 더해주는 식으로 작동. 인지할것.
+
+                    // 9시간을 더하기 위해 Calendar 사용
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(startDate);
+                    calendar.add(Calendar.HOUR_OF_DAY, 9);  // 9시간 추가
+                    Date adjustedDate = calendar.getTime();  // 조정된 시간
+
+                    boolean benefitType = element.getElementsByTagName("payTpCd").item(0).getTextContent().equals("급여");
+                    boolean surgeryYn = element.getElementsByTagName("soprTpNm").item(0).getTextContent().equals("수술");
+
+                    boolean deductibleA = element.getElementsByTagName("slfBrdnRtCzaApvYn").item(0).getTextContent().equals("Y");
+                    boolean deductibleB = element.getElementsByTagName("slfBrdnRtCzbApvYn").item(0).getTextContent().equals("Y");
+
                     int unitPrice = Integer.parseInt(element.getElementsByTagName("unprc2").item(0).getTextContent());
                     double costScore = Double.parseDouble(element.getElementsByTagName("cvalPnt").item(0).getTextContent());
 
                     TreatmentDTO billDTO = TreatmentDTO.builder()
-                            .startDate(startDate)
+                            .startDate(adjustedDate)
                             .benefitType(benefitType)
                             .unitPrice(unitPrice)
                             .costScore(costScore)

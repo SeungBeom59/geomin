@@ -29,7 +29,7 @@
         WHERE
             MM_NAME LIKE CONCAT (#{keyword} , '%')
         LIMIT
-            5
+            10
     </select>
 
     <select id="getMedicalByCode" resultMap="MedicalMaterialMap">
@@ -40,7 +40,7 @@
         WHERE
             MM_CODE LIKE CONCAT (#{keyword} , '%')
         LIMIT
-            5
+            10
     </select>
 
 

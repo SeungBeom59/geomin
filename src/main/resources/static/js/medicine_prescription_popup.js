@@ -91,7 +91,7 @@ $('#pills').on('click', 'li:last-child', function() {
     // 일관성을 높이고 즉시 반영되도록 하기 위함이다. 물론 이후에 다시 옵저버가 콜백함수로서 실행하게 된다.
     updateLocalStorage();
 });
-// input에 값이 바뀔 때마다 없데이트
+// input에 값이 바뀔 때마다 업데이트
 $('#pills').on('input' , 'input' , function (){
     updateLocalStorage();
 });

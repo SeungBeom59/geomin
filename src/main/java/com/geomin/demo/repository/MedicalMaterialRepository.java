@@ -8,10 +8,10 @@ import java.util.List;
 @Mapper
 public interface MedicalMaterialRepository {
 
-    // 치료재료명으로 검색하기 (LIMIT 5개)
+    // 치료재료명으로 검색하기 (LIMIT 10개)
     List<MedicalMaterialVO> getMedicalByName(String keyword);
 
-    // 치료재료코드로 검색하기 (LIMIT 5개)
+    // 치료재료코드로 검색하기 (LIMIT 10개)
     List<MedicalMaterialVO> getMedicalByCode(String keyword);
 
 
