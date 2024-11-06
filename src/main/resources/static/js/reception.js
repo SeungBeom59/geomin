@@ -18,6 +18,8 @@ $(document).ready(function (){
 
 
 
+
+
     // // 첨부파일 박스 html
     // const fileDragBox = $('#file-drag-box');
     //
@@ -328,6 +330,7 @@ function updateDiagnosis(){
 
     var symptomsValue = $('#symptoms-record').val().trim();
     var diagnosisValue = $('#diagnosis-record').val().trim();
+
     if(!symptomsValue || !diagnosisValue){
         alert('증상 및 진료 기록은 필수입니다. ');
         return;
@@ -403,8 +406,7 @@ function updateDiagnosis(){
         kcds.push(kcdData);
     });
     if(kcds.length > 0){
-        data.append("kcds",
-            new Blob([JSON.stringify(kcds)] , {type : "application/json; charset=utf-8"}));
+        data.append("kcds", new Blob([JSON.stringify(kcds)] , {type : "application/json; charset=utf-8"}));
     }
     // 삭제예정 질병기록코드 데이터 가져오기
     // var deleteKcds = [];
@@ -2097,7 +2099,7 @@ function insertDiagnosis(response){
         $('#no-files').hide();  // 저장된 파일 없음 설명글 비활성화
 
         if(fileInfo !== null && fileInfo.length > 0 ){
-            console.log("이게 된다고???????????????????????")
+
             $('#file-drag-box > i').hide();
             $('#file-drag-box > p').hide();
 
@@ -2109,7 +2111,7 @@ function insertDiagnosis(response){
             console.log($('#fileId').val(fileInfo.at(0).fileId));
         }
         else{
-            console.log('실행되었어어어어ㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓ')
+
             $('#file-drag-box > i').show();
             $('#file-drag-box > p:nth-child(2)').show();
         }
@@ -2712,3 +2714,82 @@ function getTreatmentPopup(){
         'width=800 , height=535 , screenX=500,screenY=100, resizeable=no'
     );
 }
+
+function receiveTreatmentInfo(allData) {
+    console.log('allData : ' , allData);
+
+    var treatmentList = Array.isArray(allData.treatment)? allData.treatment : [];
+    var medicalList = Array.isArray(allData.medical)? allData.medical : [];
+    // 둘 중 하나라도 받아온 데이터가 있다면 기존 데이터 모두 삭제.
+    if(treatmentList.length > 0 || medicalList.length > 0){
+        $('#no-pay').css('display' , 'none');
+        $('#pay ul').empty();  // 하위 html 모두 삭제
+    }
+
+    if(treatmentList.length > 0){
+        treatmentList.forEach(function(treatment){
+            renderTreatment(treatment);
+        });
+    }
+
+    if(medicalList.length > 0){
+        medicalList.forEach(function(medical){
+            renderMedical(medical);
+        });
+    }
+
+}
+
+function renderTreatment(treatment){
+
+    var treatmentBox = $('#treatment-box');
+    treatmentBox.css('display' , 'block');
+
+    var benefitType = treatment.benefitType == true? '급여' : '비급여';
+    var benefitClass = treatment.benefitType == true? 'benefit' : 'non-benefit';
+    var surgeryYn = treatment.surgeryYn == true? '수술' : '비수술';
+    var surgeryClass = treatment.surgeryYn == true? 'surgery' : 'no-surgery';
+
+    var treatmentHtml =
+        '<li class="treatment-data">' +
+        '<div>' +
+        '<span>' + treatment.feeCode + '</span>' +
+        '<span>' + treatment.codeName + '</span>' +
+        '<span class="' + benefitClass + '">' + benefitType + '</span>' +
+        '<span class="' + surgeryClass + '">' + surgeryYn + '</span>' +
+        '<input type="hidden" class="costScore" value="' + treatment.costScore + '">' +
+        '<input type="hidden" class="benefitType" value="' + treatment.benefitType +'">' +
+        '<input type="hidden" class="unitPrice" value="' + treatment.unitPrice + '">' +
+        '<input type="hidden" class="feeDivNum" value="' + treatment.feeDivNum + '">' +
+        '<input type="hidden" class="surgeryYn" value="' + treatment.surgeryYn + '">' +
+        '<input type="hidden" class="deductibleA" value="' + treatment.deductibleA + '">' +
+        '<input type="hidden" class="deductibleB" value="' + treatment.deductibleB + '">' +
+        '<input type="hidden" class="startDate" value="' + treatment.startDate + '">' +
+        '</div>' +
+        '<div class="delete-data">X</div>'
+        '</li>';
+
+    treatmentBox.append(treatmentHtml);
+}
+
+function renderMedical(medical){
+
+    var medicalBox = $('#medical-box');
+    medicalBox.css('display' , 'block');
+
+    var medicalHtml =
+        '<li class="medical-data">' +
+        '<div>' +
+        '<span>' + medical.mmCode + '</span>' +
+        '<span>' + medical.mmName + '</span>' +
+        '<input type="hidden" class="mmId" value="' + medical.mmId + '">' +
+        '</div>' +
+        '<div class="delete-data">X</div>' +
+        '</li>';
+
+    medicalBox.append(medicalHtml);
+}
+
+$('#pay ul').on('click' , '.delete-data' , function(){
+    $(this).closest('li').remove();
+});

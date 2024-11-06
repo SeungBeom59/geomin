@@ -61,7 +61,6 @@ public class HomeController {
         UserSecurityDTO user = userService.getUser(principal.getName());
 //        log.info("user::{}" , user);
 
-        log.info("여기까지는 실행되었음");
         Page<WaitingDTO> waitingList = waitingService.getWaitingList(pageable , user.getDepartmentId());
         log.info("page" + waitingList.getPageable());
         log.info("totalPage " + waitingList.getTotalPages());

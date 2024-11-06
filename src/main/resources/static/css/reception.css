@@ -1347,3 +1347,62 @@ th , td {
     justify-content: center;
 }
 
+#pay {
+    align-items : normal;
+    display : block;
+    overflow-y : scroll;
+}
+
+#treatment-box , #medical-box {
+    margin : 0; padding : 0;
+    list-style : none;
+    display : none;
+    font-size : 14px;
+}
+
+#no-pay {
+    display : flex;
+    justify-content : center;
+    align-items : center;
+    height : 130px;
+}
+
+#pay > ul > li {
+    display : flex;
+    justify-content : space-between;
+    border-bottom: 1px solid #7b7a7a;
+}
+
+#pay > ul > li > div:last-child {
+    margin-right : 10px;
+    color: #9B2727;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#pay > ul > li:hover {
+    background-color: #93b4c7bb;
+}
+
+#pay > ul > li > div > span:first-child {
+    font-weight : bold;
+    display : inline-block;
+    width : 85px;
+}
+
+#pay > ul > li > div > span:not(span:first-child) {
+    margin-left : 5px;
+}
+
+#pay > ul > li > div > span:nth-child(2) {
+    display : inline-block;
+    width : 450px;
+    overflow-y: scroll;
+    height: 16px;
+    scrollbar-width: none;
+}
+
+.entpNm , .benefit {color: #279B33;}
+.non-benefit {color: #569EC7;}
+.surgery {color: #c45b15;}
+.no-surgery {color: red;}

@@ -169,15 +169,34 @@ article {
 
 .values > li:not(li:first-child) > span {
     margin-right: 10px;
+    /*border : 1px solid red;*/
 }
 
 .values > li:not(li:first-child) > span:first-child {
     font-weight: bold;
+    width : 73px;
+}
+
+.values > li:not(li:first-child) > span:nth-child(2) {
+    width : 400px;
+    height : 17px;
+    overflow-x : scroll;
+    scrollbar-width : none;
+    -ms-overflow-style: none;
+    font-size : 12px;
+    line-height : 17px;
+}
+
+.treatment-data {
+    display : flex;
+    /*border : 1px solid;*/
 }
 
 .benefit , .non-benefit , .surgery , .no-surgery , .entpNm {
     font-weight: bold;
 }
+
+
 
 .entpNm , .benefit {color: #279B33;}
 .non-benefit {color: #569EC7;}
@@ -203,6 +222,7 @@ article {
     height: 280px;
     border-radius: 5px;
     width: 638px;
+    overflow-y : scroll;
 }
 
 #selected-box ul {
@@ -215,12 +235,19 @@ article {
     justify-content: space-between;
 }
 
+#selected-box > ul > li:hover {
+    background-color: #93b4c7bb;
+}
+
 #selected-box > ul > li > div > span:first-child {
     font-weight: bold;
+    display : inline-block;
+    width : 80px;
 }
 
 #selected-box > ul > li > div > span {
     margin-left : 5px;
+    padding-top : 2px;
 }
 
 #selected-box > ul > li > div:last-child {
@@ -228,6 +255,32 @@ article {
     color : #9B2727;
     cursor : pointer;
     font-weight : bold;
+    padding-top : 3px;
+}
+
+.selected-treatment > div > span:nth-child(2),
+.selected-medical > div > span:nth-child(2),
+.selected-medical > div > span:nth-child(3) {
+    display: inline-block;
+    overflow-y: scroll;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    line-height : 18px;
+}
+
+.selected-treatment > div > span:nth-child(2) {
+    width: 410px;
+    height: 18px;
+}
+
+.selected-medical > div > span:nth-child(2) {
+    width: 350px;
+    height: 18px;
+}
+
+.selected-medical > div > span:nth-child(3) {
+    width : 145px;
+    height : 18px;
 }
 
 /****************************************************************/
@@ -250,4 +303,13 @@ article {
     justify-content: end;
     margin-top: 20px;
     margin-right: 10px;
+}
+
+.reset {
+    background-color : #9B2727;
+    margin-right : 20px;
+}
+
+.ok {
+
 }

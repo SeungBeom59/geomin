@@ -19,12 +19,30 @@ $(document).ready(function() {
         $('#search-output').hide(); // 클릭 시 결과박스 숨기기
     });
 
+    // 검색결과 클릭할 경우, selected-box에 해당 html 담기
     $('#treatmentBox , #medicalBox').on('click' , '.treatment-data , .medical-data' , function(){
-        console.log('클릭됨');
+
         var selectedData = $(this).html();
-        $('#selected-box ul').append(
-            '<li><div>' + selectedData + '</div>' +
-            '<div class="delete-btn">X</div></li>');
+
+        if($(this).hasClass('treatment-data')){
+
+            var unitPrice = $(this).find('.unitPrice').val();
+            var benefitType = $(this).find('.benefitType').val();
+            // 병원단가가 없는데 급여인 경우, 병원의 치료수가가 아니므로 불가처리.
+            if(unitPrice == "0" && benefitType == "true"){
+                alert('병원에서 적용할 수 없는 치료수가 입니다.');
+                return;
+            }
+
+            $('#selected-box ul').append(
+                        '<li class="selected-treatment"><div>' + selectedData + '</div>' +
+                        '<div class="delete-btn">X</div></li>');
+        }
+        else if($(this).hasClass('medical-data')){
+            $('#selected-box ul').append(
+                        '<li class="selected-medical"><div>' + selectedData + '</div>' +
+                        '<div class="delete-btn">X</div></li>');
+        }
     });
 
 
@@ -50,7 +68,68 @@ $(document).ready(function() {
             $('#treatmentBox').css('display' , 'none');
             $('#medicalBox').css('display' , 'block');
         }
+
+        search();   // 클릭되면 자동 검색함수 실행되도록.
     });
+
+    // 초기화 버튼을 누르면 선택박스에 담긴 모든 데이터들을 삭제.
+    $('.reset').on('click' , function(){
+        $('#selected-box ul').empty();
+    });
+
+    // 확인 버튼을 누르면 선택박스에 담긴 모든 데이터들을 json으로 만들어서 호출했던 부모창의 함수로 전달.
+    $('.ok').on('click' , function(){
+
+        // 담긴 정보가 없을 경우에는 알림을 주고 실행되지 않도록 한다.
+        if($('#selected-box ul').children().length === 0){
+            alert('담긴 정보가 없습니다.');
+            return;
+        }
+
+        var treatmentList = []; // 치료수가 담을 배열 변수
+        var medicalList = []; // 치료재료 담을 배열 변수
+
+        // 선택박스 안에 치료수가들이 모두 key:value 형태로서 담기도록.
+        $('#selected-box ul .selected-treatment').each(function(){
+            var item = $(this);
+            var data = {
+                feeCode : item.find('span:nth-child(1)').text(),
+                codeName : item.find('span:nth-child(2)').text(),
+                benefit: item.find('.benefit').text(),
+                surgery: item.find('.no-surgery').text(),
+                costScore: item.find('.costScore').val(),
+                benefitType: item.find('.benefitType').val(),
+                unitPrice: item.find('.unitPrice').val(),
+                feeDivNum: item.find('.feeDivNum').val(),
+                surgeryYn: item.find('.surgeryYn').val(),
+                deductibleA: item.find('.deductibleA').val(),
+                deductibleB: item.find('.deductibleB').val(),
+                startDate: item.find('.startDate').val()
+            }
+            treatmentList.push(data);
+        });
+        // 선택박스 안에 치료재료들이 모두 key:value 형태로서 담기도록
+        $('#selected-box ul .selected-medical').each(function(){
+
+            var item = $(this);
+            var data = {
+                mmId : item.find('.mmId').val(),
+                mmCode : item.find('span:nth-child(1)').text(),
+                mmName : item.find('span:nth-child(2)').text()
+            }
+            medicalList.push(data);
+        });
+
+        // 부모창에 보낼 변수 모음
+        var allData = {
+            treatment : treatmentList,
+            medical : medicalList
+        };
+
+        opener.parent.receiveTreatmentInfo(allData); // 부모창에서 받을 함수 호출
+        window.self.close();    // 팝업창 닫기
+    });
+
 });
 
 // selected-box에서 클릭이벤트가 발생한 요소의 class가 delete-btn이라면 삭제.
@@ -179,15 +258,17 @@ function insertMedicalMaterial(medicalMaterialList){
             dataHtmlBox +=
                 '<li class="medical-data">' +
                 '<span>' + medical.mmCode + '</span>' +
-                '<span>' + medical.mmName + '</span>';
+                '<span>' + medical.mmName + '</span>' +
+                '<span class="entpNm">' + medical.distributor + '</span>' +
+                '<input type="hidden" class="mmId" value="' + medical.mmId + '"></li>';
 
-            if(medical.distributor != null){
-                dataHtmlBox += '<span class="entpNm">' + medical.distributor + '</span>' +
-                    '<input type="hidden" class="mmId" value="' + medical.mmId + '"></li>';
-            }
-            else {
-                dataHtmlBox += '</li>';
-            }
+//            if(medical.distributor != null && medical.distributor != '-'){
+//                dataHtmlBox += '<span class="entpNm">' + medical.distributor + '</span>' +
+//                    '<input type="hidden" class="mmId" value="' + medical.mmId + '"></li>';
+//            }
+//            else {
+//                dataHtmlBox += '<input type="hidden" class="mmId" value="' + medical.mmId + '"></li>';
+//            }
 
         })
 
