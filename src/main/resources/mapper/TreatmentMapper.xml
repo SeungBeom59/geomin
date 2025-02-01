@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Maooer 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.geomin.demo.repository.TreatmentRepository">
+
+
+    <!--<resultMap id="TreatmentMap" type="com.geomin.demo.domain.TreatmentVO">
+        <id property="treatmentId" column="treatment_id" />
+        <id property="treatmentSeq" column="treatment_seq" />
+        <result property="startDate" column="start_date" />
+        <result property="benefitType" column="benefit_type" />
+        <result property="feeCode" column="fee_code" />
+    </resultMap>-->
+
+    <select id="getLastTreatmentId">
+        SELECT
+            IFNULL( MAX(TREATMENT_ID) , 0 )
+        FROM
+            TREATMENT
+    </select>
+
+    <insert id="insertTreatments">
+        INSERT INTO TREATMENT
+            ( TREATMENT_ID , TREATMENT_SEQ , BENEFIT_TYPE , CODE_NAME , COST_SCORE,
+              DEDUCTIBLE_A , DEDUCTIBLE_B , FEE_CODE , FEE_DIV_NUM , START_DATE,
+              SURGERY_YN , UNIT_PRICE)
+        VALUES
+        <foreach collection="treatmentVOs" item="treatment" separator=",">
+            ( #{treatment.treatmentId} , #{treatment.treatmentSeq} , #{treatment.benefitType} ,
+              #{treatment.codeName} , #{treatment.costScore} , #{treatment.deductibleA} , #{treatment.deductibleB} ,
+              #{treatment.feeCode} , #{treatment.feeDivNum} , #{treatment.startDate} ,
+              #{treatment.surgeryYn} , #{treatment.unitPrice} )
+        </foreach>
+    </insert>
+
+    <delete id="deleteById">
+        DELETE FROM
+            TREATMENT
+        WHERE
+            TREATMENT_ID = #{treatmentId}
+    </delete>
+
+    <select id="getTreatmentById">
+        SELECT
+            *
+        FROM
+            TREATMENT
+        WHERE
+            TREATMENT_ID = #{treatmentId}
+    </select>
+</mapper>

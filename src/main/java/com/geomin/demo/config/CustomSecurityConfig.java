@@ -35,7 +35,7 @@ public class CustomSecurityConfig {
     // Spring 3.0 이상 버전부터는 Spring Security 6.0 이상 버전만 사용가능, 기존방식 불가.
     // webSecurityConfigureadapter를 extends 해서 만들기도 했는데 deprecated 되어서 더 이상 사용불가.
     // 무조건 @Bean 등록한 SecurityFilterChain 만들어서 이용!
-    // spring security 6.1.0 부터는 메서드 체이닝의 사용을 지향하고 람다식을 통해 함수형을 설정해야함.
+    // spring security 6.1.0 부터는 메서드 체이닝의 사용을 지양하고 람다식을 통해 함수형을 설정해야함.
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         log.info("-----------------------configur---------------------");

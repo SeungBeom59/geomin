@@ -1,5 +1,6 @@
 package com.geomin.demo.dto;
 
+import com.geomin.demo.domain.MedicalBillVO;
 import lombok.*;
 
 import java.util.List;
@@ -30,6 +31,7 @@ public class ResponseDTO {
     private List<TreatmentDTO> treatmentDTOList;    // 처방수가 기록 모음
 
     private List<MedicalMaterialDTO> medicalMaterialDTOList;    // 치료재료 모음
+    private List<MedicalBillDTO> medicalBillDTOList;            // 치료재료청구 모음
 
     // 페이징용
     private int page;                   // 페이지

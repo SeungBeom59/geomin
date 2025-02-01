@@ -5,6 +5,7 @@
 
 <mapper namespace="com.geomin.demo.repository.MedicalMaterialRepository">
 
+    <!--치료재료 테이블-->
     <resultMap id="MedicalMaterialMap" type="com.geomin.demo.domain.MedicalMaterialVO">
         <id property="mmId" column="mm_id" />
         <result property="mmCode" column="mm_code" />
@@ -19,6 +20,13 @@
         <result property="manufacturer" column="manufacturer" />
         <result property="mmType" column="mm_type" />
         <result property="distributor" column="distributor" />
+    </resultMap>
+
+    <!--치료재료청구 테이블-->
+    <resultMap id="MedicalBillMap" type="com.geomin.demo.domain.MedicalBillVO">
+        <id property="medicalBillId" column="medical_bill_id" />
+        <id property="medicalBillSeq" column="medical_bill_seq" />
+        <association property="medical" resultMap="MedicalMaterialMap" column="mm_id"/>
     </resultMap>
 
     <select id="getMedicalByName" resultMap="MedicalMaterialMap">
@@ -43,5 +51,44 @@
             10
     </select>
 
+
+    <!--****************************************************************************************-->
+    <!--치료재료청구 테이블에서 마지막 pk 가져오기-->
+    <select id="getLastMedicalBillId">
+        SELECT
+            IFNULL(MAX(MEDICAL_BILL_ID) , 0)
+        FROM
+            MEDICAL_BILL
+    </select>
+    <!--치료재료청구 테이블에서 pk로 레코드 삭제-->
+    <delete id="deleteByMedicalBillId">
+        DELETE FROM
+            MEDICAL_BILL
+        WHERE
+            MEDICAL_BILL_ID = #{medicalBillId}
+    </delete>
+    <!--치료재료청구 테이블에 insert-->
+    <insert id="insertMedicalBills">
+        INSERT INTO MEDICAL_BILL
+            (MEDICAL_BILL_ID , MEDICAL_BILL_SEQ ,  MM_ID)
+        VALUES
+        <foreach collection="medicalBillVOS" item="medicalBill" separator=",">
+            ( #{medicalBill.medicalBillId} , #{medicalBill.medicalBillSeq} , #{medicalBill.medical.mmId})
+        </foreach>
+    </insert>
+    <!--치료재료청구 테이블에서 pk로 레코드 조회하여 참조되는 치료재료들 가져오기-->
+    <select id="getMaterialByBillId" resultMap="MedicalBillMap">
+        SELECT
+            MB.*,
+            MM.*
+        FROM
+            MEDICAL_BILL MB
+        LEFT OUTER JOIN
+            MEDICAL_MATERIAL MM
+        ON
+            MB.MM_ID = MM.MM_ID
+        WHERE
+            MB.MEDICAL_BILL_ID = #{medicalBillId}
+    </select>
 
 </mapper>

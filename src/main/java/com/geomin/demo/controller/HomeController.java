@@ -4,6 +4,7 @@ import com.geomin.demo.dto.*;
 import com.geomin.demo.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.BridgeMethodResolver;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -33,6 +34,10 @@ public class HomeController {
     private final KcdService kcdService;
     private final FileService fileService;
     private final MedicineService medicineService;
+    private final TreatmentService treatmentService;
+    private final MedicalMaterialService medicalMaterialService;
+
+
 
     // 로그인
     @GetMapping("/login")
@@ -360,8 +365,8 @@ public class HomeController {
         log.info("response::{}",response);
 
         if(response == null){
-            log.info("response = null : server error");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("데이터 정보 없음");
+            log.info("response = null : 환자 과거 진료기록 없음..");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("데이터 정보 없음");
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -426,6 +431,8 @@ public class HomeController {
             @RequestPart(value = "pills" , required = false) List<MedicineDTO> pills,
             @RequestPart(value = "deleteFiles" , required = false) List<Integer> deleteFiles,
             @RequestPart(value = "kcds" , required = false) List<KcdDTO> kcds ,
+            @RequestPart(value = "treatments" , required = false) List<TreatmentDTO> treatments ,
+            @RequestPart(value = "medicals" , required = false) List<MedicalMaterialDTO> medicals,
             Principal principal){
 
         log.info("post >> /diagnosis-update... updateDiagnosis() 실행.");
@@ -435,10 +442,13 @@ public class HomeController {
         log.info("pills::{}" , pills);
         log.info("deleteFiles::{}" , deleteFiles);
         log.info("kcds::{}" , kcds);
+        log.info("medicals::{}" , medicals);
+        log.info("treatments::{}" , treatments);
 
         UserSecurityDTO user = userService.getUser(principal.getName());    // 신원확인 정보 가져오기
         ResponseDTO result;
 
+        // ---------------- 판별 분기 너무 많아서 controller 로직 파악 어려움, 숨길수 있도록 서비스로 넘기도록.-------------
         // kcdId, 질병기록이 존재하지 않고  저장시킬 kcd가 존재하는가? (신규)
         if(diagnosisDTO.getKcdId() <= 0 && kcds != null){
             int kcdId = kcdService.addKcd(kcds);
@@ -481,6 +491,28 @@ public class HomeController {
             diagnosisDTO.setMedicineId(medicineId);
         }
 
+        // treatmentId가 존재하지 않고 저장시킬 치료수가 정보가 있는가(신규)
+        if(diagnosisDTO.getTreatmentId() <= 0 && treatments != null){
+            int treatmentId = treatmentService.insertTreatment(treatments);
+            diagnosisDTO.setTreatmentId(treatmentId);
+        }
+        // 기존의 treatmentId, 즉 처방수가 기록 번호가 존재하는가? (수정)
+        else if(diagnosisDTO.getTreatmentId() > 0){
+            int treatmentId = treatmentService.deleteAndCreateTreatment(diagnosisDTO.getTreatmentId() , treatments);
+            diagnosisDTO.setTreatmentId(treatmentId);
+        }
+
+        // medicalBillId가 존재하지 않고 저장시킬 치료재료 정보가 있는가?(신규)
+        if(diagnosisDTO.getMedicalBillId() <= 0 && medicals != null){
+            int medicalBillId = medicalMaterialService.insertMedicalBills(medicals);
+            diagnosisDTO.setMedicalBillId(medicalBillId);
+        }
+        // 기존의 medicalBillId가 존재, 치료재료 기록 번호가 존재하는가? (수정)
+        else if(diagnosisDTO.getMedicalBillId() > 0){
+            int medicalBillId = medicalMaterialService.deleteAndCreateMedicalBill(diagnosisDTO.getMedicalBillId() , medicals);
+            diagnosisDTO.setMedicalBillId(medicalBillId);
+        }
+
         // 진료했던 진료기록이라면 수정자에 아이디 넣기
         if(diagnosisDTO.getDiagnosisYn() != null && diagnosisDTO.getDiagnosisYn()){
             diagnosisDTO.setDiagnosisModifier(user.getReferenceId());
@@ -494,12 +526,12 @@ public class HomeController {
         // id가 존재(기존 진료기록 또는 진료접수를 통한 진료기록)
         if(diagnosisDTO.getDiagnosisId() > 0){
             result =  diagnosisService.updateDiagnosisById(diagnosisDTO);
-            log.info("result::{}", result);
+//            log.info("result::{}", result);
         }
         // id가 0 또는 그 이하인 경우, 진료접수 없이 작성한 새로운 진료기록
         else {
             log.info("새로운 진료기록 작성 서비스로 넘어갑니다.");
-            log.info("diagnosisDTO::{}" , diagnosisDTO);
+//            log.info("diagnosisDTO::{}" , diagnosisDTO);
             result = diagnosisService.createDiagnosis(diagnosisDTO);
         }
 

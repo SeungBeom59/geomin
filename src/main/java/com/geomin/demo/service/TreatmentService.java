@@ -1,15 +1,14 @@
-package com.geomin.demo.controller;
+package com.geomin.demo.service;
 
+import com.geomin.demo.domain.TreatmentVO;
 import com.geomin.demo.dto.MedicalMaterialDTO;
 import com.geomin.demo.dto.PagingDTO;
 import com.geomin.demo.dto.ResponseDTO;
 import com.geomin.demo.dto.TreatmentDTO;
-import com.geomin.demo.repository.MedicalMaterialRepository;
-import com.geomin.demo.service.MedicalMaterialService;
+import com.geomin.demo.repository.TreatmentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -30,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 // 수가기준정보조회서비스
 @Service
@@ -41,6 +41,8 @@ public class TreatmentService {
     private String key;
 
     private final MedicalMaterialService medicalMaterialService;
+    private final TreatmentRepository treatmentRepository;
+
 
     public ResponseDTO search(int type , String keyword) throws IOException {
 
@@ -227,4 +229,113 @@ public class TreatmentService {
         return null;
     }
 
+    // 치료수가 정보 db에 넣기
+    public int insertTreatment(List<TreatmentDTO> treatments) {
+
+        int lastTreatmentId = treatmentRepository.getLastTreatmentId();
+
+        List<TreatmentVO> treatmentVOS = new ArrayList<>();
+        AtomicInteger treatmentSeq = new AtomicInteger(1);
+
+        for (TreatmentDTO treatment : treatments) {
+
+            TreatmentVO treatmentVO = TreatmentVO.builder()
+                    .treatmentId(lastTreatmentId + 1)
+                    .treatmentSeq(treatmentSeq.getAndIncrement())
+                    .benefitType(treatment.isBenefitType())
+                    .codeName(treatment.getCodeName())
+                    .costScore(treatment.getCostScore())
+                    .deductibleA(treatment.isDeductibleA())
+                    .deductibleB(treatment.isDeductibleB())
+                    .feeCode(treatment.getFeeCode())
+                    .feeDivNum(treatment.getFeeDivNum())
+                    .startDate(treatment.getStartDate())
+                    .surgeryYn(treatment.isSurgeryYn())
+                    .unitPrice(treatment.getUnitPrice())
+                    .build();
+
+            treatmentVOS.add(treatmentVO);
+        }
+
+        log.info("treatmentVOS::{}" , treatmentVOS);
+        int sucessCnt = treatmentRepository.insertTreatments(treatmentVOS);
+
+        if(sucessCnt != treatments.size()){
+            log.error("insertTreatments() failed");
+            throw new IllegalArgumentException("insertTreatments() failed");
+        }
+
+        return lastTreatmentId + 1;
+    }
+
+    // 기존 기록 삭제 및 새로운 정보로 넣어주기
+    public int deleteAndCreateTreatment(int treatmentId, List<TreatmentDTO> treatments) {
+
+        // 기존 treatment 기록 삭제
+        treatmentRepository.deleteById(treatmentId);
+
+        if(treatments == null || treatments.size() <= 0){
+            // 새로운 treatment 정보에 아무것도 없다면 연관정보 없음을 알리기 위해 -1 리턴. sql에서 -1이면 없도록 처리진행.
+            return -1;
+        }
+        // dto -> vo 변환
+        List<TreatmentVO> treatmentVOS = new ArrayList<>();
+        AtomicInteger treatmentSeq = new AtomicInteger(1);
+
+        for (TreatmentDTO treatment : treatments) {
+
+            TreatmentVO treatmentVO = TreatmentVO.builder()
+                    .treatmentId(treatmentId)
+                    .treatmentSeq(treatmentSeq.getAndIncrement())
+                    .benefitType(treatment.isBenefitType())
+                    .codeName(treatment.getCodeName())
+                    .costScore(treatment.getCostScore())
+                    .deductibleA(treatment.isDeductibleA())
+                    .deductibleB(treatment.isDeductibleB())
+                    .feeCode(treatment.getFeeCode())
+                    .feeDivNum(treatment.getFeeDivNum())
+                    .startDate(treatment.getStartDate())
+                    .surgeryYn(treatment.isSurgeryYn())
+                    .unitPrice(treatment.getUnitPrice())
+                    .build();
+
+            treatmentVOS.add(treatmentVO);
+        }
+        // 새롭게 집어넣으면 insert 성공 레코드 갯수 반환
+        int sucessCnt = treatmentRepository.insertTreatments(treatmentVOS);
+        // 성공 갯수와 새로운 처방수가기록 사이즈와 비교.
+        if(sucessCnt != treatments.size()){
+            log.error("insertTreatments() failed");
+            throw new IllegalArgumentException("insertTreatments() failed");
+        }
+        // 기존의 처방수가기록 반환.
+        return treatmentId;
+    }
+
+    // id를 이용하여 처방수가기록 리스트 가져오기
+    public List<TreatmentDTO> getTreatmentListById(int treatmentId) {
+
+        List<TreatmentVO> treatmentVOS = treatmentRepository.getTreatmentById(treatmentId);
+        List<TreatmentDTO> treatmentDTOS = new ArrayList<>();
+
+        treatmentVOS.forEach(vo -> {
+
+            TreatmentDTO treatmentDTO = TreatmentDTO.builder()
+                    .treatmentId(vo.getTreatmentId())
+                    .treatmentSeq(vo.getTreatmentSeq())
+                    .benefitType(vo.isBenefitType())
+                    .feeCode(vo.getFeeCode())
+                    .feeDivNum(vo.getFeeDivNum())
+                    .surgeryYn(vo.isSurgeryYn())
+                    .unitPrice(vo.getUnitPrice())
+                    .costScore(vo.getCostScore())
+                    .codeName(vo.getCodeName())
+                    .startDate(vo.getStartDate())
+                    .build();
+
+            treatmentDTOS.add(treatmentDTO);
+        });
+
+        return treatmentDTOS;
+    }
 }

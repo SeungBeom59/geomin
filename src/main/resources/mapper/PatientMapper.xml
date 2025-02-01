@@ -55,7 +55,7 @@
         <if test="pageable.sort != null and !pageable.sort.isEmpty()">
             ORDER BY
             <foreach collection="pageable.sort" item="order" separator=",">
-                ${order.property} ${order.direction}
+                ${order.property} #{order.direction}
             </foreach>
         </if>
         OFFSET #{pageable.offset} ROWS FETCH NEXT #{pageable.pageSize} ROWS ONLY
@@ -140,7 +140,7 @@
         <if test="pageable.sort != null and !pageable.sort.isEmpty()">
             ORDER BY
             <foreach collection="pageable.sort" item="order" separator=",">
-                ${order.property} ${order.direction}
+                #{order.property} #{order.direction}
             </foreach>
         </if>
         OFFSET #{pageable.offset} ROWS FETCH NEXT #{pageable.pageSize} ROWS ONLY

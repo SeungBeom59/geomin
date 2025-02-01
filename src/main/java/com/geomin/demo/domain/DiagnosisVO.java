@@ -30,6 +30,8 @@ public class DiagnosisVO {
     private int medicineId;                 // 의약품 처방 번호(fk : 관계는 맺지 않음)
     private int fileId;                     // 첨부파일 번호(fk: 관계는 맺지 않음)
     private int kcdId;                      // 질병기록 번호(fk: 관계는 맺지 않음)
+    private int treatmentId;                // 처방기록 번호(fk : 관계맺지는 않음)
+    private int medicalBillId;              // 진료재료 청구 번호(fk : 관계 맺지 않음)
     private Boolean diagnosisDelYn;         // 삭제 여부 (1:true 삭제 | 0:false 존재)
 
 

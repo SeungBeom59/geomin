@@ -1,9 +1,8 @@
 package com.geomin.demo.controller;
 
-import com.geomin.demo.dto.MedicalMaterialDTO;
 import com.geomin.demo.dto.ResponseDTO;
-import com.geomin.demo.repository.MedicalMaterialRepository;
 import com.geomin.demo.service.MedicalMaterialService;
+import com.geomin.demo.service.TreatmentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
-import java.util.List;
 
 @Controller
 @Slf4j

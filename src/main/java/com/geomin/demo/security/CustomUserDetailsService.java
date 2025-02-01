@@ -42,9 +42,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         }
 
         UserVO userVO = result.get();
-
         UserSecurityDTO userSecurityDTO = new UserSecurityDTO(userVO);
-
 
         log.info("***************************************************************************************");
         log.info("UserSecurityDTO::{}",userSecurityDTO);

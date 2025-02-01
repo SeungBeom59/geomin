@@ -18,6 +18,8 @@
         <result property="fileId" column="file_id" />
         <result property="kcdId" column="kcd_id" />
         <result property="diagnosisDelYn" column="diagnosis_del_yn" />
+        <result property="treatmentId" column="treatment_id" />
+        <result property="medicalBillId" column="medical_bill_id" />
 
         <!--  diagnosis_modifier mapping -->
         <association property="diagnosisModifier" resultMap="modifierMap" column="diagnosis_modifier"/>
@@ -175,9 +177,9 @@
                 d.DIAGNOSIS_DATE DESC
             </if>
         OFFSET
-            ${offset} ROWS
+            #{offset} ROWS
         FETCH NEXT
-            ${size} ROWS ONLY
+            #{size} ROWS ONLY
     </select>
 
     <select id="getTotalDiagnosis" parameterType="com.geomin.demo.dto.DiagnosisDTO">
@@ -253,6 +255,20 @@
                 KCD_ID = NULL ,
             </if>
 
+            <if test="treatmentId > 0">
+                TREATMENT_ID = #{treatmentId},
+            </if>
+            <if test="treatmentId == -1">
+                TREATMENT_ID = NULL,
+            </if>
+
+            <if test="medicalBillId > 0">
+                MEDICAL_BILL_ID = #{medicalBillId},
+            </if>
+            <if test="medicalBillId == -1">
+                MEDICAL_BILL_ID = NULL,
+            </if>
+
             <if test="diagnosisYn == true">
                 MODIFY_DATE = now(),
                 DIAGNOSIS_MODIFIER = #{diagnosisModifier},
@@ -308,6 +324,12 @@
             <if test="kcdId > 0">
                 KCD_ID ,
             </if>
+            <if test="treatmentId > 0">
+                TREATMENT_ID ,
+            </if>
+            <if test="medicalBillId > 0">
+                MEDICAL_BILL_ID ,
+            </if>
              DIAGNOSIS_YN , DIAGNOSIS_DATE )
         VALUES
             ( #{diagnosisId} , #{patientId} , #{doctorId} ,
@@ -321,6 +343,12 @@
             </if>
             <if test="kcdId > 0">
                 #{kcdId} ,
+            </if>
+            <if test="treatmentId > 0">
+                #{treatmentId},
+            </if>
+            <if test="medicalBillId > 0">
+                #{medicalBillId},
             </if>
               true , now()
             )

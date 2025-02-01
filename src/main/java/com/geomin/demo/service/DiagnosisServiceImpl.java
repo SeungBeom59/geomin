@@ -23,6 +23,8 @@ public class DiagnosisServiceImpl implements DiagnosisService{
     private final KcdService kcdService;
     private final WaitingService waitingService;
     private final DoctorRepository doctorRepository;
+    private final TreatmentService treatmentService;
+    private final MedicalMaterialService medicalMaterialService;
 
 //    @Override
 //    public Page<DiagnosisDTO> getDiagnosisList(Pageable pageable , DiagnosisDTO diagnosisDTO) {
@@ -136,6 +138,9 @@ public class DiagnosisServiceImpl implements DiagnosisService{
                     .fileId(vo.getFileId())
                     .medicineId(vo.getMedicineId())
                     .diagnosisDelYn(vo.getDiagnosisDelYn())
+                    .kcdId(vo.getKcdId())
+                    .medicalBillId(vo.getMedicalBillId())
+                    .treatmentId(vo.getTreatmentId())
                     .build();
 
             dto = vo.getDateAndModifiedMember(vo , dto);
@@ -269,6 +274,7 @@ public class DiagnosisServiceImpl implements DiagnosisService{
     // 중복되는 코드가 너무 길어서 함수로 사용.
     // 진료기록 정보를 이용하여 파일, 의약품, 진료기록이 모두 감싸진 responseDTO를 만들도록.
     // + 질병기록 (24/09/06)
+    // + 처방수가 , 치료재료 (24/11/07)
     public ResponseDTO createResponseDTO(DiagnosisVO result){
 
         log.info("result::{}" , result);
@@ -295,6 +301,18 @@ public class DiagnosisServiceImpl implements DiagnosisService{
             List<KcdDTO> kcds = kcdService.getKcdListById(result.getKcdId());
             responseDTO.setKcdDTOList(kcds);
         }
+        /*
+            여기부분 처리해야 함. 앞단으로 넘겨서 클라이언트 화면에 뿌려줄 수 있도록 데이터 찾아와서 넣어주기
+            처방수가의 비급여와 치료재료의 상한금액이 없을 경우 처리를 어떻게 할 것이냐...?
+         */
+        if(result != null && result.getTreatmentId() > 0){
+            List<TreatmentDTO> treatments = treatmentService.getTreatmentListById(result.getTreatmentId());
+            responseDTO.setTreatmentDTOList(treatments);
+        }
+        if(result != null && result.getMedicalBillId() > 0){
+            List<MedicalMaterialDTO> medicalMaterialDTOS = medicalMaterialService.getMaterialByBillId(result.getMedicalBillId());
+            responseDTO.setMedicalMaterialDTOList(medicalMaterialDTOS);
+        }
 
         PatientVO patient = result.getPatient();
         DepartmentVO department = result.getDepartment();
@@ -316,6 +334,9 @@ public class DiagnosisServiceImpl implements DiagnosisService{
                 .diagnosisYn(result.getDiagnosisYn())
                 .fileId(result.getFileId())
                 .medicineId(result.getMedicineId())
+                .kcdId(result.getKcdId())
+                .medicalBillId(result.getMedicalBillId())
+                .treatmentId(result.getTreatmentId())
                 .build();
 
         diagnosis = result.getDateAndModifiedMember(result , diagnosis);

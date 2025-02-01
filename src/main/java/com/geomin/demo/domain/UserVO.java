@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-@ToString(exclude = "roleSet")
+@ToString(exclude = "roleSet")  // 순환 참조 방지
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
