@@ -1373,7 +1373,14 @@ th , td {
     border-bottom: 1px solid #7b7a7a;
 }
 
-#pay > ul > li > div:last-child {
+/*#pay > ul > li > div:last-child {
+    margin-right : 10px;
+    color: #9B2727;
+    cursor: pointer;
+    font-weight: bold;
+}*/
+
+#pay > ul > li > .delete-data {
     margin-right : 10px;
     color: #9B2727;
     cursor: pointer;

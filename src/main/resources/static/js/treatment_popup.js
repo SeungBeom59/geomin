@@ -1,4 +1,76 @@
 $(document).ready(function() {
+
+    if(window.opener && !window.opener.closed){
+
+        var treatments = [];
+
+        var treatmentBox = window.opener.$('#treatment-box');
+
+        treatmentBox.find('.treatment-data').each(function(){
+             var item = $(this);
+
+             var data = {
+                 feeCode : item.find('span:nth-child(1)').text(),
+                 codeName : item.find('span:nth-child(2)').text(),
+                 benefitType : item.find('.benefit').text(),
+                 surgery: item.find('.no-surgery').text(),
+                 costScore: item.find('.costScore').val(),
+                 benefitType: item.find('.benefitType').val(),
+                 unitPrice: item.find('.unitPrice').val(),
+                 feeDivNum: item.find('.feeDivNum').val(),
+                 surgeryYn: item.find('.surgeryYn').val(),
+                 deductibleA: item.find('.deductibleA').val(),
+                 deductibleB: item.find('.deductibleB').val(),
+                 startDate: item.find('.startDate').val()
+             }
+
+             treatments.push(data);
+        });
+
+        var medicals = [];
+
+        medicalBox = window.opener.$('#medical-box');
+
+        medicalBox.find('.medical-data').each(function(){
+            var item = $(this);
+
+            var data = {
+                mmId : item.find('.mmId').val(),
+                mmCode :  item.find('span').eq(0).text(),
+                mmName:  item.find('span').eq(1).text()
+            }
+
+            medicals.push(data);
+        });
+
+        console.log('medicals' , medicals);
+        console.log('treatments' , treatments);
+
+        if(treatments.length > 0){
+            treatments.forEach(function(treatment){
+
+                var treatmentHtml = renderTreatment(treatment);
+
+                $('#selected-box ul').append(
+                    '<li class="selected-treatment"><div>' + treatmentHtml + '</div>' +
+                    '<div class="delete-btn">X</div></li>');
+            });
+        }
+
+        if(medicals.length > 0){
+            medicals.forEach(function(medical){
+
+                var medicalHtml = renderMedical(medical);
+
+                $('#selected-box ul').append(
+                    '<li class="selected-medical"><div>' + medicalHtml + '</div>' +
+                    '<div class="delete-btn">X</div></li>');
+            });
+        }
+    }
+
+
+
     // search-bar 검색창에 focus나 input 이벤트 발생시, 결과박스가 300ms로 슬라이드해서 내려오도록.
     $('#search-bar').on('focus input', function() {
         // 결과박스 멈춤 설정, 애니메이션 중복 및 대기 삭제
@@ -131,6 +203,8 @@ $(document).ready(function() {
     });
 
 });
+
+
 
 // selected-box에서 클릭이벤트가 발생한 요소의 class가 delete-btn이라면 삭제.
 $('#selected-box').on('click' , '.delete-btn' , function(){
@@ -296,3 +370,43 @@ function clearAll() {
     clearMedicalData();
 }
 
+// 부모창에서 받아온 데이터들 html로
+function renderTreatment(treatment){
+
+    let dataHtmlBox = "";
+
+    var benefitType = treatment.benefitType == true? '급여' : '비급여';
+    var benefitClass = treatment.benefitType == true? 'benefit' : 'non-benefit';
+
+    var surgeryYn = treatment.surgeryYn == true? '수술' : '비수술';
+    var surgeryClass = treatment.surgeryYn == true? 'surgery' : 'no-surgery';
+
+    dataHtmlBox +=
+        '<span>' + treatment.feeCode + '</span>' +
+        '<span>' + treatment.codeName + '</span>' +
+        '<span class="' + benefitClass + '">' + benefitType + '</span>' +
+        '<span class="' + surgeryClass + '">' + surgeryYn + '</span>' +
+        // 외부 공공데이터 api에 요청보내서 가져오는거라서, 여기서 한번에 데이터를 몽땅 들고 서버로 가져가는게 좋을 것 같음.
+        '<input type="hidden" class="costScore" value="' + treatment.costScore + '">' +
+        '<input type="hidden" class="benefitType" value="' + treatment.benefitType +'">' +
+        '<input type="hidden" class="unitPrice" value="' + treatment.unitPrice + '">' +
+        '<input type="hidden" class="feeDivNum" value="' + treatment.feeDivNum + '">' +
+        '<input type="hidden" class="surgeryYn" value="' + treatment.surgeryYn + '">' +
+        '<input type="hidden" class="deductibleA" value="' + treatment.deductibleA + '">' +
+        '<input type="hidden" class="deductibleB" value="' + treatment.deductibleB + '">' +
+        '<input type="hidden" class="startDate" value="' + treatment.startDate + '">';
+
+     return dataHtmlBox;
+}
+
+function renderMedical(medical){
+
+    let dataHtmlBox = "";
+
+     dataHtmlBox +=
+        '<span>' + medical.mmCode + '</span>' +
+        '<span>' + medical.mmName + '</span>' +
+        '<input type="hidden" class="mmId" value="' + medical.mmId + '">';
+
+     return dataHtmlBox;
+}

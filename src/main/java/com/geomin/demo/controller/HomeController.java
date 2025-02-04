@@ -4,7 +4,6 @@ import com.geomin.demo.dto.*;
 import com.geomin.demo.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.BridgeMethodResolver;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -67,10 +66,10 @@ public class HomeController {
 //        log.info("user::{}" , user);
 
         Page<WaitingDTO> waitingList = waitingService.getWaitingList(pageable , user.getDepartmentId());
-        log.info("page" + waitingList.getPageable());
-        log.info("totalPage " + waitingList.getTotalPages());
-        log.info("totalElements " + waitingList.getTotalElements());
-        log.info("waitingList::{}" , waitingList.stream().toList());
+//        log.info("page" + waitingList.getPageable());
+//        log.info("totalPage " + waitingList.getTotalPages());
+//        log.info("totalElements " + waitingList.getTotalElements());
+//        log.info("waitingList::{}" , waitingList.stream().toList());
 
         int waitingEnd = waitingService.getEndCount(user.getDepartmentId());
 
@@ -99,7 +98,7 @@ public class HomeController {
         model.addAttribute("searchValue" , patientName);
         model.addAttribute("patients" , patients);
 
-        log.info("patients::{}", patients.stream().toList());
+//        log.info("patients::{}", patients.stream().toList());
 
         return "patient_popup";
     }
@@ -116,7 +115,7 @@ public class HomeController {
 
         PatientDTO dto = patientService.getPatientById(patientDTO);
         dto.setIdentify(WaitingUtil.getIdentify(dto.getIdentify()));
-        log.info("dto::{}",dto);
+//        log.info("dto::{}",dto);
 
         model.addAttribute("patient" , dto);
 
@@ -134,7 +133,7 @@ public class HomeController {
 
         log.info("post >> /waiting/post... addWaiting() 실행됨.");
 
-        log.info("waitingDTO::{}",waitingDTO);
+//        log.info("waitingDTO::{}",waitingDTO);
 
         int result = waitingService.addWaiting(waitingDTO , principal);
 
@@ -159,7 +158,7 @@ public class HomeController {
 
         int page = requestBody.get("page") != null? requestBody.get("page") : 0;
         log.info("post >> /waiting... searchWaiting() 실행됨");
-        log.info("page = " + page);
+//        log.info("page = " + page);
 
         UserSecurityDTO user = userService.getUser(principal.getName());
 
@@ -188,7 +187,7 @@ public class HomeController {
     public ResponseEntity<?> modifyWaitingStatus(@RequestBody WaitingDTO waitingDTO){
 
         log.info("post >> /waiting-modify... modifyWaitingStatus() 실행됨");
-        log.info("waitingDTO::{}" , waitingDTO);
+//        log.info("waitingDTO::{}" , waitingDTO);
 
         int result = waitingService.modifyWaitingStatus(waitingDTO);
 
@@ -206,11 +205,11 @@ public class HomeController {
 
         log.info("post >> /waiting-end-cnt... getWaitingEndCnt() 실행.");
 
-        log.info("waitingDTO::{}", waitingDTO);
+//        log.info("waitingDTO::{}", waitingDTO);
         int waitingEndCnt = waitingService.getEndCount(waitingDTO.getDepartmentId());
 
         waitingDTO.setWaitingEndCnt(waitingEndCnt);
-        log.info("waitingDTO::{}" , waitingDTO);
+//        log.info("waitingDTO::{}" , waitingDTO);
 
         return ResponseEntity.status(HttpStatus.OK).body(waitingDTO);
     }
@@ -221,7 +220,7 @@ public class HomeController {
 
 
         log.info("Post >> /patient-add... addPatient() 실행됨");
-        log.info("patientDTO::{}",patientDTO);
+//        log.info("patientDTO::{}",patientDTO);
 
          int result = patientService.addPatient(patientDTO);
 
@@ -241,7 +240,7 @@ public class HomeController {
     public ResponseEntity<?> updatePatient(@RequestBody PatientDTO patientDTO){
 
         log.info("Post >> /patient-update... updatePatient() 실행됨");
-        log.info("patientDTO::{}" , patientDTO);
+//        log.info("patientDTO::{}" , patientDTO);
 
         int result = patientService.updatePatient(patientDTO);
 
@@ -263,7 +262,7 @@ public class HomeController {
     public ResponseEntity<?> getPatient(@RequestBody PatientDTO patientDTO){
 
         log.info("Post >> /patient-get... getPatient() 실행됨");
-        log.info("patientDTO::{}" , patientDTO);
+//        log.info("patientDTO::{}" , patientDTO);
 
         PatientDTO dto = patientService.getPatientById(patientDTO);
 
@@ -283,7 +282,7 @@ public class HomeController {
 
         log.info("post >> /vitals-search... getVitalsList() 실행됨.");
 
-        log.info("vitalsDTO::{}", vitalsDTO);
+//        log.info("vitalsDTO::{}", vitalsDTO);
 
         Page<VitalsDTO> vitals = patientService.getVitalsList(vitalsDTO , pageable);
 
@@ -297,7 +296,7 @@ public class HomeController {
         @RequestBody VitalsDTO vitalsDTO ){
 
         log.info("post >> /vitals-add... addVitals() 실행됨.");
-        log.info("vitalsDTO::{}",vitalsDTO);
+//        log.info("vitalsDTO::{}",vitalsDTO);
 
         int result = patientService.addVitals(vitalsDTO);
 
@@ -319,7 +318,7 @@ public class HomeController {
             @RequestBody VitalsDTO vitalsDTO){
 
         log.info("post >> /vitals-update... updatevitals() 실행됨.");
-        log.info("vitalsDTO::{}",vitalsDTO);
+//        log.info("vitalsDTO::{}",vitalsDTO);
 
         int result = patientService.updateVitals(vitalsDTO);
 
@@ -354,11 +353,11 @@ public class HomeController {
                                                        @RequestBody DiagnosisDTO diagnosisDTO ){
 
         log.info("post >>> /diagnosis?page=" + page + "&sort=" + isSorted + " getDiagnosisList 실행됨");
-        log.info("diagnosisDTO::{}",diagnosisDTO);
-        log.info("isSorted:{}",isSorted);
+//        log.info("diagnosisDTO::{}",diagnosisDTO);
+//        log.info("isSorted:{}",isSorted);
 
         diagnosisDTO.setSort(isSorted);
-        log.info("diagnosisDTO::{}",diagnosisDTO);
+//        log.info("diagnosisDTO::{}",diagnosisDTO);
 
         ResponseDTO response = diagnosisService.getDiagnosisList(page , diagnosisDTO);
 
@@ -380,6 +379,9 @@ public class HomeController {
 
         ResponseDTO response = diagnosisService.getDiagnosisById(diagnosisId);
 
+        log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+        log.info("response::{}",response);
+
         if(response == null){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("데이터 정보 없음");
         }
@@ -393,7 +395,7 @@ public class HomeController {
     public ResponseEntity<?> callPatient(@RequestBody WaitingDTO waitingDTO){
 
         log.info("post >> /patient-call... callPatient() 실행.");
-        log.info("waitingDTO::{}" , waitingDTO);
+//        log.info("waitingDTO::{}" , waitingDTO);
 
         // action 없이 waiting-modify에 waitingId만 요청 받을 경우, 호출 버튼을 누른 것이므로
         // action을 "진료중"으로 바꾸어준다.
@@ -509,6 +511,8 @@ public class HomeController {
         }
         // 기존의 medicalBillId가 존재, 치료재료 기록 번호가 존재하는가? (수정)
         else if(diagnosisDTO.getMedicalBillId() > 0){
+            log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+            log.info("medicalBillId = " + diagnosisDTO.getMedicalBillId());
             int medicalBillId = medicalMaterialService.deleteAndCreateMedicalBill(diagnosisDTO.getMedicalBillId() , medicals);
             diagnosisDTO.setMedicalBillId(medicalBillId);
         }
@@ -543,7 +547,7 @@ public class HomeController {
     @PostMapping("/diagnosis-delete/{diagnosisId}")
     public ResponseEntity<?> deleteDiagnosis(@PathVariable(name = "diagnosisId") int diagnosisId){
         log.info("post >> /diagnosis-delete... deleteDiagnosis() 실행" );
-        log.info("diagnosisId::{}" , diagnosisId);
+//        log.info("diagnosisId::{}" , diagnosisId);
 
         boolean result = diagnosisService.deleteDiagnosisById(diagnosisId);
 

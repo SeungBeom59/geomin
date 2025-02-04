@@ -354,7 +354,9 @@ function updateDiagnosis(){
     var kcdId = $('#kcdId').val() === '' || $('#kcdId').val() === null ? 0 : $('#kcdId').val();
     var medicineId = $('#pillId').val() === '' || $('#pillId').val() === null ? 0 : $('#pillId').val();
     var treatmentId = $('#treatmentId').val() === '' || $('#treatmentId').val() === null ? 0 : $('#treatmentId').val();
-    var medicalBillId = $('#medicalId').val() === '' || $('#medicalId').val() === null ? 0 : $('#medicalId').val();
+    var medicalBillId = $('#medicalBillId').val() === '' || $('#medicalBillId').val() === null ? 0 : $('#medicalBillId').val();
+
+
     // ajax 데이터
     var data = new FormData();
 
@@ -434,6 +436,9 @@ function updateDiagnosis(){
 
 
     console.log('pills : ' , pills);
+    console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+    console.log("제대로 medicalBillId 넘어가고 있는거냐!");
+    console.log("medicalBillId" , medicalBillId);
     console.log('data : ' , data);
     console.log('deleteFiles : ' , deleteFiles);
     console.log('medicals : ' , medicals);
@@ -1759,6 +1764,7 @@ function insertPastDiagnosis(response){
     var diagnosis = content.diagnosis;
     var prescription = content.prescription;
 
+
     console.log('insertpast : ' , response);
     var attendingDoctor = content.doctorName;
     var date = content.diagnosisDate;
@@ -1860,6 +1866,9 @@ function insertPastDiagnosis(response){
     else {
         $('#no-pre-pills').css('display' , 'flex');
     }
+
+    ////////// 처방수가 & 치료재료
+
 
 
 
@@ -2025,7 +2034,7 @@ function pastDiagnosispaging(response){
     var list = Array.isArray(response.diagnosisDTOList)? response.diagnosisDTOList : [];
 
     list.forEach(function (diagnosis){
-        console.log('diagnosis' , diagnosis);
+//        console.log('diagnosis' , diagnosis);
 
         let date = diagnosis.diagnosisDate.substring(0, diagnosis.diagnosisDate.indexOf('/'));
 
@@ -2093,6 +2102,8 @@ function insertDiagnosis(response){
     var fileInfo = Array.isArray(response.fileInfoDTOList)? response.fileInfoDTOList : [];
     var medicine = Array.isArray(response.medicineDTOList)? response.medicineDTOList : [];
     var kcds = Array.isArray(response.kcdDTOList)? response.kcdDTOList : [];
+    var treatments = Array.isArray(response.treatmentDTOList)? response.treatmentDTOList : [];
+    var medicalMaterials = Array.isArray(response.medicalMaterialDTOList)? response.medicalMaterialDTOList : [];
 
     console.log('response' , response);
     console.log('fileInfo' , fileInfo);
@@ -2165,7 +2176,31 @@ function insertDiagnosis(response){
             $('#no-kcd').css('display' , 'flex');
         }
 
+        // 처방수가 & 치료재료
+        if(treatments.length == 0 && medicalMaterials.length == 0){
+                $('#no-pay').css('display' , 'flex');
+        }
+
+        if(treatments.length > 0){
+            $('#no-pay').css('display' , 'none');
+            $('#treatmentId').val(treatments.at(0).treatmentId);
+
+            treatments.forEach(function (treatment){
+                renderTreatment(treatment);
+            });
+        }
+
+        if(medicalMaterials.length > 0){
+            $('#no-pay').css('display' , 'none');
+            console.log("medicalBillId 설정해줬음" , diagnosis.medicalBillId);
+            $('#medicalBillId').val(diagnosis.medicalBillId);
+
+            medicalMaterials.forEach(function (medicalMaterial){
+                renderMedical(medicalMaterial);
+            });
+        }
     }
+    // 새로 작성인 경우
     else if(diagnosis.diagnosisYn === false || diagnosis.diagnosisYn === null){
         $('#diagnosis-modify-btn').hide();
         $('#diagnosis-cancel-btn').hide();
@@ -2173,6 +2208,8 @@ function insertDiagnosis(response){
         $('#diagnosis-record').val("");
         $('#prescription-record').val("");
     }
+
+    // 공통처리 (수정 || 새로작성)
 
     $('#diagnosis-create-btn').show();  // 등록버튼 활성화
     // 모든 textarea 활성화.
@@ -2196,7 +2233,7 @@ function insertDiagnosis(response){
     $('#new-diagnosisId').val(diagnosis.diagnosisId);   // hidden에 진료 id 넣기
     $('#new-patientId').val(diagnosis.patientId);       // hidden에 불러온 환자 id 넣기
 
-    var symptomsRecord = diagnosis.symptoms.replace('\r\n' , '<br\>');
+    var symptomsRecord = diagnosis.symptoms.replace('\r\n' , '<br>');
     $('#symptoms-record').val(symptomsRecord);     // 증상 값 넣기
 
     // $('#sortable-container').removeClass("ui-sortable-disabled"); // disabled가 적용되있다면 삭제되도록.
@@ -2358,6 +2395,8 @@ function clearDiagnosis(){
     $('#diagnosisYn').val(false);      // 초기화
     $('#kcdId').val("");                    // hidden kcd 질병기록 id 초기화
     $('#pillId').val("");                       // hidden pillId 의약품 id 초기화
+    $('#treatmentId').val("");  // 처방수가 id 초기화
+    $('#medicalBillId').val("");    // 치료재료 id 초기화
 
     uploadFiles = [];   /// uploadFiles 초기화
 
@@ -2377,10 +2416,13 @@ function clearDiagnosis(){
     $('#no-files').hide();
     $('#no-kcd').css('display' , 'flex');
     $('#diagnosis-write-sub-title').hide();
+    $('#no-pay').css('display' , 'flex');
 
     localStorage.removeItem('selectedPills');   // 로컬스토리지에 의약품 정보 삭제
     $('#pills').find('.pill').remove();     // 처방 선택된 의약품 html 삭제
     $('#sortable-container .kcd').remove();      // 질병기록 kcd html 삭제
+    $('#treatment-box').find('.treatment-data').remove(); // 처방수가 삭제
+    $('#medical-box').find('.medical-data').remove(); // 의료수가 삭제
     // $('#sortable-container').sortable("disable");
 
     // if ($('#sortable-container').data('ui-sortable')) {
@@ -2408,6 +2450,8 @@ function readDiagnosis(response){
     var fileInfo = Array.isArray(response.fileInfoDTOList)? response.fileInfoDTOList : [];
     var medicine = Array.isArray(response.medicineDTOList)? response.medicineDTOList : [];
     var kcds = Array.isArray(response.kcdDTOList)? response.kcdDTOList : [];
+    var treatments = Array.isArray(response.treatmentDTOList)? response.treatmentDTOList : [];
+    var medicalMaterials = Array.isArray(response.medicalMaterialDTOList)? response.medicalMaterialDTOList : [];
 
 
     $('#diagnosis-modify-btn').show();
@@ -2520,7 +2564,65 @@ function readDiagnosis(response){
     ///////////////////////////////////////////////
     // 처방수가 또는 치료재료 기록 존재할 경우
 
+    if(treatments.length == 0 && medicalMaterials.length == 0){
+        $('#no-pay').css('display' , 'flex');
+    }
+
+    if(treatments.length > 0){
+        $('#no-pay').css('display' , 'none');
+        treatments.forEach(function (treatment){
+        readTreatmentRender(treatment);
+        });
+    }
+
+    if(medicalMaterials.length > 0){
+        $('#no-pay').css('display' , 'none');
+        medicalMaterials.forEach(function (medicalMaterial){
+            readMedicalMaterialRender(medicalMaterial);
+        });
+    }
+
+
+
 }
+
+// 읽기용 처방수가 정보 넣기
+function readTreatmentRender(treatment){
+
+    var treatmentBox = $('#treatment-box');
+    treatmentBox.css('display' , 'block');
+
+    var benefitType = treatment.benefitType == true? '급여' : '비급여';
+    var benefitClass = treatment.benefitType == true? 'benefit' : 'non-benefit';
+    var surgeryYn = treatment.surgeryYn == true? '수술' : '비수술';
+    var surgeryClass = treatment.surgeryYn == true? 'surgery' : 'no-surgery';
+
+    var treatmentHtml =
+        '<li class="treatment-data">' +
+        '<div>' +
+        '<span>' + treatment.feeCode + '</span>' +
+        '<span>' + treatment.codeName + '</span>' +
+        '<span class="' + benefitClass + '">' + benefitType + '</span>' +
+        '<span class="' + surgeryClass + '">' + surgeryYn + '</span>' +
+        '</div></li>';
+
+    treatmentBox.append(treatmentHtml);
+}
+// 읽기용 치료재료 정보 넣기
+function readMedicalMaterialRender(medicalMaterial){
+    var medicalBox = $('#medical-box');
+    medicalBox.css('display' , 'block');
+
+    var medicalHtml =
+        '<li class="medical-data">' +
+        '<div>' +
+        '<span>' + medicalMaterial.mmCode + '</span>' +
+        '<span>' + medicalMaterial.mmName + '</span>' +
+        '</div></li>';
+
+    medicalBox.append(medicalHtml);
+}
+
 
 // 진료작성칸 보기용 파일 리스트 html 처리
 function readFileRender(file){
@@ -2741,7 +2843,57 @@ function getTreatmentPopup(){
         '수가검색',
         'width=800 , height=535 , screenX=500,screenY=100, resizeable=no'
     );
+
+//    postTreatmentDataToPopup(popup); // 수가&치료재료 팝업창으로 기존 데이터 보내기
+
 }
+
+//function postTreatmentDataToPopup(popup){
+//
+//    var treatmentList = [];
+//
+//    $('#treatment-box .treatment-data').each(function(){
+//
+//        var item = $(this);
+//
+//        treatmentList.push({
+//            feeCode : item.find('span:nth-child(1)').text(),
+//            codeName : item.find('span:nth-child(2)').text(),
+//            benefitType : item.find('.benefit').text(),
+//            surgery: item.find('.no-surgery').text(),
+//            costScore: item.find('.costScore').val(),
+//            benefitType: item.find('.benefitType').val(),
+//            unitPrice: item.find('.unitPrice').val(),
+//            feeDivNum: item.find('.feeDivNum').val(),
+//            surgeryYn: item.find('.surgeryYn').val(),
+//            deductibleA: item.find('.deductibleA').val(),
+//            deductibleB: item.find('.deductibleB').val(),
+//            startDate: item.find('.startDate').val()
+//        });
+//    });
+//
+//
+//    var medicalList = [];
+//
+//    $('#medical-box .medical-data').each(function(){
+//
+//         medicalList.push({
+//            mmId : $(this).find('.mmId').val(),
+//            mmCode :  $(this).find('span').eq(0).text(),
+//            mmName:  $(this).find('span').eq(1).text()
+//         });
+//    });
+//
+//
+//    var data = {
+//        treatments : treatmentList,
+//        medicals : medicalList
+//    }
+//
+//    popup.postMessage(data , "*"); // 열려 있는 모든 팝업창에 데이터 보내기로 됨.
+//
+//}
+
 // 수가&치료재료 검색 팝업창으로 부터 정보를 받아 #pay 칸에 html로 만들어 넣어준다.
 function receiveTreatmentInfo(allData) {
     console.log('allData : ' , allData);
