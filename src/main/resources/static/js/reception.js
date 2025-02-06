@@ -1806,6 +1806,7 @@ function insertPastDiagnosis(response){
     var fileInfo = Array.isArray(response.fileInfoDTOList)? response.fileInfoDTOList : [];
     var medicine = Array.isArray(response.medicineDTOList)? response.medicineDTOList : [];
     var kcds = Array.isArray(response.kcdDTOList)? response.kcdDTOList : [];
+
     var treatments = Array.isArray(response.treatmentDTOList)? response.treatmentDTOList : [];
     var medicals = Array.isArray(response.medicalMaterialDTOList)? response.medicalMaterialDTOList : [];
 
@@ -1867,7 +1868,58 @@ function insertPastDiagnosis(response){
         $('#no-pre-pills').css('display' , 'flex');
     }
 
-    ////////// 처방수가 & 치료재료
+//    ////////// 처방수가 & 치료재료
+    var pastPayBox = $('#past-pay');
+    pastPayBox.find('.past-treatment-data').remove();
+    pastPayBox.find('.past-medical-data').remove();
+
+    if(treatments.length > 0 || medicals.length > 0){
+        $('#no-past-pay').hide();
+    }
+    else{
+        $('#no-past-pay').css('display' , 'flex');
+        $('#past-treatment-box').hide();
+        $('#past-medical-box').hide();
+    }
+
+
+
+    if(treatments.length > 0){
+        var pastTreatmentsBox = $('#past-treatment-box');
+        pastTreatmentsBox.show();
+
+        treatments.forEach(function(treatment){
+
+            var benefitType = treatment.benefitType == true? '급여' : '비급여';
+            var benefitClass = treatment.benefitType == true? 'benefit' : 'non-benefit';
+            var surgeryYn = treatment.surgeryYn == true? '수술' : '비수술';
+            var surgeryClass = treatment.surgeryYn == true? 'surgery' : 'no-surgery';
+
+            var treatmentHtml =
+                '<li class="past-treatment-data"><div>' +
+                '<span>' + treatment.feeCode + '</span>' +
+                '<span>' + treatment.codeName + '</span></div>' +
+                '<div><span class="' + benefitClass + '">' + benefitType + '</span>' +
+                '<span class="' + surgeryClass + '">' + surgeryYn + '</span></div></li>';
+
+            pastTreatmentsBox.append(treatmentHtml);
+        });
+    }
+
+    if(medicals.length > 0){
+        var pastMedicalBox = $('#past-medical-box')
+        pastMedicalBox.show();
+
+        medicals.forEach(function(medical){
+
+            var medicalHtml =
+                '<li class="past-medical-data">' +
+                '<span>' + medical.mmCode + '</span>' +
+                '<span>' + medical.mmName + '</span></li>';
+
+            pastMedicalBox.append(medicalHtml);
+        });
+    }
 
 
 

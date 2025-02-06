@@ -979,10 +979,6 @@ th , td {
     margin-right: 10px;
 }
 
-#pre-pills {
-
-}
-
 .pre-pill {
     list-style: none;
     border-bottom: 1px solid #ccc;
@@ -1015,7 +1011,65 @@ th , td {
     width: 100%;
     height: 100%;
 }
+/* 과거 처방 기록 css */
+#no-past-pay{
+    display : flex;
+    justify-content : center;
+    align-items : center;
+    height : 100px;
+}
 
+#past-pay > #past-treatment-box , #past-pay > #past-medical-box {
+    list-style : none;
+    margin : 0; padding : 0;
+    font-size : 12px;
+}
+
+#past-pay > #past-treatment-box > li {
+    display : flex;
+    justify-content : space-between;
+}
+
+#past-pay > #past-treatment-box > li > div:nth-child(1) {
+    width : 470px;
+    display : flex;
+}
+
+#past-pay > #past-treatment-box > li > div:nth-child(2) {
+    width : 70px;
+    display : flex;
+    justify-content : space-between;
+}
+
+.past-treatment-data > div:nth-child(1) > span:nth-child(1) ,
+.past-medical-data > span:nth-child(1) {
+    display : inline-block;
+    min-width : 62px;
+    font-weight : bold;
+    padding-left : 2px;
+}
+
+#past-pay > #past-treatment-box > li > div:nth-child(1) > span:nth-child(2) ,
+#past-pay > #past-medical-box > li > span:nth-child(2){
+    margin-left : 5px;
+    display : inline-block;
+    overflow-y : scroll;
+    scrollbar-width : none;
+    max-height : 14px;
+}
+
+
+#past-pay > ul > li {
+    height : 14px;
+    border-bottom: 1px solid #7b7a7a;
+}
+
+#past-pay > ul > li:hover {
+    background-color: #93b4c7bb;
+}
+
+
+/* 과거 첨부파일 css */
 #pre-files-box {
     display: none;
     width: 578px;

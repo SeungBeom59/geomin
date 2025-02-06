@@ -107,7 +107,6 @@ public class DiagnosisServiceImpl implements DiagnosisService{
 
 
     @Override
-    @Transactional
     public ResponseDTO getDiagnosisList(int page, DiagnosisDTO diagnosisDTO) {
 
         int size = 15;
@@ -178,7 +177,6 @@ public class DiagnosisServiceImpl implements DiagnosisService{
     }
 
     @Override
-    @Transactional
     public DiagnosisDTO getTodayDiagnosis(int waitingId) {
 
         DiagnosisVO result = diagnosisRepository.getDiagnosisByWaitingId(waitingId);
