@@ -2,6 +2,8 @@ package com.geomin.demo.dto;
 
 import com.geomin.demo.domain.MedicalBillVO;
 import lombok.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -27,6 +29,7 @@ public class ResponseDTO {
     private List<KcdDTO> kcdDTOList;                // 질병기록 모음
 
     private List<WaitingDTO> waitingDTOList;        // 진료대기 또는 진료완료 환자 모음
+    private Page<WaitingDTO> waitingDTOS;           // 웹 소캣통신에 함께 보낼 진료대기 환자 리스트
 
     private List<TreatmentDTO> treatmentDTOList;    // 처방수가 기록 모음
 

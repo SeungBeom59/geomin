@@ -1,3 +1,8 @@
+
+var stompClient = null;         // sockJs 클라이언트
+var connected = false;          // 웹 소켓 연결 여부
+let uploadFiles = [];           // 파일 업로드 목록
+
 // 시작시 활력징후 ,  입력표 초기화
 $(document).ready(function (){
 
@@ -16,27 +21,92 @@ $(document).ready(function (){
     $tr.find('td').eq(5).find('input').val(0);
     $tr.find('td').eq(6).find('input').val(0);
 
+    var savedSessionId = sessionStorage.getItem('sessionId');
 
+    if(savedSessionId){
+        console.log("이미 저장된 세션ID가 존재합니다. " + savedSessionId);
+    }
+    else{
+        console.log("새로운 세션ID 만들어짐.")
+    }
 
+    // 웹 소캣 연결
+    if(!stompClient || !connected){
+        connect(savedSessionId); // 웹 소켓 연결 시도.
+    }
 
+    ///////////////////////////////////
+    // 웹 소켓 재사용하도록 만들어야 하는데,
+    // 서버단에서 어떻게 할 것인지?
+    ///////////////////////////////////
 
-    // // 첨부파일 박스 html
-    // const fileDragBox = $('#file-drag-box');
-    //
-    // // 첨부파일 드래그 이벤트 추가
-    // fileDragBox.on('dragenter' , highlight );
-    // fileDragBox.on('dragover' , highlight );
-    // fileDragBox.on('dragleave' , unhighlight );
-    // fileDragBox.on('drop' , handleDrop );
+    ////////////////////////
+    // 웹 소켓 통신 연결 시도 //
+    function connect(savedSessionId){
 
-    // 파일 업로드 input, label 이용시
-    // $('#file-upload').on('change', fileSelect);
+        if(stompClient !== null && connected){
+            console.log("서버와 실시간 통신 이미 연결됨.");
+        }
 
+        var savedSessionId = sessionStorage.getItem("sessionId");
 
+        var socket = new SockJS("/ws");
+        stompClient = Stomp.over(socket);
+
+        if(!savedSessionId){
+            console.log("세션 ID 없으므로, 새로운 소켓 연결을 시도.");
+            // 웹 소켓 통신 미연결시, 연결 시도 진행
+            stompClient.connect({}, onConnected , onError);
+        }
+        else{
+            console.log("기존 세션 재사용하여 소켓 연결을 시도, 세션 ID :" + savedSessionId);
+            stompClient.connect({sessionId : savedSessionId}, function(){
+                connected = true;
+
+                var departmentId = $('#departmentId').val();
+                stompClient.subscribe("/sub/waiting/" + departmentId , onMessageReceived); // 특정 주제에 대해 구독한다.
+
+            } , onError);
+
+        }
+    }
+    // 웹 소켓 통신 연결된 경우
+    function onConnected(){
+        var sessionUrl = stompClient.ws._transport.url;  // 실제 세션 ID 가져오는 방식
+        // ex : sessionId:ws://localhost:8080/ws/169/50hcbxrn/websocket 이런식
+        var sessionId = sessionUrl.split("/")[5]; // 세션 id
+        sessionStorage.setItem('sessionId', sessionId);  // 새로 고침 후에도 재사용 가능
+        console.log("새로운 세션ID 저장됨." + sessionId);
+
+        var departmentId = $('#departmentId').val();
+        stompClient.subscribe("/sub/waiting/" + departmentId , onMessageReceived); // 특정 주제에 대해 구독한다.
+    //    stompClient.send("/pub/waiting/" + departmentId);
+
+        connected = true;
+    }
 });
 
-let uploadFiles = [];           // 파일 업로드 목록
 
+
+//    stompClient.send(); // 컨트롤러 동작, (정보 요청)
+
+// 웹 소켓 통신 에러
+function onError(){
+    console.log("서버와의 실시간 통신이 끊겼습니다.");
+
+    connected = false;
+}
+// 서버로부터 받은 메세지 처리
+function onMessageReceived(message){
+    var response = JSON.parse(message.body);
+    console.log("서버에서 받은 데이터 : " , response);
+
+    // 사이드바 업데이트 해주도록.
+    // 사이드바의 현재 버튼 활성화(진료대기 , 진료 완료환자) 여부에 따라 html 작업 필요
+}
+
+
+// 파일 첨부 이벤트 활성화
 function onFileEvent(){
     // 첨부파일 박스 html
     const fileDragBox = $('#file-drag-box');
@@ -49,7 +119,7 @@ function onFileEvent(){
 
     $('#file-upload').on('change', fileSelect);
 }
-
+// 파일 첨부 이벤트 비활성화
 function offFileEvent(){
     // 첨부파일 박스 html
     const fileDragBox = $('#file-drag-box');
@@ -1189,6 +1259,10 @@ function getWaitingPopup(){
 // 진료 접수 팝업창 수신용 함수
 function receiveWaitingInfo(response) {
 
+    // 웹 소켓 통신으로 서버에 업데이트 되었음을 알리는 신호 보내기
+    var departmentId = $('#departmentId').val();
+    stompClient.send("/pub/waiting/" + departmentId);
+
     var waitingList = JSON.parse(response);  // json형태로 넘겨줬기 때문에 parse
     console.log('waitingList = ' , waitingList);
 
@@ -1882,8 +1956,6 @@ function insertPastDiagnosis(response){
         $('#past-medical-box').hide();
     }
 
-
-
     if(treatments.length > 0){
         var pastTreatmentsBox = $('#past-treatment-box');
         pastTreatmentsBox.show();
@@ -1920,9 +1992,6 @@ function insertPastDiagnosis(response){
             pastMedicalBox.append(medicalHtml);
         });
     }
-
-
-
 
     ///////////////// 파일
     var filesBox = $('#pre-files');
@@ -3069,3 +3138,5 @@ function collectMedical() {
 
     return medicalList;
 }
+
+
