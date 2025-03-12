@@ -12,7 +12,7 @@ import org.springframework.web.context.ConfigurableWebApplicationContext;
 import org.springframework.web.context.support.AbstractRefreshableWebApplicationContext;
 import org.springframework.web.servlet.HttpServletBean;
 
-@PropertySource("classpath:apiKey.properties")
+@PropertySource("classpath:key.properties")
 
 @SpringBootApplication
 public class DemoApplication {

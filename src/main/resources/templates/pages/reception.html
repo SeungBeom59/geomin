@@ -1,0 +1,368 @@
+<!-- Default Layout Import-->
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/default_layout}">
+
+<!-- defaultLayout의 HeadFragment 확장-->
+<head>
+    <!-- daum postcode -->
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <title>Geomin-Home</title>
+</head>
+
+<body>
+
+    <section id="left-section" layout:fragment="leftSection">
+        <article id="patient-article">
+            <form method="post" id="patient-record">
+
+                <div>
+                    <input type="hidden" id="patientId">
+                    <input type="hidden" id="vitalId">
+                    <input type="hidden" value="" id="vitalPage">
+
+                    <label for="patient_name">성함 : </label>
+                    <input type="text" id="patient_name" name="patientName" value="" size="10" autocomplete="off" class="patientValue" placeholder="OOO">
+
+                    <label for="identify">주민등록번호 : </label>
+                    <input type="text" id="identify" name="identify" value="" size="10" autocomplete="off" class="patientValue" oninput="checkIdentify(this)" placeholder="000000-0000000">
+
+                    <label for="gender">성별 :</label>
+                    <!--<input type="text" id="gender" name="gender" value="" size="2">-->
+                    <select name="gender" id="gender">
+                        <option value="true" selected>남</option>
+                        <option value="false">여</option>
+                    </select>
+
+                    <button type="button" class="btn" id="patient-modify-btn" onclick="modifyPatient()">수정</button>
+                    <button type="button" class="btn" id="patient-update-btn" onclick="addPatient()">등록</button>
+                    <button type="button" class="btn" id="patient-btn" onclick="addPatient()">등록</button>
+                    <button type="button" class="btn" id="patient-cancel-btn" onclick="searchPatient()">취소</button>
+                </div>
+
+                <div>
+                    <label for="address">주소 : </label>
+                    <input type="text" id="address" name="address" value="" size="30" autocomplete="off" readonly placeholder="'주소검색'을 이용해 주세요.">
+
+                    <label for="address-detail">상세주소 : </label>
+                    <input type="text" id="address-detail" name="addressDetail" value="" size="30" autocomplete="off" placeholder="상세주소를 입력해주세요.">
+
+                    <button type="button" class="btn" id="post-search-btn" onclick="daumPostcode()">주소검색</button>
+                </div>
+
+                <div>
+
+                    <label for="post-code">우편번호 : </label>
+                    <input type="text" id="post-code" name="postCode" value="" size="3" autocomplete="off" readonly placeholder="...">
+
+                    <label for="extraAddress">참고항목 :</label>
+                    <input type="text" id="extraAddress" name="extraAddress" size="5" autocomplete="off" readonly placeholder="...">
+
+                    <label for="age">나이 : </label>
+                    <input type="text" id="age" name="age" value="" size="3" autocomplete="off" oninput="checkInt(this)" placeholder="0">
+
+                    <label for="blood-type">혈액형 : </label>
+                    <input type="text" id="blood-type" name="bloodType" value="" size="3">
+                </div>
+
+                <div>
+                    <label for="phone">연락처 : </label>
+                    <input type="text" id="phone" name="phone" value="" oninput="checkDashAndNumbers()" autocomplete="off" placeholder="000-0000-0000">
+
+                    <label for="emergency-phone">비상연락처 : </label>
+                    <input type="text" id="emergency-phone" name="emergencyPhone" value="" oninput="checkDashAndNumbers()" autocomplete="off" placeholder="000-0000-0000">
+                </div>
+
+                <hr>
+
+
+                <table id="vital-sign-table">
+                    <tbody>
+                    <tr>
+                        <th>날짜</th>
+                        <th>몸무게(Kg)</th>
+                        <th>신장(cm)</th>
+                        <th>혈압(수축)</th>
+                        <th>혈압(이완)</th>
+                        <th>체온(℃)</th>
+                        <th>맥박</th>
+                    </tr>
+
+                    <tr>
+                        <td><input type="date" value=""></td>
+                        <td><input type="text" value="" size="2" autocomplete="off" oninput="checkDouble(this)" class="vitalValue" placeholder="00.0"></td>
+                        <td><input type="text" value="" size="2" autocomplete="off" oninput="checkDouble(this)" class="vitalValue" placeholder="000.0"></td>
+                        <td><input type="text" value="" size="2" autocomplete="off" oninput="checkInt(this)" class="vitalValue" placeholder="0"></td>
+                        <td><input type="text" value="" size="2" autocomplete="off" oninput="checkInt(this)" class="vitalValue" placeholder="0"></td>
+                        <td><input type="text" value="" size="2" autocomplete="off" oninput="checkDouble(this)" class="vitalValue" placeholder="00.0"></td>
+                        <td><input type="text" value="" size="2" autocomplete="off" oninput="checkInt(this)" class="vitalValue" placeholder="0"></td>
+                    </tr>
+
+
+                    </tbody>
+                </table>
+
+                <div>
+                    <div id="vital-sign-btn-box">
+                        <button type="button" class="btn" onclick="clearVitals()" id="vital-sign-add-btn">+</button>
+                        <button type="button" class="btn" onclick="updateVital()" id="vital-sign-update-btn">등록</button>
+                        <button type="button" class="btn" onclick="modifyVital()" id="vital-sign-modify-btn">수정</button>
+                        <button type="button" class="btn" onclick="addVital()" id="vital-sign-btn">등록</button>
+                        <button type="button" class="btn" onclick="searchVitals()" id="vital-sign-cancel-btn">취소</button>
+                    </div>
+
+                    <ul id="vital-sign-paging">
+                        <li id="prev-page">
+                            <i class="fa-solid fa-angle-left" style="color: #000000;"></i>
+                        </li>
+
+
+                        <li id="next-page">
+                            <i class="fa-solid fa-angle-right" style="color: #000000;"></i>
+                        </li>
+                    </ul>
+                </div>
+
+            </form>
+
+            <div>
+
+            </div>
+        </article>
+
+        <article id="diagnosis-article">
+            <nav>
+                <ul id="diagnosis-record-list">
+                    <li>
+                        <select id="past-record-order" onchange="getDiagnosisOrder()">
+                            <option id="record-order-desc" value="true">최신순</option>
+                            <option id="record-order-asc" value="false">오래된순</option>
+                        </select>
+                    </li>
+
+
+                </ul>
+
+                <ul id="diagnosis-record-paging">
+
+                </ul>
+                <input type="hidden" id="past-record-page" value="">
+            </nav>
+
+            <div id="past-box">
+                <div id="past-title-box">
+                    <input type="hidden" id="past-diagnosis-id">
+                    <h3 id="diagnosis-title">진료기록
+                        <span>2024-05-04</span>
+                        <span> | </span>
+                        <span>임승범</span>
+                    </h3>
+                    <div id="past-diagnosis-btn-box">
+                        <button class="btn diagnosis-modify-btn" onclick="changeDiagnosis(this)" data-diagnosis-id="past">수정</button>
+                        <button class="btn diagnosis-delete-btn" onclick="deleteDiagnosis(this)" data-diagnosis-id="past">삭제</button>
+                        <span id="past-to-read" onclick="changeDiagnosis(this)" data-diagnosis-id="read">
+                                            <i class="fa-solid fa-arrow-up-right-from-square fa-lg"></i>
+                                        </span>
+                    </div>
+                </div>
+
+                <div class="textarea-box pre-diagnosis-box">
+                    <div id="pre-symptoms-box">
+                        <h4>증상</h4>
+                        <div id="attending-doctor-box">
+                            <span>담당의 </span>
+                            <span> : </span>
+                            <span>임승범</span>
+                        </div>
+                    </div>
+                    <textarea name="symptoms" id="symptoms-past-record" readonly placeholder="증상 내용이 없습니다.">코 막힘 , 호흡불편 , 코 가려움</textarea>
+                </div>
+
+                <div class="textarea-box pre-diagnosis-box">
+                    <h4>진료</h4>
+                    <div id="pre-diagnosis-box">
+                        <textarea name="diagnosis" id="diagnosis-past-record" readonly placeholder="진료 내용이 없습니다.">알레르기성 비염, 환경 개선 및 약물요법 병행치료 진행 </textarea>
+                        <div id="pre-kcds">
+                            <div id="no-pre-kcds">선택된 상병이 없습니다.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="textarea-box pre-pay-box">
+                    <h4>처방</h4>
+
+                    <div id="past-pay">
+                        <div id="no-past-pay">
+                            선택된 처방이 없습니다.
+                        </div>
+                        <ul id="past-treatment-box">
+
+                        </ul>
+                        <ul id="past-medical-box">
+
+                        </ul>
+                    </div>
+                </div>
+
+
+
+                <div class="textarea-box pre-diagnosis-box">
+                    <h4>의약품 | 조제시 참고사항</h4>
+                    <div id="pre-prescription-box">
+                        <div id="pre-pills">
+                            <div id="no-pre-pills">
+                                처방된 의약품이 없습니다.
+                            </div>
+                        </div>
+                        <textarea name="prescription" id="prescription-past-record" readonly placeholder="조제시 참고사항 내용이 없습니다.">항히스타민 성분 약 7일치 처방 바람.</textarea>
+                    </div>
+                </div>
+
+                <div id="no-record-diagnosis">
+                    <span>과거 진료 기록이 없습니다.</span>
+                </div>
+
+                <div id="pre-files-box">
+                    <h4>파일목록</h4>
+                    <div id="pre-files">
+                        <div id="no-pre-files">
+                            저장된 파일이 없습니다.
+                        </div>
+                    </div>
+                </div>
+
+                <h5 id="past-modify-box">
+                    <span>2024-09-02/23:43:36</span>
+                    <span> | </span>
+                    <span>임승범</span>
+                    <span>(마지막 수정자)</span>
+                </h5>
+
+            </div>
+        </article>
+    </section>
+
+    <section id="right-section" layout:fragment="rightSection">
+
+        <article id="right-article">
+
+            <div>
+                <input type="hidden" id="new-diagnosisId">
+                <input type="hidden" id="diagnosisModifier">
+                <input type="hidden" id="new-patientId">
+                <input type="hidden" id="diagnosisYn">
+                <h3 id="diagnosis-write-title">
+                    진료기록 작성
+                    <span id="todayDiagnosisDate">2024/05/11 15:13</span>
+                    <span> | </span>
+                    <span>[선택된 환자 없음]</span>
+                </h3>
+                <h5 id="diagnosis-write-sub-title">
+                    <span>2024-09-02/23:43:36</span>
+                    <span> | </span>
+                    <span>수정자</span>
+                    <span>(수정자)</span>
+                </h5>
+            </div>
+
+            <div class="textarea-box big mt" >
+                <div>
+                    <h4>증상</h4>
+                    <div id="diagnosis-btn-box">
+                        <button class="btn" id="diagnosis-modify-btn" onclick="callDiagnosis(this)" data-diagnosis-id="new">수정</button>
+                        <button class="btn" id="diagnosis-create-btn" onclick="updateDiagnosis()" >등록</button>
+                        <button class="btn" id="diagnosis-delete-btn" onclick="deleteDiagnosis(this)" data-diagnosis-id="new">삭제</button>
+                        <button class="btn" id="diagnosis-cancel-btn" onclick="callDiagnosis(this)" data-diagnosis-id="new">취소</button>
+                    </div>
+                </div>
+                <textarea name="symptoms" id="symptoms-record" readonly ></textarea>
+            </div>
+
+            <div class="textarea-box big">
+                <div>
+                    <h4>진료</h4>
+                    <button class="btn" id="kcdsSearchBtn" onclick="getKcdPopup()">상병 검색</button>
+                </div>
+                <div id="diagnosisBox">
+                    <textarea name="diagnosis" id="diagnosis-record" readonly></textarea>
+                    <div id="sortable-container" class="kcds">
+                        <input type="hidden" value="" id="kcdId">
+                        <div id="no-kcd">
+                            선택된 상병이 없습니다.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="textarea-box big">
+                <div>
+                    <h4>처방</h4>
+                    <button class="btn sf-mbtn" id="feeSearch" onclick="getTreatmentPopup()">처방 검색</button>
+                </div>
+
+                <div id="pay">
+                    <input type="hidden" value="" id="treatmentId">
+                    <ul id="treatment-box">
+
+                    </ul>
+                    <input type="hidden" value="" id="medicalBillId">
+                    <ul id="medical-box">
+
+                    </ul>
+                    <div id="no-pay">
+                        선택된 처방이 없습니다.
+                    </div>
+                </div>
+            </div>
+
+            <div class="textarea-box big">
+                <div>
+                    <h4>의약품 | 조제 시 참고사항</h4>
+                    <button type="button" class="btn sf-mbtn" id="medicineSearchBtn" onclick="getMedicinePopup()">의약품 검색</button>
+                </div>
+
+                <div class="prescriptionBox">
+                    <input type="hidden" value="" id="pillId">
+                    <div id="pills">
+                        <div id="no-pills">
+                            처방된 의약품이 없습니다.
+                        </div>
+                    </div>
+                    <textarea name="prescription" id="prescription-record" readonly></textarea>
+                </div>
+            </div>
+
+            <div id="file-box">
+                <div>
+                    <input type="hidden" value="" id="fileId">
+                    <h4 id="file-add">파일등록</h4>
+                    <h4 id="file-read">파일목록</h4>
+                    <label for="file-upload" class="btn file-label">내PC</label>
+                </div>
+
+                <div>
+                    <div id="file-drag-box" class="">
+                        <i class="fa-solid fa-file-image fa-2xl" style="color: #74C0FC;"></i>
+                        <p>File drag and drop</p>
+                        <p id="no-files">저장된 파일이 없습니다.</p>
+                        <div id="files" class="files">
+
+                        </div>
+
+                    </div>
+
+                    <ul>
+                        <li><input type="file" id="file-upload" accept="image/*, .pdf" multiple></li>
+                    </ul>
+                </div>
+            </div>
+        </article>
+
+        <!-- js -->
+        <script src="/js/receptionTest.js"></script>
+    </section>
+
+</body>
+
+</html>

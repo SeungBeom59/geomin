@@ -62,9 +62,9 @@ public class HomeController {
         log.info("get >> /reception... getHome() 실행됨.");
 //        log.info("principal::{}",principal);
 //        log.info(principal.getName());
-        UserSecurityDTO user = userService.getUser(principal.getName());
 //        log.info("user::{}" , user);
 
+        UserSecurityDTO user = userService.getUser(principal.getName());
         Page<WaitingDTO> waitingList = waitingService.getWaitingList(pageable , user.getDepartmentId());
 //        log.info("page" + waitingList.getPageable());
 //        log.info("totalPage " + waitingList.getTotalPages());
@@ -78,7 +78,25 @@ public class HomeController {
         model.addAttribute("waitingEnd" , waitingEnd);
 
 
-        return "reception";
+        return "pages/reception";
+    }
+
+    // 수납 페이지
+    @GetMapping("pay")
+    public String getPay(Principal principal , Model model,
+                         @PageableDefault(size = 4) Pageable pageable){
+
+        log.info("get >> /pay... getPay() 실행됨.");
+
+        UserSecurityDTO user = userService.getUser(principal.getName());
+        Page<WaitingDTO> waitingList = waitingService.getWaitingList(pageable , user.getDepartmentId());
+        int waitingEnd = waitingService.getEndCount(user.getDepartmentId());
+
+        model.addAttribute("user" , user);
+        model.addAttribute("waitingList" , waitingList);
+        model.addAttribute("waitingEnd" , waitingEnd);
+
+        return "pages/pay";
     }
 
 

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<!-- Thymeleaf 선언 / headerFragment 임을 선언-->
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <header th:fragment="HeaderFragment">
+        <div>
+            <div id="search-box">
+                <div>
+                    <input type="text" name="patientName" placeholder="환자 검색" id="search-bar">
+                </div>
+                <button id="search-btn" alt="검색버튼">
+                    <i class="fa-solid fa-magnifying-glass" style="color: #000000;"></i>
+                </button>
+            </div>
+
+            <div>
+                <button type="button" class="btn" onclick="clearPatient()">신환등록</button>
+                <button type="button" class="btn" onclick="">수납</button>
+                <button type="button" class="btn" onclick="getWaitingPopup()">접수</button>
+                <!--                        <button type="button" class="btn sf-mbtn" onclick="newDiagnosis()">진료기록작성</button>-->
+            </div>
+        </div>
+
+        <div>
+            <button type="button" class="btn" id="logout-btn" onclick="logout()">로그아웃</button>
+        </div>
+
+    </header>
+</body>
+</html>

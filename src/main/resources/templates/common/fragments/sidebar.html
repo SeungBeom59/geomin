@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+
+<body>
+    <aside id="sidebar" th:fragment="SidebarFragment">
+
+        <div id="name-box">
+            <h1>진료실 -
+                <span th:if="${user.getDepartment() != null}" th:text="${user.getDepartment()}">소속</span>
+                <span th:if="${user.getDepartment() == null}">무소속</span>
+            </h1>
+            <h3>담당자 : <span th:text="${user.getName()}">최은석</span></h3>
+            <input type="hidden" id="userId" th:value="${user.getId()}">
+            <input type="hidden" id="departmentId" th:value="${user.getDepartmentId()}">
+        </div>
+
+        <hr>
+
+        <div>
+            <div>
+                <button id="waitingBtn" class="btn" onclick="findWaiting(this)">진료대기</button>
+                <span id="waiting-user-count" th:text="${waitingList.getTotalElements()}">3</span> 명
+            </div>
+
+            <div>
+                <button id="endWaitingBtn" class="btn" onclick="findEndWaiting(this)">진료완료</button>
+                <span id="waiting-end-count" th:text="${waitingEnd}">5</span> 명
+            </div>
+        </div>
+
+        <hr>
+
+        <div id="waiting-list">
+
+            <th:block th:each="waitingUser : ${waitingList.content}">
+                <div class="name-card">
+                    <div>
+                        <span class="name" th:text="${waitingUser.getPatientName()}">이름</span>
+                        <input type="hidden" th:value="${waitingUser.getWaitingId()}" class="waitingId">
+                        <button th:if="${waitingUser.getWaitingStatus() == '진료중'}" class="btn2" onclick="">진료중</button>
+                        <button th:if="${waitingUser.getWaitingStatus() != '진료중'}" class="btn" onclick="callPatient(this)">호출</button>
+                    </div>
+
+                    <div>
+                        <span th:text="${waitingUser.getIdentify()}">생년월일</span>
+                        <span th:if="${waitingUser.getAge() != null && waitingUser.getAge() != 0}" th:text="${waitingUser.getAge()+'세'}">나이</span>
+                        <span th:if="${waitingUser.isGender() == true}">남</span>
+                        <span th:if="${waitingUser.isGender() == false}">여</span>
+                    </div>
+
+                    <div>
+                        <span th:text="${waitingUser.getWaitingDate()} + '접수'"></span>
+                        <span th:text="${waitingUser.getWaitingType()}"></span>
+                    </div>
+
+                    <div>
+                        <span th:text="${waitingUser.getWaitingStatus()}"></span>
+                    </div>
+                </div>
+            </th:block>
+
+
+        </div>
+
+
+        <input type="hidden" value="0" id="waiting-current-page">
+
+        <ul id="waiting-paging">
+
+            <th:block th:if="${waitingList.getTotalPages() != 0}" th:each="page : ${#numbers.sequence(1 , waitingList.getTotalPages())}">
+                <li th:if="${page <= 3}" th:classappend="${waitingList.number + 1 == page}? 'active' " th:text="${page}" th:onclick="'searchWaiting(' + (${page} - 1) + ')'">
+                </li>
+            </th:block>
+
+            <li th:if="${waitingList.getTotalPages() > 3}" id="waiting-next-page">
+                <i class="fa-solid fa-angle-right" style="color: #000000;"></i>
+            </li>
+        </ul>
+
+    </aside>
+</body>
+</html>
