@@ -36,6 +36,13 @@ dependencies {
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
     implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
 
+    // aop : spring starter aop는 본래 aspectj와 달리 bean에만 적용가능하나
+    // aspectj의 일부기능도 활성화할 수 있도록 되어 있음. 이에 사용하도록 추가.
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+    runtimeOnly 'org.aspectj:aspectjrt:1.6.10'
+    runtimeOnly 'org.aspectj:aspectjweaver:1.8.8'
+
+
     // 입력값 검증
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 

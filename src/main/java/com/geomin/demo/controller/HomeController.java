@@ -1,6 +1,7 @@
 package com.geomin.demo.controller;
 
 import com.geomin.demo.dto.*;
+import com.geomin.demo.resolver.CommonModel;
 import com.geomin.demo.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +37,7 @@ public class HomeController {
     private final TreatmentService treatmentService;
     private final MedicalMaterialService medicalMaterialService;
 
-
+    // todo : 모든 컨트롤러의 log 알림 지우기. (aop로 로그남기도록 처리했음)
 
     // 로그인
     @GetMapping("/login")
@@ -54,47 +55,21 @@ public class HomeController {
 
     // 접수 페이지
 //    @PreAuthorize("hasAnyRole('USER')")
+    @CommonModel
     @GetMapping(value = {"/reception" , "/" , ""})
-    public String getHome(
-            Principal principal , Model model,
-            @PageableDefault(size = 4) Pageable pageable
-    ){
+    public String getHome(Model model, @PageableDefault(size = 4) Pageable pageable){
         log.info("get >> /reception... getHome() 실행됨.");
-//        log.info("principal::{}",principal);
-//        log.info(principal.getName());
-//        log.info("user::{}" , user);
-
-        UserSecurityDTO user = userService.getUser(principal.getName());
-        Page<WaitingDTO> waitingList = waitingService.getWaitingList(pageable , user.getDepartmentId());
-//        log.info("page" + waitingList.getPageable());
-//        log.info("totalPage " + waitingList.getTotalPages());
-//        log.info("totalElements " + waitingList.getTotalElements());
-//        log.info("waitingList::{}" , waitingList.stream().toList());
-
-        int waitingEnd = waitingService.getEndCount(user.getDepartmentId());
-
-        model.addAttribute("user" , user);
-        model.addAttribute("waitingList" , waitingList);
-        model.addAttribute("waitingEnd" , waitingEnd);
-
 
         return "pages/reception";
     }
 
     // 수납 페이지
     @GetMapping("pay")
-    public String getPay(Principal principal , Model model,
-                         @PageableDefault(size = 4) Pageable pageable){
+    @CommonModel
+    public String getPay(Model model, @PageableDefault(size = 4) Pageable pageable){
 
         log.info("get >> /pay... getPay() 실행됨.");
 
-        UserSecurityDTO user = userService.getUser(principal.getName());
-        Page<WaitingDTO> waitingList = waitingService.getWaitingList(pageable , user.getDepartmentId());
-        int waitingEnd = waitingService.getEndCount(user.getDepartmentId());
-
-        model.addAttribute("user" , user);
-        model.addAttribute("waitingList" , waitingList);
-        model.addAttribute("waitingEnd" , waitingEnd);
 
         return "pages/pay";
     }
@@ -441,6 +416,7 @@ public class HomeController {
         return ResponseEntity.status(HttpStatus.OK).body(callResponse);
     }
 
+    // fixme : 너무 복잡한 로직이 컨트롤러 로직 흐름 이해 방해, 퍼사드 패턴이라도 써서 정리하기
     // 진료 기록 작성 | 수정
     @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("/diagnosis-update")

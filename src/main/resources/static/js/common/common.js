@@ -199,3 +199,318 @@ $('#custom-context-menu .submenu li').on('click' , function (){
 //
 //
 //}
+
+// 진료 접수 명단 html 넣기
+function insertWaiting(content){
+    $('#waitingBtn').removeClass('off');
+    $('#endWaitingBtn').addClass('off');
+
+    $('#waiting-list').empty(); // 하위 html 모두 삭제
+
+    console.log('insertWaiting 실행됨');
+    console.log('content : ' , content);
+
+    content.forEach(function (waitingUser){
+
+        var html = '<div class="name-card">';
+
+        html += '<div>' +
+                    '<input type="hidden" value="' + waitingUser.waitingId + '" class="waitingId">';
+
+        if(waitingUser.waitingStatus == '진료중'){
+            html +=     '<span class="name">' + waitingUser.patientName + '</span><button class="btn2" onclick="">진료중</button></div>';
+        }
+        else {
+            html +=     '<span class="name">' + waitingUser.patientName + '</span><button class="btn" onclick="callPatient(this)">호출</button></div>';
+        }
+
+        html += '<div>' +
+                    '<span>' + waitingUser.identify + '</span>';
+
+        if(waitingUser.age != null && waitingUser.age >= 0){
+            html += '<span>' + waitingUser.age + '세</span>';
+        }
+
+        html += '<span>' + (waitingUser.gender? '남' : '여') + '</span></div>';
+
+        html += '<div><span>' + waitingUser.waitingDate + '접수</span>';
+        html += '<span>' + waitingUser.waitingType + '</span></div>';
+
+        html += '<div><span>' + waitingUser.waitingStatus + '</span></div></div>';
+
+        $('#waiting-list').append(html);
+    });
+}
+
+// 진료 접수 명단 페이징 html 넣기
+function waitingpaging(waitingList){
+
+    $('#waiting-paging').empty();
+
+    console.log("waitingpaging 실행됨");
+
+    var totalElements = waitingList.totalElements;          // 총 레코드 갯수
+    var totalPages = waitingList.totalPages;                // 총 페이지 갯수
+    var size = waitingList.size;                            // 보여줄 레코드 수
+    var currentPage = waitingList.pageable.pageNumber;      // 현재 페이지
+    var waitingEndCnt = 0;                                  // 진료완료 수
+
+    if(waitingList.content.length !== 0){
+        waitingEndCnt = waitingList.content.at(0).waitingEndCnt;
+        $('#waiting-end-count').text(waitingEndCnt);    // 진료 완료 환자수 변경
+    }
+    else {
+        getWaitingEndCnt();
+    }
+
+    console.log('totalElements = ' , totalPages , ' totalPages = ' ,
+        totalPages, ' size = ' , size , ' currentPage = ' , currentPage);
+
+    $('#waiting-current-page').val(currentPage); // 현재페이지 hidden으로 숨겨놓기
+
+    $('#waiting-user-count').text(totalElements);   // 진료 대기 환자수 변경
+
+
+    // var html = '<ul id="waiting-paging>"';
+    var waitingpaging = '';
+
+    var startPage = Math.max(0 , Math.floor(currentPage / 3) * 3);
+    var endPage = Math.min(startPage + 3 , totalPages);
+
+    console.log(startPage);
+    console.log(endPage);
+
+    if(currentPage >= 3){
+        waitingpaging += '<li id="waiting-prev-page" onclick="searchWaiting(' + (startPage - 1) + ')">'+
+            '<i class="fa-solid fa-angle-left" style="color: #000000;"></i>' +
+            '</li>';
+    }
+
+    for(var page = startPage; page < endPage; page++){
+        var isActive = (currentPage === page)? 'active' : '';
+        waitingpaging += '<li class="' + isActive + '" onclick="searchWaiting(' + page +')">' + (page+1)  + '</li>';
+    }
+
+    if(totalPages > endPage){
+        waitingpaging += '<li id="waiting-next-page" onclick="searchWaiting(' + endPage + ')">' +
+            '<i class="fa-solid fa-angle-right" style="color: #000000;"></i>' +
+            '</li>';
+    }
+
+    console.log(waitingpaging);
+    $('#waiting-paging').append(waitingpaging);
+
+}
+
+// 진료 접수 팝업창 수신용 함수
+function receiveWaitingInfo(response) {
+
+    // 웹 소켓 통신으로 서버에 업데이트 되었음을 알리는 신호 보내기
+    var departmentId = $('#departmentId').val();
+    stompClient.send("/pub/waiting/" + departmentId);
+
+    var waitingList = JSON.parse(response);  // json형태로 넘겨줬기 때문에 parse
+    console.log('waitingList = ' , waitingList);
+
+    insertWaiting(waitingList.content);     // 접수 대기 명단 넣어주기
+
+    waitingpaging(waitingList);
+}
+
+function getWaitingEndCnt(){
+
+    var data = {
+        departmentId: $('#departmentId').val()
+    }
+
+    $.ajax({
+        url: '/waiting-end-cnt',
+        type: 'post',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(data),
+        success: function (response){
+            console.log('따로 ajax 이용, 진료완료 환자 수 가져옴.');
+            var waitingEndCnt = response.waitingEndCnt;
+            $('#waiting-end-count').text(waitingEndCnt);    // 진료 완료 환자수 변경
+        },
+        error: function (xhr, status, error){
+            console.error('AJAX 요청 실패: ', status, error);
+        }
+    })
+
+}
+
+function searchWaiting(page){
+
+    console.log(page);
+
+    var data = {
+        page : page
+    }
+
+    $.ajax({
+       url: "/waiting",
+       type: 'post',
+       contentType: 'application/json; charset=utf-8',
+       data: JSON.stringify(data),
+       success: function (response){
+           var waitingList = JSON.stringify(response);
+           receiveWaitingInfo(waitingList);
+           console.log(response);
+       } ,
+       error : function (xhr, status, error){
+           console.error('AJAX 요청 실패: ', status, error);
+       }
+    });
+
+}
+
+function findWaiting(button){
+    $(button).removeClass('off');
+    $('#endWaitingBtn').addClass('off');
+    searchWaiting();
+}
+
+function findEndWaiting(button){
+    $(button).removeClass('off');
+    $('#waitingBtn').addClass('off');
+
+    // 위처럼 searchEndWaiting() 만들어주는게 좋겠음.
+    var page = 0;
+    searchEndWaiting(page);
+}
+
+function searchEndWaiting(page) {
+    console.log('searchEndWaiting() 실행됨');
+    $('#endWaitingBtn').removeClass('off');
+    $('#waitingBtn').addClass('off');
+
+    $('#waiting-list').empty(); // 하위 html 모두 삭제
+    $('#waiting-paging').empty(); // 페이징도 삭제해줘야함.
+
+    // var data = {
+    //
+    // }
+    console.log('page = ' , page);
+    $.ajax({
+        url : '/waiting/end/' + page,
+        type: 'post',
+        contentType: 'application/json; charset=utf-8',
+        // data: JSON.stringify(data),
+        success: function (response){
+            // alert('searchEndWaiting() 성공');
+            console.log(response);
+            processWaiting(response);
+        },
+        error: function (xhr , status, error){
+            console.log('ajax 요청 실패' , status , error);
+        }
+    })
+
+}
+
+function processWaiting(response){
+
+    var waitings = Array.isArray(response.waitingDTOList)? response.waitingDTOList : [];
+
+    $('#waiting-list').empty(); // 하위 html 모두 삭제
+    $('#waiting-paging').empty(); // 페이징도 삭제해줘야함.
+
+    if(waitings.length > 0){
+       insertEndWaiting(waitings);
+    }
+    if(response.pagingDTO != null){
+        endWaitingPaging(response);
+    }
+}
+
+function endWaitingPaging(response){
+    console.log('endWaitingpaging()실행');
+    var paging = response.pagingDTO;
+    $('#waiting-paging').empty();
+
+    var btnCnt = paging.btnCnt;
+    var total = paging.total;
+    var currentGroupPage = paging.currentGroupPage;
+    var endPage = paging.endPage;
+    var page = paging.page;
+    var size = paging.size;
+    var startPage = paging.startPage;
+    var totalPages = paging.totalPages;
+    var next =  page < totalPages;
+    var prev = paging.prev;
+
+    $('#waiting-current-page').val(page);   // hidden page값 변경
+    $('#waiting-end-count').text(total);    // 진료완료 환자 수 변경
+
+    var waitingPaging = '';
+
+    if(prev === true){
+        waitingPaging +=
+            `<li id="waiting-prev-page" onclick="searchEndWaiting(${startPage - 2})">` +
+            `<i class="fa-solid fa-angle-left" style="color: #000000;"></i>` +
+            `</li>`;
+    }
+
+    for(var p = startPage; p <= endPage; p++){
+        var isActive = (page === p)? 'active' : '';
+        waitingPaging += `<li class="` + isActive + `" onclick="searchEndWaiting(` + (p - 1) + `)">` + p + `</li>`;
+    }
+
+    if(next === true){
+        waitingPaging += `<li id="waiting-next-page" onclick="searchEndWaiting(` + endPage + `)">` +
+            `<i class="fa-solid fa-angle-right" style="color: #000000;"></i>` +
+            `</li>`;
+    }
+    $('#waiting-paging').append(waitingPaging);
+}
+
+function insertEndWaiting(content){
+
+    var waitingCnt = content[0].waitingEndCnt;
+    $('#waiting-user-count').text(waitingCnt);
+
+    content.forEach(function (waitingUser){
+
+        var html = '<div class="name-card">';
+
+        html += '<div>' +
+            '<input type="hidden" value="' + waitingUser.waitingId + '" class="waitingId">';
+        html +=     '<span class="name">' + waitingUser.patientName;
+
+
+        switch (waitingUser.payStatus){
+            case 0 :
+                html += '</span><button class="btn" onclick="">수납대기</button></div>';
+                break;
+            case 1 :
+                html += '</span><button class="btn3" onclick="">수납완료</button></div>';
+                break;
+            case 2 :
+                html += '</span><button class="btn4" onclick="">일부수납</button></div>';
+                break;
+        }
+
+        // 수납여부에 따라 구분
+
+
+        html += '<div>' +
+            '<span>' + waitingUser.identify + '</span>';
+
+        if(waitingUser.age != null && waitingUser.age >= 0){
+            html += '<span>' + waitingUser.age + '세</span>';
+        }
+
+        html += '<span>' + (waitingUser.gender? '남' : '여') + '</span></div>';
+
+        html += '<div><span>' + waitingUser.waitingDate + '접수</span>';
+        html += '<span>' + waitingUser.waitingType + '</span></div>';
+
+        html += '<div><span>' + waitingUser.waitingStatus + '</span></div></div>';
+
+        $('#waiting-list').append(html);
+    });
+
+
+}
+

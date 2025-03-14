@@ -1,0 +1,325 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard-dynamic-subset.css');
+/* pretendard 폰트 cdn */
+
+/* 기본 설정 */
+html, body {
+    margin: 0; padding: 0;
+    background-color: white;
+    font-family: 'Pretendard' , 'sans-serif';
+    box-sizing: border-box;
+    background-color: black;
+    min-width: 1900px;
+    height: 1000px;
+    /* background-color: black; */
+    /* overflow-x: hidden; */
+    /* overflow-y: hidden; */
+}
+
+/* 버튼 기본양식 */
+.btn , .btn2 , .btn3 , .btn4 {
+    display: block;
+    border-radius: 10px;
+    border: 0;
+    width: 82px; height: 24px;
+    background-color: #444343;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+    text-align: center;
+}
+
+.off {
+    background-color: #909090;
+}
+
+
+#wrap {
+    display: flex;
+    min-height: 100%;
+    background-color: #e8edf6;
+}
+
+#header-main-wrap {
+    width: 1650px;
+    min-height: 100%;
+}
+
+aside {
+    /* display: block; */
+    border-right: 1px solid #444343;
+    min-width: 250px;
+    background-color: #5D78D8;
+}
+
+header {
+    min-width: 1650px;
+    height: 50px;
+    background-color: #5B9FFF;
+    border-bottom: 1px solid #444343;
+}
+
+main {
+    /* border: 1px solid black; */
+    min-width: 1650px;
+    height: 100vh;
+
+}
+
+/* 모든 콘텐츠 제목칸 설정, 상단회색바 */
+.title-box {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    background-color: #D9D9D9;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-indent: 20px;
+}
+
+/* aside */
+/* 위치, 담당자 이름 */
+#name-box {
+    text-indent: 10px;
+    color: white;
+    /* border: 1px solid black; */
+}
+
+#name-box > h3 > span {
+    color: black;
+    font-size: 20px;
+}
+
+/* 진료대기, 진료완료 */
+aside > div:nth-child(3) {
+    /* border: 1px solid black; */
+    display: flex;
+    justify-content: space-around;
+    height: 60px;
+}
+
+aside > div:nth-child(3) > div {
+    /* border: 1px solid red; */
+    text-align: center;
+    color: white;
+}
+
+/* aside > div:nth-child(3) > div > button {
+    display: block;
+    border-radius: 10px;
+    border: 0;
+    width: 82px; height: 24px;
+    background-color: #909090;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+} */
+
+aside > div:nth-child(3) > div > span {
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    display: inline-block;
+    margin-top: 10px;
+    /* border: 1px solid black; */
+}
+
+/* 진료대기자 또는 진료완료 인원 목록 */
+
+
+#waiting-list {
+    /* border: 1px solid black; */
+    /*min-height: 560px;*/
+}
+
+.name-card {
+    background-color: white;
+    border-radius: 10px;
+    width: 228px;
+    margin-left: 10px;
+    /*height: 125px;*/
+    height: 100px;
+    margin-top: 20px;
+}
+/* 이름 , 호출 버튼 */
+.name-card > div:first-child {
+    display: flex;
+    justify-content: space-around;
+    padding-top: 5px;
+}
+
+.name-card > div:first-child > span {
+    display: block;
+    font-size: 18px; font-weight: bold;
+    /* border: 1px solid black; */
+}
+
+.name-card > div:first-child > button {
+    background-color: #569EC7;
+}
+
+.btn3 {background: #B7B7B7 !important;}
+.btn4 {background: #279B33 !important;}
+
+
+/* 인적사항 */
+.name-card > div:nth-child(2) {
+    /* border: 1px solid black; */
+    display: flex;
+    justify-content: space-evenly;
+    margin-top: 8px;
+}
+
+/* 접수시간 */
+.name-card > div:nth-child(3) {
+    /* border: 1px solid black; */
+    /*padding-left: 24px;*/
+    display: flex;
+    justify-content: space-around;
+}
+
+.name-card > div:nth-child(3) > span:last-child ,
+.name-card > div:nth-child(4) > span {
+    color: #0a58ca;
+}
+
+
+
+.name-card > div:nth-child(2) ,
+.name-card > div:nth-child(3) ,
+.name-card > div:nth-child(4)  {
+    font-size: 15px; font-weight: bold;
+}
+
+.name-card > div:nth-child(4) {
+    /* border: 1px solid black; */
+    text-align: center;
+    margin-top: 5px;
+}
+.name-card > div:nth-child(4) > input {
+    border: none;
+    border-bottom: 1px solid black;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 14px;
+}
+.name-card > div:nth-child(4) > input:focus {
+    outline: none;
+}
+
+/* header */
+/* 검색창, 검색버튼 */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header > div:first-child {
+    display: flex;
+    justify-content: space-between;
+    /* border: 1px solid red;  */
+    margin-left: 20px;
+    min-width: 450px;
+}
+
+header > div:first-child > div:last-child {
+    /* border: 1px solid black; */
+    display: flex;
+    align-items: center;
+}
+
+header > div:first-child > div:last-child > button {
+    margin-left: 10px;
+
+}
+
+#search-box {
+    /* border: 1px solid black; */
+    display: flex;
+}
+
+#search-box > div > input {
+    width: 282px; height: 24px;
+    font-size: 20px;
+}
+
+#search-btn {
+    cursor: pointer;
+}
+
+/* 로그아웃 버튼 */
+header > div:last-child {
+    /* border: 1px solid red; */
+    margin-right: 30px;
+}
+
+/* main */
+/* 레이아웃 정리 */
+main {
+    display: flex;
+}
+
+section {
+    /* border: 1px solid black; */
+    width: 50%;
+}
+
+#left-section > article ,
+#right-section > article {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    margin-left: 31px; margin-top: 20px;
+    width: 761px;
+    background-color: white;
+}
+
+/*우클릭 메뉴 css 설정*/
+#custom-context-menu {
+    display: none;
+    position: absolute;
+    z-index: 1000;
+    background:  white;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+#custom-context-menu > ul {
+    text-align: center;
+    list-style: none;
+    position: relative;
+    width: 120px;
+    margin: 0; padding: 0;
+    padding-block: 5px;
+    cursor: pointer;
+}
+
+#custom-context-menu > ul > li:hover , .submenu > li:hover {
+    background-color: #5B9FFF;
+    color: white;
+    font-weight: bold;
+}
+
+.submenu {
+    display: none;
+    margin: 0; padding: 0;
+    list-style: none;
+    text-align: center;
+    /*border: 1px solid black;*/
+    position: absolute;
+    width: 100px;
+    left: 120px;
+    top: -1px;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    border: 1px solid #ccc;
+    background: white;
+    color: black;
+}
+
+/**호출 버튼 클릭시, 진료중 버튼 설정**/
+.btn2 {
+    background-color: #3eb97b !important
+}

@@ -5,15 +5,54 @@
         layout:decorate="~{common/layouts/default_layout}">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="/css/pages/pay.css">
     <title>Geomin-Pay</title>
 </head>
 <body>
     <section id="left-section" layout:fragment="leftSection">
-        
+        <article id="left-article">
+            <div class="title-box">
+                <h3 id="pay-search-title">수납기록</h3>
+            </div>
+
+            <form id="pay-search-option">
+                <div>
+                    <div>
+                        <label>날짜날짜</label>
+                        <input type="date"> ~ <input type="date">
+                        <button class="">한달</button>
+                        <button class="">일주일</button>
+                        <button class="">오늘</button>
+                    </div>
+
+                    <div>
+                        <button class="btn" onclick="" id="pay-search-btn">수납 검색</button>
+                    </div>
+                </div>
+
+                <div>
+                    2
+                </div>
+
+                <div>
+                    3
+                </div>
+            </form>
+        </article>
     </section>
 
     <section id="right-section" layout:fragment="rightSection">
+        <article id="receipt-article">
+            <div class="title-box">
+                <h3>수납</h3>
+            </div>
+        </article>
 
+        <article id="document-article">
+            <div class="title-box">
+                <h3>문서</h3>
+            </div>
+        </article>
     </section>
 </body>
 </html>

@@ -1,0 +1,51 @@
+/* 페이지의 모든 article 공통 요소 */
+/*#left-article , #right-section > #receipt-article ,
+#right-section > #document-article {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    margin-left: 31px;
+    margin-top: 20px;
+    width: 761px;
+    background-color: white;
+}*/
+
+#left-section > #left-article {
+    height: 891px;
+}
+
+/* 수납기록 검색 옵션칸 설정 */
+#pay-search-option {
+    box-sizing: border-box;
+    border: 1px solid black;
+    margin-top: 15px;
+    padding-left: 20px;
+}
+
+#pay-search-option > div:first-child {
+    display: flex;
+}
+
+#pay-search-option > div:first-child > div:first-child {
+    display : flex;
+}
+
+#pay-search-option > div > label {
+    font-weight : bold;
+}
+
+
+/* 우측 콘텐츠 영역 section */
+#right-section {
+
+}
+
+/* 우측 수납명세서 */
+#right-section > #receipt-article {
+    height: 550px;
+}
+
+
+/* 우측 문서발급 */
+#right-section > #document-article {
+    height: 321px;
+}

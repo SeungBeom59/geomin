@@ -6,17 +6,17 @@
 
 <head>
     <!--head 안에는 공통 JS, CSS, favicon 등의 내용이 담기도록 한다.-->
-    <th:block th:replace="common/fragments/config :: ConfigFragment"></th:block>
+    <th:block th:replace="~{common/fragments/config :: ConfigFragment}"></th:block>
 </head>
 
 <body>
 
     <div id="wrap">
-        <aside id="sidebar" th:replace="common/fragments/sidebar :: SidebarFragment">사이드바</aside>
+        <aside id="sidebar" th:replace="~{common/fragments/sidebar :: SidebarFragment}">사이드바</aside>
 
         <div id="header-main-wrap">
             <!-- 공통 Header 영역 -->
-            <header th:replace="common/fragments/header :: HeaderFragment">헤더</header>
+            <header th:replace="~{common/fragments/header :: HeaderFragment}">헤더</header>
 
             <!-- 페이지별 Content 영역 -->
             <main>
@@ -27,7 +27,7 @@
         </div>
 
         <div id="custom-context-menu">
-            <ul th:replace="common/fragments/context_menu :: contextMenuFragment"></ul>
+            <ul th:replace="~{common/fragments/context_menu :: contextMenuFragment}"></ul>
         </div>
     </div>
 
