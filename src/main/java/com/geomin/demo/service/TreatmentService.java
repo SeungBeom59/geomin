@@ -82,6 +82,8 @@ public class TreatmentService {
         // code인지 keyword인지 구분 함수 필요.
 
         if (keyword.matches("^[A-Za-z]{2}\\d+$") || keyword.matches("^[A-Za-z]\\d+$")){
+
+            keyword = keyword.toUpperCase(); // 소문자인 경우 대문자로 변경
             urlBuilder.append("&" + URLEncoder.encode("mdfeeCd","UTF-8") + "=" + URLEncoder.encode(keyword, "UTF-8")); /*수가코드(검색 유형 : A%)*/
         }
         else {
@@ -196,7 +198,7 @@ public class TreatmentService {
                     boolean deductibleA = element.getElementsByTagName("slfBrdnRtCzaApvYn").item(0).getTextContent().equals("Y");
                     boolean deductibleB = element.getElementsByTagName("slfBrdnRtCzbApvYn").item(0).getTextContent().equals("Y");
 
-                    int unitPrice = Integer.parseInt(element.getElementsByTagName("unprc2").item(0).getTextContent());
+                    int unitPrice = Integer.parseInt(element.getElementsByTagName("unprc1").item(0).getTextContent());
                     double costScore = Double.parseDouble(element.getElementsByTagName("cvalPnt").item(0).getTextContent());
 
                     TreatmentDTO billDTO = TreatmentDTO.builder()

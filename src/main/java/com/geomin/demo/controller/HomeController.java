@@ -36,14 +36,12 @@ public class HomeController {
     private final MedicineService medicineService;
     private final TreatmentService treatmentService;
     private final MedicalMaterialService medicalMaterialService;
-
-    // todo : 모든 컨트롤러의 log 알림 지우기. (aop로 로그남기도록 처리했음)
+    private final ServiceFacade serviceFacade;
 
     // 로그인
     @GetMapping("/login")
     public String getLogin(String logout) {
 
-        log.info("get >> /login... getLogin() 실행됨.");
         log.info("logout: " + logout);      // 사용자 logout 요청시에는 null이 아닌 "" 빈 값 들어오게 됨.
 
         if(logout != null){
@@ -58,7 +56,6 @@ public class HomeController {
     @CommonModel
     @GetMapping(value = {"/reception" , "/" , ""})
     public String getHome(Model model, @PageableDefault(size = 4) Pageable pageable){
-        log.info("get >> /reception... getHome() 실행됨.");
 
         return "pages/reception";
     }
@@ -67,8 +64,6 @@ public class HomeController {
     @GetMapping("pay")
     @CommonModel
     public String getPay(Model model, @PageableDefault(size = 4) Pageable pageable){
-
-        log.info("get >> /pay... getPay() 실행됨.");
 
 
         return "pages/pay";
@@ -82,7 +77,7 @@ public class HomeController {
                                   PatientDTO patientDTO,
                                   Model model
     ){
-        log.info("get >> /patient-search/" + patientName);
+
 
         patientDTO.setPatientName(patientName);
 
@@ -99,14 +94,13 @@ public class HomeController {
 
     // 진료 접수 팝업창
     @GetMapping("/waiting/{patientId}")
-    public String getWaiting(@PathVariable("patientId") String patientId , Model model){
+    public String getWaiting(@PathVariable("patientId") int patientId , Model model){
 
-        PatientDTO patientDTO = new PatientDTO();
-        patientDTO.setPatientId(Integer.parseInt(patientId));
+//        PatientDTO patientDTO = new PatientDTO();
+//        patientDTO.setPatientId(Integer.parseInt(patientId));
 
-        log.info("get >> /waiting/" + patientDTO.getPatientId() + "... getWaiting()실행됨");
-
-        PatientDTO dto = patientService.getPatientById(patientDTO);
+        PatientDTO dto = patientService.getPatientById(patientId);
+//        PatientDTO dto = patientService.getPatientById(patientDTO);
         dto.setIdentify(WaitingUtil.getIdentify(dto.getIdentify()));
 //        log.info("dto::{}",dto);
 
@@ -124,7 +118,7 @@ public class HomeController {
             Principal principal ,
             @PageableDefault(size = 4) Pageable pageable){
 
-        log.info("post >> /waiting/post... addWaiting() 실행됨.");
+
 
 //        log.info("waitingDTO::{}",waitingDTO);
 
@@ -150,7 +144,7 @@ public class HomeController {
             Principal principal){
 
         int page = requestBody.get("page") != null? requestBody.get("page") : 0;
-        log.info("post >> /waiting... searchWaiting() 실행됨");
+
 //        log.info("page = " + page);
 
         UserSecurityDTO user = userService.getUser(principal.getName());
@@ -179,7 +173,7 @@ public class HomeController {
     @PostMapping("/waiting-modify")
     public ResponseEntity<?> modifyWaitingStatus(@RequestBody WaitingDTO waitingDTO){
 
-        log.info("post >> /waiting-modify... modifyWaitingStatus() 실행됨");
+
 //        log.info("waitingDTO::{}" , waitingDTO);
 
         int result = waitingService.modifyWaitingStatus(waitingDTO);
@@ -196,7 +190,7 @@ public class HomeController {
     @PostMapping("/waiting-end-cnt")
     public ResponseEntity<?> getWaitingEndCnt(@RequestBody WaitingDTO waitingDTO){
 
-        log.info("post >> /waiting-end-cnt... getWaitingEndCnt() 실행.");
+
 
 //        log.info("waitingDTO::{}", waitingDTO);
         int waitingEndCnt = waitingService.getEndCount(waitingDTO.getDepartmentId());
@@ -212,7 +206,7 @@ public class HomeController {
     public ResponseEntity<?> addPatient(@RequestBody PatientDTO patientDTO){
 
 
-        log.info("Post >> /patient-add... addPatient() 실행됨");
+
 //        log.info("patientDTO::{}",patientDTO);
 
          int result = patientService.addPatient(patientDTO);
@@ -232,7 +226,7 @@ public class HomeController {
     @PostMapping("/patient-update")
     public ResponseEntity<?> updatePatient(@RequestBody PatientDTO patientDTO){
 
-        log.info("Post >> /patient-update... updatePatient() 실행됨");
+
 //        log.info("patientDTO::{}" , patientDTO);
 
         int result = patientService.updatePatient(patientDTO);
@@ -241,7 +235,7 @@ public class HomeController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("서버 또는 사용자 에러");
         }
         else{
-            PatientDTO dto = patientService.getPatientById(patientDTO);
+            PatientDTO dto = patientService.getPatientById(patientDTO.getPatientId());
 
             if(patientDTO.getPatientId() == 0){
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("서버 또는 사용자 에러");
@@ -254,10 +248,9 @@ public class HomeController {
     @PostMapping("/patient-get")
     public ResponseEntity<?> getPatient(@RequestBody PatientDTO patientDTO){
 
-        log.info("Post >> /patient-get... getPatient() 실행됨");
 //        log.info("patientDTO::{}" , patientDTO);
 
-        PatientDTO dto = patientService.getPatientById(patientDTO);
+        PatientDTO dto = patientService.getPatientById(patientDTO.getPatientId());
 
         if(dto.getPatientId() == 0){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("서버 또는 사용자 에러");
@@ -273,7 +266,6 @@ public class HomeController {
             @PageableDefault(size = 1 , sort = "vital_date" , direction = Sort.Direction.DESC) Pageable pageable ,
             @RequestBody VitalsDTO vitalsDTO){
 
-        log.info("post >> /vitals-search... getVitalsList() 실행됨.");
 
 //        log.info("vitalsDTO::{}", vitalsDTO);
 
@@ -288,7 +280,7 @@ public class HomeController {
         @PageableDefault(size = 1 , sort = "vital_date" , direction = Sort.Direction.DESC) Pageable pageable,
         @RequestBody VitalsDTO vitalsDTO ){
 
-        log.info("post >> /vitals-add... addVitals() 실행됨.");
+
 //        log.info("vitalsDTO::{}",vitalsDTO);
 
         int result = patientService.addVitals(vitalsDTO);
@@ -310,7 +302,6 @@ public class HomeController {
             @PageableDefault(size = 1 , sort = "vital_date" , direction = Sort.Direction.DESC) Pageable pageable,
             @RequestBody VitalsDTO vitalsDTO){
 
-        log.info("post >> /vitals-update... updatevitals() 실행됨.");
 //        log.info("vitalsDTO::{}",vitalsDTO);
 
         int result = patientService.updateVitals(vitalsDTO);
@@ -326,19 +317,6 @@ public class HomeController {
 
     }
 
-    // 진료기록 가져오기
-//    @PostMapping("/diagnosis")
-//    public ResponseEntity<?> getDiagnosisList(@PageableDefault(size = 10) Pageable pageable ,
-//                                              @RequestBody DiagnosisDTO diagnosisDTO ){
-//
-//        log.info("post >> /diagnosis... getDiagnosisList() 실행됨.");
-//        log.info("diagnosisDTO::{}" , diagnosisDTO);
-//
-//        Page<DiagnosisDTO> diagnosisList = diagnosisService.getDiagnosisList(pageable, diagnosisDTO);
-//
-//        return ResponseEntity.status(HttpStatus.OK).body(diagnosisList);
-//
-//    }
 
     @PostMapping("/diagnosis")
     public ResponseEntity<?> getDiagnosisList(@RequestParam(name = "page" , required = false) int page,
@@ -368,7 +346,7 @@ public class HomeController {
     @PostMapping("/diagnosis/{diagnosisId}")
     public ResponseEntity<?> getDiagnosisById(@PathVariable(name = "diagnosisId") int diagnosisId){
 
-        log.info("post >>> /diagnosis?diagnosisId=" + diagnosisId);
+
 
         ResponseDTO response = diagnosisService.getDiagnosisById(diagnosisId);
 
@@ -387,7 +365,7 @@ public class HomeController {
     @PostMapping("/patient-call")
     public ResponseEntity<?> callPatient(@RequestBody WaitingDTO waitingDTO){
 
-        log.info("post >> /patient-call... callPatient() 실행.");
+
 //        log.info("waitingDTO::{}" , waitingDTO);
 
         // action 없이 waiting-modify에 waitingId만 요청 받을 경우, 호출 버튼을 누른 것이므로
@@ -400,9 +378,9 @@ public class HomeController {
 
         DiagnosisDTO todayDiagnosisDTO = diagnosisService.getTodayDiagnosis(waitingDTO.getWaitingId());
 
-        PatientDTO patient = new PatientDTO();
-        patient.setPatientId(todayDiagnosisDTO.getPatientId());
-        PatientDTO patientDTO = patientService.getPatientById(patient);
+//        PatientDTO patient = new PatientDTO();
+//        patient.setPatientId(todayDiagnosisDTO.getPatientId());
+        PatientDTO patientDTO = patientService.getPatientById(todayDiagnosisDTO.getPatientId());
 
         ResponseDTO callResponse = ResponseDTO.builder()
                 .diagnosisDTO(todayDiagnosisDTO)
@@ -416,7 +394,6 @@ public class HomeController {
         return ResponseEntity.status(HttpStatus.OK).body(callResponse);
     }
 
-    // fixme : 너무 복잡한 로직이 컨트롤러 로직 흐름 이해 방해, 퍼사드 패턴이라도 써서 정리하기
     // 진료 기록 작성 | 수정
     @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("/diagnosis-update")
@@ -431,7 +408,7 @@ public class HomeController {
             @RequestPart(value = "medicals" , required = false) List<MedicalMaterialDTO> medicals,
             Principal principal){
 
-        log.info("post >> /diagnosis-update... updateDiagnosis() 실행.");
+
         log.info("diagnosisDTO::{}" , diagnosisDTO);
         log.info("--------------------------------------------------------------------------");
         log.info("uploadFiles::{}" , uploadFiles);
@@ -442,96 +419,15 @@ public class HomeController {
         log.info("treatments::{}" , treatments);
 
         UserSecurityDTO user = userService.getUser(principal.getName());    // 신원확인 정보 가져오기
-        ResponseDTO result;
+        ResponseDTO result = null;
 
-        // ---------------- 판별 분기 너무 많아서 controller 로직 파악 어려움, 숨길수 있도록 서비스로 넘기도록.-------------
-        // kcdId, 질병기록이 존재하지 않고  저장시킬 kcd가 존재하는가? (신규)
-        if(diagnosisDTO.getKcdId() <= 0 && kcds != null){
-            int kcdId = kcdService.addKcd(kcds);
-            diagnosisDTO.setKcdId(kcdId);
-        }
-        // kcdId, 이미 질병기록이 존재하는가? (수정)
-        else if(diagnosisDTO.getKcdId() > 0){
-            // 이미 있던 기존의 질병기록 코드에 대한 수정
-            int kcdId = kcdService.deleteAndCreateKcds(diagnosisDTO.getKcdId() , kcds);
-            diagnosisDTO.setKcdId(kcdId);
-        }
+        // todo: 여기서 진료접수 이후 초회 진료기록 작성과 수정절차에 대한 분기처리 필요,
+        //  - 초회 진료기록 작성인지 판별하고 초회기록 작성(update)처리 필요.
+        //  - 2차 진료기록 수정이라면, 수납처리 중인지 또는 수납처리가 완료된 것인지 확인을 위해 isLock을 살펴보고
+        //  - 수정처리  진행가능토록해야함.
 
-        // 기존에 업로드된 파일에 대하여, 삭제요청이 있을 경우.
-        if(deleteFiles != null){
-            int fileId = fileService.deleteFiles(diagnosisDTO.getFileId() , deleteFiles);
-            diagnosisDTO.setFileId(fileId);
-        }
-
-        // 파일이 존재 한다면 업로드 진행, 파일 저장 id 대입
-        if( uploadFiles != null){
-            if(diagnosisDTO.getFileId() > 0 ){
-                log.info("fileInfoId = " + diagnosisDTO.getFileId());
-                int fileId = fileService.uploadAdditionalFiles(uploadFiles, diagnosisDTO.getFileId());
-                diagnosisDTO.setFileId(fileId);
-            }
-            else {
-                int fileId = fileService.upload(uploadFiles);
-                diagnosisDTO.setFileId(fileId);
-            }
-        }
-
-        // medicineId가 존재하지 않고 저장시킬 의약품 정보는 있는가? (신규)
-        if(diagnosisDTO.getMedicineId() <= 0 && pills != null){
-            int medicineId = medicineService.addMedicine(pills);
-            diagnosisDTO.setMedicineId(medicineId);
-        }
-        // 기존의 medicineId, 의약품정보가 존재하는가? (수정)
-        else if(diagnosisDTO.getMedicineId() > 0){
-            int medicineId = medicineService.deleteAndCreateMedicine(diagnosisDTO.getMedicineId() , pills);
-            diagnosisDTO.setMedicineId(medicineId);
-        }
-
-        // treatmentId가 존재하지 않고 저장시킬 치료수가 정보가 있는가(신규)
-        if(diagnosisDTO.getTreatmentId() <= 0 && treatments != null){
-            int treatmentId = treatmentService.insertTreatment(treatments);
-            diagnosisDTO.setTreatmentId(treatmentId);
-        }
-        // 기존의 treatmentId, 즉 처방수가 기록 번호가 존재하는가? (수정)
-        else if(diagnosisDTO.getTreatmentId() > 0){
-            int treatmentId = treatmentService.deleteAndCreateTreatment(diagnosisDTO.getTreatmentId() , treatments);
-            diagnosisDTO.setTreatmentId(treatmentId);
-        }
-
-        // medicalBillId가 존재하지 않고 저장시킬 치료재료 정보가 있는가?(신규)
-        if(diagnosisDTO.getMedicalBillId() <= 0 && medicals != null){
-            int medicalBillId = medicalMaterialService.insertMedicalBills(medicals);
-            diagnosisDTO.setMedicalBillId(medicalBillId);
-        }
-        // 기존의 medicalBillId가 존재, 치료재료 기록 번호가 존재하는가? (수정)
-        else if(diagnosisDTO.getMedicalBillId() > 0){
-            log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-            log.info("medicalBillId = " + diagnosisDTO.getMedicalBillId());
-            int medicalBillId = medicalMaterialService.deleteAndCreateMedicalBill(diagnosisDTO.getMedicalBillId() , medicals);
-            diagnosisDTO.setMedicalBillId(medicalBillId);
-        }
-
-        // 진료했던 진료기록이라면 수정자에 아이디 넣기
-        if(diagnosisDTO.getDiagnosisYn() != null && diagnosisDTO.getDiagnosisYn()){
-            diagnosisDTO.setDiagnosisModifier(user.getReferenceId());
-        }
-        // 아니라면 담당의에 의사 id 설정
-        else {
-            diagnosisDTO.setDoctorId(user.getReferenceId());
-        }
-
-        log.info("업데이트 전 마지막 dto 형태 ::{}" , diagnosisDTO);
-        // id가 존재(기존 진료기록 또는 진료접수를 통한 진료기록)
-        if(diagnosisDTO.getDiagnosisId() > 0){
-            result =  diagnosisService.updateDiagnosisById(diagnosisDTO);
-//            log.info("result::{}", result);
-        }
-        // id가 0 또는 그 이하인 경우, 진료접수 없이 작성한 새로운 진료기록
-        else {
-            log.info("새로운 진료기록 작성 서비스로 넘어갑니다.");
-//            log.info("diagnosisDTO::{}" , diagnosisDTO);
-            result = diagnosisService.createDiagnosis(diagnosisDTO);
-        }
+        result = serviceFacade.updateProcessDiagnosis(diagnosisDTO ,
+                uploadFiles ,deleteFiles , pills , kcds ,treatments , medicals , principal);
 
         return ResponseEntity.status(HttpStatus.OK).body(result);
 
@@ -540,8 +436,6 @@ public class HomeController {
     // 진료기록 삭제 요청처리 (db에서 논리삭제, 실제 삭제 아님.)
     @PostMapping("/diagnosis-delete/{diagnosisId}")
     public ResponseEntity<?> deleteDiagnosis(@PathVariable(name = "diagnosisId") int diagnosisId){
-        log.info("post >> /diagnosis-delete... deleteDiagnosis() 실행" );
-//        log.info("diagnosisId::{}" , diagnosisId);
 
         boolean result = diagnosisService.deleteDiagnosisById(diagnosisId);
 
@@ -556,7 +450,7 @@ public class HomeController {
     // 파일 미리보기
     @GetMapping("/files/{fileName}")
     public ResponseEntity<?> viewFile(@PathVariable String fileName){
-        log.info("get >> /files/ [" + fileName + "] viewFile 실행");
+
 
         return fileService.viewFile(fileName);
     }
@@ -565,7 +459,7 @@ public class HomeController {
     @GetMapping("/files/download/{fileName}")
     public ResponseEntity<?> downloadFile(@PathVariable String fileName){
 
-        log.info("get >> /files/download/ [" + fileName + "] downloadFile 실행");
+
 
         return fileService.downloadFile(fileName);
     }
@@ -574,7 +468,7 @@ public class HomeController {
 //    @PostMapping("/files/delete")
     public ResponseEntity<?> deleteFile(@RequestBody FileInfoDTO fileInfoDTO){
 
-        log.info("post >> /files/delete... deleteFile() 실행.");
+
 
         boolean isOk = fileService.deleteFile(fileInfoDTO);
 

@@ -9,50 +9,217 @@
     <title>Geomin-Pay</title>
 </head>
 <body>
-    <section id="left-section" layout:fragment="leftSection">
-        <article id="left-article">
-            <div class="title-box">
-                <h3 id="pay-search-title">수납기록</h3>
+<section id="left-section" layout:fragment="leftSection">
+    <article id="left-article">
+        <div class="title-box">
+            <h3 id="pay-search-title">수납기록</h3>
+        </div>
+
+        <form id="pay-search-option">
+            <div>
+                <div>
+                    <label class="option-title">날짜</label>
+                    <input type="date" class="date"> ~ <input type="date" class="date">
+
+                    <button class="btn3 custom-btn3">한달</button>
+                    <button class="btn3 custom-btn3">일주일</button>
+                    <button class="btn3 custom-btn3">오늘</button>
+                </div>
+
+                <div>
+                    <button class="btn" onclick="" id="pay-reset-btn">초기화</button>
+                    <button class="btn" onclick="" id="pay-search-btn">수납 검색</button>
+                </div>
             </div>
 
-            <form id="pay-search-option">
-                <div>
+            <div id="pay-option-box">
+                <div id="pay-type-option">
+                    <label class="option-title">수납종류</label>
+
+                    <label for="ok">수납완료</label>
+                    <input type="checkbox" id="ok">
+
+                    <label for="waiting">수납대기</label>
+                    <input type="checkbox" id="waiting">
+
+                    <label for="part">일부수납</label>
+                    <input type="checkbox" id="part">
+                </div>
+
+                <div id="pay-department-option">
+                    <label class="option-title">진료과</label>
+                    <select name="department" id="department" disabled="disabled">
+                        <option value="">내과</option>
+                        <option value="">정신과</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label class="option-title">접수종류</label>
+
+                <label >일반</label>
+                <input type="checkbox">
+
+                <label >외래</label>
+                <input type="checkbox">
+
+                <label >입원</label>
+                <input type="checkbox">
+
+                <label >전문</label>
+                <input type="checkbox">
+
+                <label >응급</label>
+                <input type="checkbox">
+
+                <label >재활</label>
+                <input type="checkbox">
+            </div>
+
+            <div id="pay-patient-option">
+                <label class="option-title">환자선택</label>
+                <input type="text" size="4" placeholder="환자번호">
+                <input type="text" size="4" placeholder="환자성명">
+                <input type="text" size="10" placeholder="주민번호 앞자리">
+                <button class="btn custom-btn">환자검색</button>
+            </div>
+        </form>
+
+        <hr id="pay-hr">
+
+
+        <div id="pay-search-result">
+            <table>
+                <caption>
+                    <span class="title-date">2024-05-04</span>&nbsp;~&nbsp;<sapn class="caption-date">2024-05-06</sapn>
+                    &nbsp;검색결과&nbsp;<span>125</span>건,&nbsp;
+                    완료&nbsp;<span>102</span>건&nbsp;
+                    대기&nbsp;<span>38</span>건&nbsp;
+                    일부&nbsp;<span>10</span>건
+                </caption>
+                <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>성명</th>
+                    <th>생년월일</th>
+                    <th>진료과</th>
+                    <th>접수종류</th>
+                    <th>날짜</th>
+                    <th>수납상태</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>임승범</td>
+                    <td>970422</td>
+                    <td>내과</td>
+                    <td>일반</td>
+                    <td>2025-03-05</td>
+                    <td>완료</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>베르</td>
+                    <td>970422</td>
+                    <td>내과</td>
+                    <td>일반</td>
+                    <td>2025-03-05</td>
+                    <td>완료</td>
+                </tr>
+                </tbody>
+
+            </table>
+            <div id="no-search-result">
+                검색 결과가 없습니다.
+            </div>
+        </div>
+
+        <ul id="pay-result-paging">
+            <li><</li>
+            <li>1</li>
+            <li>2</li>
+            <li>3</li>
+            <li>></li>
+        </ul>
+
+    </article>
+</section>
+
+<section id="right-section" layout:fragment="rightSection">
+    <article id="receipt-article">
+        <div class="title-box">
+            <h3>수납
+                <span class="title-date">2024-09-02/23:43:36</span>
+                <span> | </span>
+                <span class="title-date">환자성명</span>
+                <span>수납대기</span>
+            </h3>
+        </div>
+
+        <div class="subtitle">
+            <h3>수납 내역</h3>
+            <div>
+                <!-- <button class="btn">수정</button> -->
+                <button class="btn">수납처리진행</button>
+            </div>
+        </div>
+
+        <div id="pay-receipt-box" class="pay-box">
+            <h4>
+                <span>받을금액</span>
+                <span>20,000 원</span>
+            </h4>
+            <hr>
+            <ul id="pay-specific-receipt">
+                <li><span>본인부담금</span><span>10,000 원</span></li>
+                <li><span>비급여</span><span>10,000 원</span></li>
+                <li><span>공단부담금</span><span>23,420 원</span></li>
+                <hr>
+            </ul>
+            <h5><span>진료비총액</span><span>43,420 원</span></h5>
+        </div>
+
+        <div id="pay-receive-box" class="pay-box">
+            <h4>
+                <span>수납금액</span>
+                <span>20,000 원</span>
+            </h4>
+            <hr>
+
+            <div id="no-pay-receive">
+                수납 내역 없음
+            </div>
+
+
+            <ul id="pay-receive">
+                <!-- <li>
                     <div>
-                        <label>날짜날짜</label>
-                        <input type="date"> ~ <input type="date">
-                        <button class="">한달</button>
-                        <button class="">일주일</button>
-                        <button class="">오늘</button>
+                        <span>09.30</span>
+                        <span>현금</span>
                     </div>
+                    <span>10,000 원</span>
+                </li> -->
+            </ul>
+            <hr>
+            <span id="pay-plus">+ 수납추가</span>
+        </div>
 
-                    <div>
-                        <button class="btn" onclick="" id="pay-search-btn">수납 검색</button>
-                    </div>
-                </div>
+        <div id="pay-left-box" class="pay-box">
+            <h4>
+                <span>남은금액</span>
+                <span>0 원</span>
+            </h4>
+        </div>
 
-                <div>
-                    2
-                </div>
+    </article>
 
-                <div>
-                    3
-                </div>
-            </form>
-        </article>
-    </section>
-
-    <section id="right-section" layout:fragment="rightSection">
-        <article id="receipt-article">
-            <div class="title-box">
-                <h3>수납</h3>
-            </div>
-        </article>
-
-        <article id="document-article">
-            <div class="title-box">
-                <h3>문서</h3>
-            </div>
-        </article>
-    </section>
+    <article id="document-article">
+        <div class="title-box">
+            <h3>문서</h3>
+        </div>
+    </article>
+</section>
 </body>
 </html>

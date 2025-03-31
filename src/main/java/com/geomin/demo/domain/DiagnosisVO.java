@@ -33,6 +33,7 @@ public class DiagnosisVO {
     private int treatmentId;                // 처방기록 번호(fk : 관계맺지는 않음)
     private int medicalBillId;              // 진료재료 청구 번호(fk : 관계 맺지 않음)
     private Boolean diagnosisDelYn;         // 삭제 여부 (1:true 삭제 | 0:false 존재)
+    private boolean diagnosisLock;          // 진료기록 수정 잠금여부
 
 
     public DiagnosisDTO getDateAndModifiedMember(DiagnosisVO vo , DiagnosisDTO dto){

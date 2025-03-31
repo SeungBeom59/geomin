@@ -29,8 +29,8 @@ public class TreatmentDTO {
     private boolean deductibleA;        // 본인부담율 A항 구분
     private boolean deductibleB;        // 본인부담율 B항 구분
     private int nonBenefit;             // 비급여진료비
-    private int optionalFee;            // 선택진료료
-    private int additionalOptionFee;    // 선택진료료 외
+    private int optionalFee;            // 선택진료료 -2018년부터 폐지됨
+    private int additionalOptionFee;    // 선택진료료 외 -주사, 검사 , 투약 등
 
 
 

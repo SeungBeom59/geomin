@@ -1,5 +1,7 @@
+/***********************************************************/
+
 /* 페이지의 모든 article 공통 요소 */
-/*#left-article , #right-section > #receipt-article ,
+/* #left-article , #right-section > #receipt-article ,
 #right-section > #document-article {
     border: 1px solid #ccc;
     border-radius: 10px;
@@ -7,45 +9,341 @@
     margin-top: 20px;
     width: 761px;
     background-color: white;
-}*/
+} */
 
 #left-section > #left-article {
-    height: 891px;
+    height: 893px;
 }
 
 /* 수납기록 검색 옵션칸 설정 */
 #pay-search-option {
     box-sizing: border-box;
-    border: 1px solid black;
-    margin-top: 15px;
+    /* border: 1px solid black; */
+    margin-top: 25px;
     padding-left: 20px;
+    padding-bottom: 10px;
+    padding-right: 20px;
+}
+
+#pay-search-option > div {
+    margin-top: 5px;
+    /* border: 1px solid red; */
+}
+
+.custom-btn3 {
+    width: 50px;
+    font-size: 12px;
+    margin-left: 10px;
+    height: 18px;
+}
+
+.custom-btn {
+    font-size: 14px;
 }
 
 #pay-search-option > div:first-child {
     display: flex;
+    justify-content: space-between;
+}
+
+#pay-search-btn {
+    margin-right: 5px;
+    display: flex;
+    margin-left: 10px;
 }
 
 #pay-search-option > div:first-child > div:first-child {
     display : flex;
 }
 
-#pay-search-option > div > label {
-    font-weight : bold;
+#pay-search-option > div:first-child > div:nth-child(2){
+    display: flex;
 }
 
+#pay-patient-option {
+    display: flex;
+}
+
+#pay-patient-option > input {
+    margin-right: 10px;
+}
+
+#pay-option-box {
+    display: flex;
+}
+
+#pay-department-option {
+    margin-left: 20px;
+}
+
+/* 날짜 input 설정 */
+.date {
+    border: none;
+    text-align: center;
+}
+
+.date:focus {
+    outline: none;
+    border-bottom: 2px solid blue;
+}
+
+#pay-hr {
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+/* 수납기록 검색 옵션 종류선택 글자설정 (날짜, 수납종류, 접수종류, 환자선택) */
+.option-title {
+    margin-right: 10px;
+    font-weight: bold;
+    /* border: 1px solid; */
+    width: 56px;
+}
+
+#pay-search-result {
+    /* border: 1px solid black; */
+    margin-top: 15px;
+    padding-left: 20px;
+    min-height: 570px;
+    max-height: 617px;
+}
+
+
+#pay-search-result > table {
+    border-collapse: collapse;
+    /* border: 1px solid black; */
+    width: 719px;
+}
+
+#pay-search-result > table > caption {
+    /* border: 1px solid red; */
+    text-align: left;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+#pay-search-result > table > caption > span:nth-child(4){
+    color: #279B33;
+}
+#pay-search-result > table > caption > span:nth-child(5){
+    color: #9B2727;
+}
+#pay-search-result > table > caption > span:nth-child(6){
+    color: #929B27;
+}
+
+.title-date , #pay-search-result > table > caption > span:nth-child(3) {
+    color: #5B9FFF;
+}
+
+
+
+th {
+    background-color: #D9D9D9;
+    border: 1 px solid #D9D9D9;
+}
+
+td {
+    text-align: center;
+    font-size: 14px;
+    /* font-weight: bold; */
+}
+
+tr , td , th{
+    border-bottom: 1px solid black;
+}
+
+/* td:first-child {
+    min-width: 83px;
+}
+
+td:nth-child(2){
+    min-width: 124px;
+}
+
+td:nth-child(3){
+    min-width: 98px;
+}
+td:nth-child(4){
+    min-width: 81px;
+}
+td:nth-child(5) , td:nth-child(7){
+    min-width: 65px;
+}
+td:nth-child(6){
+    min-max-width: 120px;
+} */
+
+tbody > tr:hover {
+    background-color: #5B9FFF;
+    cursor: pointer;
+}
+
+
+#no-search-result {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 18px;
+    min-height: 500px;
+    margin-right: 20px;
+    /* border: 1px solid red; */
+}
+
+#pay-result-paging {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    list-style: none;
+    /* border: 1px solid red; */
+    margin-inline: 20px;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+#pay-result-paging > li {
+    margin-inline: 10px;
+    cursor: pointer;
+}
+
+#pay-result-paging > li:hover {
+    font-weight: bold;
+}
 
 /* 우측 콘텐츠 영역 section */
 #right-section {
 
 }
 
+
 /* 우측 수납명세서 */
 #right-section > #receipt-article {
     height: 550px;
+    /* border: 1px solid black; */
 }
+
+#receipt-article > .title-box > h3 > span:nth-child(4) {
+    margin-left: 300px;
+}
+
+.subtitle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.subtitle > h3 {
+    margin-left: 40px;
+}
+
+.subtitle > div {
+    display: flex;
+    margin-right: 38px;
+}
+
+.pay-box {
+    border: 1px solid #909090;
+    margin-left: 43px;
+    margin-right: 38px;
+    margin-bottom: 20px;
+}
+
+/* --------------------------- */
+#pay-receipt-box {
+    /* border: 1px solid black; */
+    height: 150px;
+    padding-inline: 10px;
+}
+
+#pay-receipt-box > h4 ,
+#pay-receipt-box > h5 ,
+#pay-receive-box > h4 ,
+#pay-left-box > h4 {
+    display: flex;
+    justify-content: space-between;
+    height: 15px;
+    margin: 0; padding: 0;
+    padding-block: 10px;
+}
+
+#pay-specific-receipt ,
+#pay-receive {
+    list-style-type: none;
+    margin: 0; padding: 0;
+}
+
+#pay-specific-receipt > li ,
+#pay-receive > li {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    /* background-color: #b7b7b760; */
+}
+
+#pay-receipt-box > h5 {
+    padding: 0;
+}
+
+/* ------------------------------- */
+#pay-receive-box {
+    /* border: 1px solid black; */
+    padding-inline: 10px;
+    height: 180px;
+}
+
+#pay-receive {
+    max-height: 80px;
+    overflow-y: scroll;
+    border-bottom: #909090;
+}
+
+#pay-receive-box > h4 {
+    display: flex;
+    justify-content: space-between;
+    height: 15px;
+    margin: 0; padding: 0;
+    padding-block: 10px;
+}
+
+#pay-receive > li {
+
+}
+
+#pay-receive > li:hover {
+    background-color: #569EC7;
+}
+
+#pay-plus {
+    display: inline-block;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+#pay-plus:hover {
+    color: #5B9FFF;
+}
+
+#no-pay-receive {
+    display: flex;
+    justify-content: center;
+    height: 80px;
+    align-items: center;
+}
+
+#pay-left-box {
+    /* border: 1px solid black; */
+    padding-inline: 10px;
+}
+
+
 
 
 /* 우측 문서발급 */
 #right-section > #document-article {
-    height: 321px;
+    height: 319px;
 }
+
+

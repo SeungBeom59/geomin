@@ -23,5 +23,5 @@ public interface PatientService {
 
     int updatePatient(PatientDTO patientDTO);
 
-    PatientDTO getPatientById(PatientDTO patientDTO);
+    PatientDTO getPatientById(int patientId);
 }

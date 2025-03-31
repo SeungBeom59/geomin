@@ -36,6 +36,8 @@ public class DiagnosisDTO {
     private String diagnosis;               // 진료기록
     private String prescription;            // 처방기록
 
+    private boolean diagnosisLock;          // 수정 잠금여부
+
     @Builder.Default
     private Boolean diagnosisYn = false;    // 진료여부
     private String modifyDate;              // 수정날짜

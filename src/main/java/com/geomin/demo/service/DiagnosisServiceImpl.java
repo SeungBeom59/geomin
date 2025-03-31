@@ -300,8 +300,8 @@ public class DiagnosisServiceImpl implements DiagnosisService{
             responseDTO.setKcdDTOList(kcds);
         }
         /*
-            여기부분 처리해야 함. 앞단으로 넘겨서 클라이언트 화면에 뿌려줄 수 있도록 데이터 찾아와서 넣어주기
-            처방수가의 비급여와 치료재료의 상한금액이 없을 경우 처리를 어떻게 할 것이냐...?
+            todo: 여기부분 처리해야 함. 앞단으로 넘겨서 클라이언트 화면에 뿌려줄 수 있도록 데이터 찾아와서 넣어주기
+             - 처방수가의 비급여와 치료재료의 상한금액이 없을 경우 처리를 어떻게 할 것이냐...?
          */
         if(result != null && result.getTreatmentId() > 0){
             List<TreatmentDTO> treatments = treatmentService.getTreatmentListById(result.getTreatmentId());

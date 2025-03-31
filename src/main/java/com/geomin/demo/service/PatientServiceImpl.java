@@ -201,9 +201,7 @@ public class PatientServiceImpl implements PatientService{
     }
 
     @Override
-    public PatientDTO getPatientById(PatientDTO patientDTO) {
-
-        int patientId = patientDTO.getPatientId();
+    public PatientDTO getPatientById(int patientId) {
 
         PatientVO result = patientRepository.getPatientById(patientId);
 

@@ -100,9 +100,10 @@ $(document).ready(function() {
 
             var unitPrice = $(this).find('.unitPrice').val();
             var benefitType = $(this).find('.benefitType').val();
-            // 병원단가가 없는데 급여인 경우, 병원의 치료수가가 아니므로 불가처리.
+            // 병원단가가 없는데 급여인 경우, 병원의 치료수가가 아니므로 불가처리. (의원급으로 수정)
+            // 의원단가가 없는데 급여인 경우, 의원의 치료수가가 아니므로 불가처리.
             if(unitPrice == "0" && benefitType == "true"){
-                alert('병원에서 적용할 수 없는 치료수가 입니다.');
+                alert('의원급에서 적용할 수 없는 치료수가 입니다.');
                 return;
             }
 
@@ -286,7 +287,7 @@ function insertTreatment(treatmentList){
         let dataHtmlBox = "";    // 만들어진 html을 담을 변수
 
         treatmentList.forEach(function(treatment){
-
+            // fixme : boolean 판별 제대로 못하고 있음. 수정 필요.
             var benefitType = treatment.benefitType == true? '급여' : '비급여';
             var benefitClass = treatment.benefitType == true? 'benefit' : 'non-benefit';
 

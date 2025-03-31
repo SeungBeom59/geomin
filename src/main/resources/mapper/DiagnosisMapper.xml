@@ -20,6 +20,7 @@
         <result property="diagnosisDelYn" column="diagnosis_del_yn" />
         <result property="treatmentId" column="treatment_id" />
         <result property="medicalBillId" column="medical_bill_id" />
+        <result property="diagnosisLock" column="diagnosis_lock" />
 
         <!--  diagnosis_modifier mapping -->
         <association property="diagnosisModifier" resultMap="modifierMap" column="diagnosis_modifier"/>
