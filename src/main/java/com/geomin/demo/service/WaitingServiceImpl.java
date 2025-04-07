@@ -91,6 +91,14 @@ public class WaitingServiceImpl implements WaitingService {
         return response;
     }
 
+    // 진료를 받지 않고 방치된 접수 취소처리 (스케줄러)
+    @Override
+    public int cancelOldNotFinishedWaiting() {
+
+        int cancelWaitingCnt = waitingRepository.cancelOldNotFinishedWaiting();
+        return cancelWaitingCnt;
+    }
+
     //
     @Override
     public Page<WaitingDTO> getWaitingList(Pageable pageable , int departmentId) {

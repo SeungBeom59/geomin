@@ -29,4 +29,7 @@ public interface DiagnosisRepository {
     int createDiagnosis(DiagnosisDTO diagnosisDTO);
 
     void deleteDiagnosisById(int diagnosisId);
+
+    // 과거 미작성한 진료기록 논리 삭제 (스케줄러)
+    int deleteOldNotFinishedDiagnosis();
 }

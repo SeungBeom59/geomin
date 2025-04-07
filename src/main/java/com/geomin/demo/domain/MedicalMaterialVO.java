@@ -22,5 +22,6 @@ public class MedicalMaterialVO {
     private String manufacturer;    // 제조회사
     private String mmType;          // 재질
     private String distributor;     // 수입회사
+    private int mmPrc;              // 설정금액
 
 }

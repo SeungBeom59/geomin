@@ -18,4 +18,7 @@ public interface DiagnosisService {
     ResponseDTO getDiagnosisById(int diagnosisId);
 
     boolean deleteDiagnosisById(int diagnosisId);
+
+    // 과거 미작성한 진료기록 논리 삭제
+    int deleteOldNotFinishedDiagnosis();
 }

@@ -19,5 +19,8 @@ public class MedicalBillDTO {
     private String manufacturer;                 // 제조회사
     private String distributor;                  // 수입회사
     private int mmMaxPrc;                       // 상한금액
+    // 추가됨
+    private int usedMmEa;                        // 사용갯수
+    private boolean usedTreatment;              // 치료행위에 치료재료 사용여부 체크
 
 }

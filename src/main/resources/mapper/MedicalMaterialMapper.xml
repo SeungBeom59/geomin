@@ -20,12 +20,15 @@
         <result property="manufacturer" column="manufacturer" />
         <result property="mmType" column="mm_type" />
         <result property="distributor" column="distributor" />
+        <result property="mmPrc" column="mm_prc" />
     </resultMap>
 
     <!--치료재료청구 테이블-->
     <resultMap id="MedicalBillMap" type="com.geomin.demo.domain.MedicalBillVO">
         <id property="medicalBillId" column="medical_bill_id" />
         <id property="medicalBillSeq" column="medical_bill_seq" />
+        <result property="usedMmEa" column="used_mm_ea" />
+        <result property="usedTreatment" column="used_treatment" />
         <association property="medical" resultMap="MedicalMaterialMap" column="mm_id"/>
     </resultMap>
 
@@ -70,10 +73,11 @@
     <!--치료재료청구 테이블에 insert-->
     <insert id="insertMedicalBills">
         INSERT INTO MEDICAL_BILL
-            (MEDICAL_BILL_ID , MEDICAL_BILL_SEQ ,  MM_ID)
+            (MEDICAL_BILL_ID , MEDICAL_BILL_SEQ ,  MM_ID , USED_MM_EA , USED_TREATMENT)
         VALUES
         <foreach collection="medicalBillVOS" item="medicalBill" separator=",">
-            ( #{medicalBill.medicalBillId} , #{medicalBill.medicalBillSeq} , #{medicalBill.medical.mmId})
+            ( #{medicalBill.medicalBillId} , #{medicalBill.medicalBillSeq} , #{medicalBill.medical.mmId} ,
+            #{medicalBill.usedMmEa} , #{medicalBill.usedTreatment})
         </foreach>
     </insert>
     <!--치료재료청구 테이블에서 pk로 레코드 조회하여 참조되는 치료재료들 가져오기-->

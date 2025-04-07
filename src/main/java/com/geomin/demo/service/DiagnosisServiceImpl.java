@@ -105,6 +105,15 @@ public class DiagnosisServiceImpl implements DiagnosisService{
         }
     }
 
+    // 과거 미작성한 진료기록 논리 삭제 (스케줄러)
+    @Override
+    public int deleteOldNotFinishedDiagnosis() {
+
+        int deleteCnt = diagnosisRepository.deleteOldNotFinishedDiagnosis();
+
+        return deleteCnt;
+    }
+
 
     @Override
     public ResponseDTO getDiagnosisList(int page, DiagnosisDTO diagnosisDTO) {

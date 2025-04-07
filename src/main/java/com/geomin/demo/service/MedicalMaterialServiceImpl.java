@@ -43,6 +43,7 @@ public class MedicalMaterialServiceImpl implements MedicalMaterialService{
                     .mmName(vo.getMmName())
                     .manufacturer(vo.getManufacturer())
                     .distributor(vo.getDistributor())
+                    .mmPrc(vo.getMmPrc())
                     .build();
 
             dataList.add(dto);
@@ -158,6 +159,9 @@ public class MedicalMaterialServiceImpl implements MedicalMaterialService{
                     .manufacturer(vo.getManufacturer())
                     .mmType(vo.getMmType())
                     .distributor(vo.getDistributor())
+                    .mmPrc(vo.getMmPrc())
+                    .usedMmEa(billVo.getUsedMmEa())
+                    .usedTreatment(billVo.isUsedTreatment())
                     .build();
 
             medicalMaterialDTOS.add(dto);

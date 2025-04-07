@@ -14,6 +14,6 @@ public interface MedicalMaterialService {
     // 치료재료청구 테이블의 검색되는 pk 레코드 삭제 후, 새로운 값으로 insert 또는 비우기.
     int deleteAndCreateMedicalBill(int medicalBillId, List<MedicalMaterialDTO> medicals);
 
-    // 치료재료청구 pk로 관련된 레코드들을
+    // 치료재료청구 pk로 관련된 레코드들을 가져온다
     List<MedicalMaterialDTO> getMaterialByBillId(int medicalBillId);
 }

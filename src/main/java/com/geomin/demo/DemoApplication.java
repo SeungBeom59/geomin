@@ -7,6 +7,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.AbstractRefreshableConfigApplicationContext;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.ui.context.ThemeSource;
 import org.springframework.web.context.ConfigurableWebApplicationContext;
 import org.springframework.web.context.support.AbstractRefreshableWebApplicationContext;
@@ -15,6 +16,7 @@ import org.springframework.web.servlet.HttpServletBean;
 @PropertySource("classpath:key.properties")
 
 @SpringBootApplication
+@EnableScheduling
 public class DemoApplication {
 
     public static void main(String[] args) {

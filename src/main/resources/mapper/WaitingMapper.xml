@@ -170,7 +170,20 @@
             #{offset} ROWS
         FETCH NEXT
             4 ROWS ONLY
-
     </select>
+
+    <update id="cancelOldNotFinishedWaiting">
+        UPDATE
+            WAITING W JOIN DIAGNOSIS D
+            ON W.WAITING_ID = D.WAITING_ID
+        SET
+            WAITING_STATUS = 5
+        WHERE
+            D.DIAGNOSIS_DEL_YN = 1
+            AND
+            D.DIAGNOSIS_YN = 0
+            AND
+            DATE(DIAGNOSIS_DATE) = DATE_SUB(CURDATE() , INTERVAL 1 DAY)
+    </update>
 
 </mapper>

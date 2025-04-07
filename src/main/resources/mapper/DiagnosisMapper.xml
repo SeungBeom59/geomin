@@ -355,6 +355,19 @@
             )
     </insert>
 
+    <update id="deleteOldNotFinishedDiagnosis">
+        UPDATE
+            DIAGNOSIS
+        SET
+            DIAGNOSIS_DEL_YN = 1
+        WHERE
+            DIAGNOSIS_DEL_YN = 0
+            AND
+            DIAGNOSIS_YN = 0
+            AND
+            DATE(DIAGNOSIS_DATE) = DATE_SUB(CURDATE() , INTERVAL 1 DAY)
+    </update>
+
 
     
 </mapper>

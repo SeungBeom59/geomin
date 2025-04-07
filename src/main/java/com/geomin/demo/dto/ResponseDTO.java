@@ -50,4 +50,7 @@ public class ResponseDTO {
 
     private PagingDTO pagingDTO;        // 페이징
 
+
+    // fixme : 나중에는 ApiRespone<T>로 래핑하는 형태로 응답 통일
+
 }

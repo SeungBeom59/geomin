@@ -42,5 +42,6 @@ public interface WaitingRepository {
     // 접수대기 id로 가져오기
     WaitingVO getWaitingById(int waitingId);
 
-
+    // 진료를 받지 않고 방치된 접수 취소처리 (스케줄러)
+    int cancelOldNotFinishedWaiting();
 }

@@ -24,4 +24,7 @@ public interface WaitingService {
 
     // 오늘날짜로 진료접수 완료 환자 리스트 가져오기
     ResponseDTO getEndWaitingList(int page, int departmentId);
+
+    // 진료를 받지 않고 방치된 접수 취소처리 (스케줄러)
+    int cancelOldNotFinishedWaiting();
 }
