@@ -21,6 +21,11 @@
         <result property="mmType" column="mm_type" />
         <result property="distributor" column="distributor" />
         <result property="mmPrc" column="mm_prc" />
+        <result property="selfPay50Percent" column="self_pay_50_percent" />
+        <result property="selfPay80Percent" column="self_pay_80_percent" />
+        <result property="selfPay90Percent" column="self_pay_90_percent" />
+        <result property="duplicateAllowed" column="duplicate_allowed" />
+        <result property="noticeNumber" column="notice_number"  />
     </resultMap>
 
     <!--치료재료청구 테이블-->

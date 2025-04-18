@@ -1,9 +1,6 @@
 package com.geomin.demo.dto;
 
 import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import java.util.Date;
 
 @ToString
 @NoArgsConstructor
@@ -27,7 +24,13 @@ public class MedicalMaterialDTO {
     private String mmType;          // 재질
     private String distributor;     // 수입회사
     private int mmPrc;              // 설정금액
+    // 추가됨
+    private boolean selfPay50Percent;   // 본인부담비율50퍼센트 유무
+    private boolean selfPay80Percent;   // 본인부담비율80퍼센트 유무
+    private boolean selfPay90Percent;   // 본인부담비율90퍼센트 유무
+    private boolean duplicateAllowed;   // 중복인정여부 (불가인경우, 청구해도 치료재료 1개만 인정)
+    private String noticeNumber;        // 고시번호
 
-    private int usedMmEa;           // 사용갯수
-    private boolean usedTreatment;  // 치료행위 중 사용여부
+    private int usedMmEa;               // 사용갯수
+    private boolean usedTreatment;      // 치료행위 중 사용여부
 }

@@ -41,7 +41,7 @@ public class ServiceFacade {
                     uploadFiles ,deleteFiles , pills , kcds ,treatments , medicals , principal);
 
             // todo: 초회 진료기록 작성 이후 수납내역도 만들도록
-            int isGood = diagnosisBillService.createDiagnosisBill(result.getDiagnosisDTO());
+            int isGood = diagnosisBillService.createDiagnosisBill(result);
         }
         // islock 잠궜는지 확인하고 업데이트 처리 필요
         else{

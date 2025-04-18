@@ -1,0 +1,5 @@
+special:
+  kcd:
+    I10 : 0.2
+    E11 : 0.2
+  feePrefix: AA250
