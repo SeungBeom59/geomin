@@ -13,7 +13,7 @@ import java.util.List;
 public class BillCalculateResult{
 
     double totalPay;                        // 전체 총진료비 (급여 + 비급여)
-    double totalBenefitPay;                 // 급여진료비 ( 급여 + 급여속 본인부담금)
+    double totalBenefitPay;                 // 급여진료비 (급여 + 급여 중 본인부담금)
     double nonBenefit;                      // 본인부담금 (급여 중 본인부담금)
     double benefit;                         // 공단부담금
     double fullSelfPay;                     // 전액본인부담금 (비급여 전액본인부담금)

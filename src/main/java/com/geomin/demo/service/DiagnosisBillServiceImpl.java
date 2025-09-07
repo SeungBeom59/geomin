@@ -1,6 +1,7 @@
 package com.geomin.demo.service;
 
 import com.geomin.demo.domain.BillCalculateResult;
+import com.geomin.demo.domain.DiagnosisBillVO;
 import com.geomin.demo.dto.DiagnosisDTO;
 import com.geomin.demo.dto.ResponseDTO;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,16 @@ public class DiagnosisBillServiceImpl implements DiagnosisBillService{
         try {
             // 명세서 계산작업
             BillCalculateResult billResult = billCalculateService.calculateBill(responseDTO.getDiagnosisDTO());
+
+            DiagnosisBillVO vo = DiagnosisBillVO.builder()
+                    .diagnosisId(responseDTO.getDiagnosisDTO().getDiagnosisId())
+                    .totalPay((int)billResult.getTotalPay())
+                    .nonBenefit((int)billResult.getNonBenefit())
+                    .benefit((int)billResult.getBenefit())
+                    .fullSelfPay((int)billResult.getFullSelfPay())
+                    .build();
+
+
             int cnt = updateDiagnosisBill(billResult);
 
             return cnt;
